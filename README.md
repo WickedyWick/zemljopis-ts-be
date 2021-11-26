@@ -1,1 +1,1 @@
-# Zemljopis BE in TS
+# Zemljopis BE in TSP
