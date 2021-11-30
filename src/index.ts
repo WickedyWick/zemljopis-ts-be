@@ -11,7 +11,7 @@ const server = app.listen(process.env.PORT, () => {
 })
 const io = new Server(server)
 const onConnection = async(socket: socketio.Socket) => {
-    await registerGameHandlers(io, socket)
+    registerGameHandlers(io, socket)
 }
 app.get('/', (req, res) => {
     res.setHeader("Content-Type","text/html;charset=UTF-8")
