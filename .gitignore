@@ -1,2 +1,11 @@
 node_modules
 .vscode
+.env
+
+.idea
+.vscode
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
