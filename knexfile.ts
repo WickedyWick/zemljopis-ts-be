@@ -1,7 +1,7 @@
 require('dotenv').config()
 
 module.exports = {
-  client: 'pg',
+  client: 'myslq',
   connection: {
     host: process.env.DB_HOST,
     user: process.env.DB_USERNAME,
