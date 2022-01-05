@@ -4,6 +4,7 @@ import socketio, { Server } from 'socket.io'
 import { registerGameHandlers } from './sockets/game.sockets'
 const app = express()
 
+app.use(express.static(__dirname + '\\public'))
 configure(app)
 
 const server = app.listen(process.env.PORT, () => {
@@ -15,7 +16,7 @@ const onConnection = async(socket: socketio.Socket) => {
 }
 app.get('/', (req, res) => {
     res.setHeader("Content-Type","text/html;charset=UTF-8")
-    res.sendFile('./views/test.html',{root:__dirname})
+    res.sendFile('./views/landing.html',{ root:__dirname })
 })
 
 io.on('connection', onConnection)

@@ -1,0 +1,7 @@
+.col-centered{
+  margin: 0 auto;
+  float: none;
+}
+body{
+  background-image: 'url(./images/bg1.jpg)';
+}
