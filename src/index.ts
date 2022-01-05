@@ -4,6 +4,7 @@ import socketio, { Server } from 'socket.io'
 import { registerGameHandlers } from './sockets/game.sockets'
 const app = express()
 
+app.use(express.static(__dirname + '\\public'))
 configure(app)
 
 const server = app.listen(process.env.PORT, () => {
