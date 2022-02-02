@@ -1,0 +1,8 @@
+{
+    "ignore": ["**/*.test.ts", "**/*.spec.ts", "node_modules"],
+    "restart": "rs",
+    "delay": 2,
+    "exec": "concurrently \"yarn ps:api\"",
+    "ext": "ts,js"
+  }
+  

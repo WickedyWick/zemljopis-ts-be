@@ -1,0 +1,24 @@
+{
+    "compilerOptions": { 
+        "module": "CommonJS",
+        "esModuleInterop":  true,
+        "target": "es6",
+        "noImplicitAny": true,
+        "moduleResolution": "node",
+        "sourceMap": true,
+        "outDir": "build",
+        "baseUrl": "./src",
+        "rootDirs": [
+            "./src"
+        ],
+        "typeRoots": [
+            "./types"
+        ]
+    },
+    "include": [
+        "src/**/*.ts"
+    ],
+    "exclude": [
+    "migrations"
+    ]
+}
