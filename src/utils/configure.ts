@@ -1,14 +1,14 @@
 import { Express } from 'express'
 import cors from 'cors'
 import bodyParser from 'body-parser'
-import dotenv from 'dotenv'
+import * as dotenv from 'dotenv'
+dotenv.config()
 import morgan from 'morgan'
 
-dotenv.config()
 
 export const configure = (server: Express) => {
     server.use(cors())
-
+    
     server.use(bodyParser.urlencoded({ extended: false }))
 
     if (!!process.env.LOG_LEVEL) {

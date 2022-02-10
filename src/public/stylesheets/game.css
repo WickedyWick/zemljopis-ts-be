@@ -1,0 +1,118 @@
+html,body{
+    max-width: 100%;
+    overflow-x: hidden;
+  }
+  @media only screen and (max-width: 1099.9px) {
+    .nameLabel:hover{
+      border-style:solid;
+          border-width:1px;
+          border-color: black;
+          text-decoration: none;
+          border-radius : 25%;
+          cursor: pointer;
+    }
+    span:hover{
+          border-style:solid;
+          border-width:1px;
+          border-color: black;
+          text-decoration: none;
+          border-radius : 25%;
+          cursor: pointer;
+        }
+    
+    .myFlexContainer{
+            display:flex;
+            flex-direction: column;             
+            justify-content: center;
+            margin-left:10%;
+            margin-right:5%;
+            margin-top:1%;                
+            align-content: center;
+            
+        }
+    ul{
+        list-style-type:none;
+        max-height: 100px;
+        overflow-y:scroll;
+    }
+    li{
+        padding-left:0.75rem;
+    }
+    .myBtn{
+      margin-top:5px;
+    }
+}
+
+@media only screen and (min-width: 1100.0px) {
+        .nameLabel:hover{
+            border-style:solid;
+                border-width:1px;
+                border-color: black;
+                text-decoration: none;
+                border-radius : 25%;
+                cursor: pointer;
+        }
+        span:hover{
+          border-style:solid;
+          border-width:1px;
+          border-color: black;
+          text-decoration: none;
+          border-radius : 25%;
+          cursor: pointer;
+        }
+        .myFlexContainer{
+            display:flex;
+                         
+            justify-content: center;
+            margin-left:25%;
+            margin-right:5%;
+            margin-top:1%;
+            
+            align-content: center;
+            
+        }
+        .myFlexContainer > div{
+            flex:1;
+            flex-basis: 100%;
+            
+        }
+        #first {
+            padding-right:2rem;
+            display:inline-flex;
+            width:100%;
+            
+            
+        }
+        ul{
+            list-style-type:none;
+            max-height: 200px;
+            overflow-y:scroll;
+        }
+        li{
+            padding-left: 0.75rem;
+        }
+        #second{
+            display:inline-flex;
+            align-content: flex-end;
+        }
+        .support{
+            display:flex;
+            flex-direction: row;
+        }
+        .myBtn{
+          margin-left:5px;
+        }
+        .myRow {
+            display: flex;
+            flex-direction: row;
+            flex-wrap: nowrap;
+            width: 100%;
+        }
+        .myColumn {
+
+            display: flex;
+            flex-direction: column;
+            flex-basis: 100%;
+            flex: 1;
+        }
+    }
