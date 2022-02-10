@@ -5,6 +5,7 @@ import { registerGameHandlers } from './sockets/game.sockets'
 import { routes } from './routes'
 const app = express()
 
+app.use(express.static(__dirname + '\\public'))
 configure(app)
 app.use(express.static('src/public'))
 const server = app.listen(process.env.PORT, () => {
