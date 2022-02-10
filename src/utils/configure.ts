@@ -8,7 +8,7 @@ dotenv.config()
 
 export const configure = (server: Express) => {
     server.use(cors())
-
+    
     server.use(bodyParser.urlencoded({ extended: false }))
 
     if (!!process.env.LOG_LEVEL) {

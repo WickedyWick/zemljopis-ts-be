@@ -1,7 +1,8 @@
-require('dotenv').config()
+import dotenv from 'dotenv'
+dotenv.config()
 
 module.exports = {
-  client: 'myslq',
+  client: process.env.DB_CLIENT,
   connection: {
     host: process.env.DB_HOST,
     user: process.env.DB_USERNAME,
