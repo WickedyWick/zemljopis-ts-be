@@ -1,4 +1,4 @@
-import { Model, BaseModel } from 'database/model'
+import { Model, BaseModel, ModelDate } from 'database/model'
 
 export interface RoomFields {
     id: number
@@ -6,8 +6,8 @@ export interface RoomFields {
     player_count: number
     round_time_limit: number
     active: boolean
-    created_at: Date | string
-    updated_at: Date | string
+    created_at: ModelDate
+    updated_at: ModelDate
 }
 
 export interface RoomMethods { 

@@ -1,8 +1,3 @@
-axios.defaults.headers.post['Content-type'] = 'application/json; charset=UTF-8'
-
-
-const serverAddress = serverAdress()
-let povezan = false;
 const roomReg = /^[A-Za-z0-9]{8}$/g
 const usernameReg = /^[A-Za-zа-шА-ШčČćĆžŽšŠđĐђјљњћџЂЈЉЊЋЏ ]{4,16}$/g
 const tokenReg = /^[A-Za-z0-9]{48}$/g
@@ -11,12 +6,9 @@ let usernameInput = document.getElementById('txb_username')
 let roomCodeInput = document.getElementById('txb_roomCode')
 let roundTimeDDL = document.getElementById('roundTimeLimit')
 let playerNumberDDL = document.getElementById('playerNumber')
-const roomReg = /^[A-Za-z0-9]{8}$/g
-const usernameReg = /^[A-Za-zа-шА-ШčČćĆžŽšŠđĐђјљњћџЂЈЉЊЋЏ ]{4,16}$/g
-const tokenReg = /^[A-Za-z0-9]{48}$/g
-
 let napraviBtn = document.getElementById('napravi')
 let vratiBtn = document.getElementById('vrati')
+
 function disableButtons(){
     $(pridruziBtn).prop("disabled", true )
     $(napraviBtn).prop("disabled", true )
@@ -37,22 +29,27 @@ function myAlert(test){
     });   
 }
 
-document.getElementById('napravi').addEventListener('click', (e) =>{
+napraviBtn.addEventListener('click', (e) =>{
     console.log('posting...')
     const username = usernameInput.value.trim()
     disableButtons()
     if (usernameReg.test(username)) {
         const playerCount = playerNumberDDL.value
         const roundTimeLimit = roundTimeDDL.value
-        axios.post('/createGame', {
-            'username': username,
-            'roundTimeLimit': roundTimeLimit,
-            'playerCount': playerCount
+        
+        axios({
+            method: 'post',
+            url: '/createGame',
+            data: {
+                "username": username,
+                "playerCount": playerCount,
+                "roundTimeLimit": roundTimeLimit
+            }
         }).then((res) => {
             if(res.status == 500) {
                 myAlert(res.data["ERR_MSG"])
                 enableButtons()
-            }else if(statusCode == 200){               
+            }else if(res.status == 200){               
                 localStorage.setItem('sessionToken',res.data['sessionToken'])
                 window.location.href = `/game?roomCode=${res.data['roomCode']}&username=${res.data['username']}`
             } else {
@@ -60,6 +57,7 @@ document.getElementById('napravi').addEventListener('click', (e) =>{
                 enableButtons()
             }
         }).catch((err) => {
+            // handle better
             console.log(err)
             enableButtons()
         })
@@ -69,5 +67,34 @@ document.getElementById('napravi').addEventListener('click', (e) =>{
     }
     roomReg.lastIndex =-1;
     usernameReg.lastIndex = -1;
+})
+
+pridruziBtn.addEventListener('click', (e) => {
+    e.preventDefault()
+    const username = usernameInput.value.trim()
+    const room = roomCodeInput.value.trim()
+    disableButtons()
+    if (roomReg.test(room) && usernameReg.test(username)) {
+        axios({
+            method: 'post',
+            url: '/joinRoom',
+            data: {
+                "username": username,
+                "roomCode": room
+            }
+        }).then((res) => {
+            if (res.status == 500){
+                myAlert(res.data["ERR_MSG"])
+                enableButtons()
+            }else if(res.status == 200) {
+                localStorage.setItem('sessionToken',res.data['sessionToken'])
+                window.location.href = `/game?roomCode=${res.data['roomCode']}&username=${res.data['username']}`
+            }
+        }).catch((err) => {
+            console.log(err)
+
+        })
+    }
+
 })
 

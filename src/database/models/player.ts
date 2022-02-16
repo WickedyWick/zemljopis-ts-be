@@ -1,4 +1,4 @@
-import { Model, BaseModel } from 'database/model'
+import { Model, BaseModel, ModelDate } from 'database/model'
 
 export interface PlayerFields {
     id: number 
@@ -6,8 +6,8 @@ export interface PlayerFields {
     username: string
     session_token: string
     kicked: boolean
-    created_at: Date | string
-    updated_at: Date | string
+    created_at: ModelDate
+    updated_at: ModelDate
 }
 
 export interface PlayerMethods {
@@ -35,3 +35,5 @@ export class Player extends BaseModel<PlayerFields, PlayerMethods> {
         
     }
 }
+
+export default new Player()

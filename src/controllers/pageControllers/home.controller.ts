@@ -20,19 +20,20 @@ export const createRoom: Action<any, RoomBody, any , any> = async (req, res, nex
             'round_time_limit': roundTimeLimit,
             'room_code': roomCode
         })
+        
     } catch (err) {
         //check if its dupe
         console.log(err)
         return next(ERROR_ROOM_CREATE)
     }
-    
     try {
         const sessionToken = await randomBytes(48).toString('hex')
+        console.log(sessionToken)
         const player = await Player.create({
             'username': username,
             'room_code': roomCode,
             'session_token': sessionToken,
-        })
+        }, true)
     } catch (err) {
         console.log(err)
         return next(ERROR_ROOM_CREATE)
