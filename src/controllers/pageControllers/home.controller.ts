@@ -28,7 +28,7 @@ export const createRoom: Action<any, RoomBody, any , any> = async (req, res, nex
     }
     try {
         const sessionToken = await randomBytes(48).toString('hex')
-        console.log(sessionToken)
+
         const player = await Player.create({
             'username': username,
             'room_code': roomCode,
