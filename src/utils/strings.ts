@@ -12,3 +12,5 @@ export const makeRoomCode = async () => {
     }
 
 }
+
+export const defaultLetters = ["a","b","c","č","ć","d","dž","đ","e","f","g","h","i","j","k","l","lj","m","n","nj","o","p","r","s","š","t","u","v","z","ž"]

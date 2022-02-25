@@ -32,7 +32,7 @@ export class Room extends BaseModel<RoomFields, RoomMethods> {
     }
 
     instanceMethods: RoomMethods = {
-        
+
     }
 }
 

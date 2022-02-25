@@ -2185,6 +2185,11 @@ redis-parser@3.0.0:
   dependencies:
     redis-errors "^1.0.0"
 
+redis-rejson@^1.0.0:
+  version "1.0.0"
+  resolved "https://registry.yarnpkg.com/redis-rejson/-/redis-rejson-1.0.0.tgz#52e5d91851e2de5adba77877efb21509b4665d9b"
+  integrity sha1-UuXZGFHi3lrbp3h377IVCbRmXZs=
+
 redis@*, redis@^4.0.3:
   version "4.0.3"
   resolved "https://registry.yarnpkg.com/redis/-/redis-4.0.3.tgz#f60931175de6f5b5727240a08e58a9ed5cf0f9de"
