@@ -32,7 +32,7 @@ export class Player extends BaseModel<PlayerFields, PlayerMethods> {
     }
 
     instanceMethods = {
-        
+
     }
 }
 
