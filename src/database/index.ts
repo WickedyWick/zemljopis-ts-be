@@ -23,4 +23,6 @@ export const db = knex({
     }
 })
 
+// here timer objects will be stored
+export const timerMap: Map<string, NodeJS.Timer> = new Map<string, NodeJS.Timer>()
 attachPaginate()

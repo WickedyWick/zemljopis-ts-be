@@ -3,6 +3,7 @@ import { Room, Player } from 'database/models'
 import { makeRoomCode } from 'utils/strings'
 import { ERROR_ROOM_CREATE } from 'utils/errors/home'
 import { randomBytes } from 'crypto'
+import { gameData } from 'redis/game'
 interface RoomBody {
     username: string
     playerCount: number
@@ -20,7 +21,15 @@ export const createRoom: Action<any, RoomBody, any , any> = async (req, res, nex
             'round_time_limit': roundTimeLimit,
             'room_code': roomCode
         })
+<<<<<<< HEAD
 
+=======
+        await gameData.createRoom(
+            roomCode,
+            playerCount,
+            roundTimeLimit
+        )
+>>>>>>> c1ed52b6514f8ec5bc1204b47ef51ce5ae4ebd37
     } catch (err) {
         //check if its dupe
         console.log(err)
@@ -28,7 +37,6 @@ export const createRoom: Action<any, RoomBody, any , any> = async (req, res, nex
     }
     try {
         const sessionToken = await randomBytes(48).toString('hex')
-        console.log(sessionToken)
         const player = await Player.create({
             'username': username,
             'room_code': roomCode,
