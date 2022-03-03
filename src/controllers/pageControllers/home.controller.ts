@@ -20,7 +20,7 @@ export const createRoom: Action<any, RoomBody, any , any> = async (req, res, nex
             'round_time_limit': roundTimeLimit,
             'room_code': roomCode
         })
-        
+
     } catch (err) {
         //check if its dupe
         console.log(err)
@@ -38,7 +38,7 @@ export const createRoom: Action<any, RoomBody, any , any> = async (req, res, nex
         console.log(err)
         return next(ERROR_ROOM_CREATE)
     }
-    
+
     res.json({ roomCode, username }).status(200)
 
 }

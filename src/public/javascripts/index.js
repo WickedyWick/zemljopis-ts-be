@@ -49,11 +49,11 @@ napraviBtn.addEventListener('click', (e) =>{
             if(res.status == 500) {
                 myAlert(res.data["ERR_MSG"])
                 enableButtons()
-            }else if(res.status == 200){               
+            }else if(res.status >= 200 && res.status < 300){               
                 localStorage.setItem('sessionToken',res.data['sessionToken'])
                 window.location.href = `/game?roomCode=${res.data['roomCode']}&username=${res.data['username']}`
             } else {
-                myAlert(res.data["ERR_MSG"])
+                myAlert("Doslo je do problema , pokusajte ponovo!")
                 enableButtons()
             }
         }).catch((err) => {
@@ -86,7 +86,7 @@ pridruziBtn.addEventListener('click', (e) => {
             if (res.status == 500){
                 myAlert(res.data["ERR_MSG"])
                 enableButtons()
-            }else if(res.status == 200) {
+            }else if(res.status >= 200 && res.status < 300) {
                 localStorage.setItem('sessionToken',res.data['sessionToken'])
                 window.location.href = `/game?roomCode=${res.data['roomCode']}&username=${res.data['username']}`
             }
