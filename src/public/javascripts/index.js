@@ -39,7 +39,7 @@ napraviBtn.addEventListener('click', (e) =>{
         
         axios({
             method: 'post',
-            url: '/createGame',
+            url: '/home/createGame',
             data: {
                 "username": username,
                 "playerCount": playerCount,
@@ -77,7 +77,7 @@ pridruziBtn.addEventListener('click', (e) => {
     if (roomReg.test(room) && usernameReg.test(username)) {
         axios({
             method: 'post',
-            url: '/joinRoom',
+            url: '/home/regUser',
             data: {
                 "username": username,
                 "roomCode": room
