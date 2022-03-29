@@ -1,7 +1,7 @@
 import { Action } from 'utils/typings'
 import { Room, Player } from 'database/models'
 import { makeRoomCode } from 'utils/strings'
-import { ERROR_ROOM_CREATE } from 'utils/errors/home'
+import { ERROR_ROOM_CREATE, ERROR_REG_PLAYER } from 'utils/errors/home'
 import { randomBytes } from 'crypto'
 import { GameData } from 'redis/game'
 interface RoomBody {
@@ -54,8 +54,10 @@ export const createRoom: Action<any, RoomBody, any , any> = async (req, res, nex
 
 export const regUser: Action<any, any, any, any> = async(req, res, next) => {
     const { username, roomCode } = req.body
-
-    if (await GameData.roomExists(roomCode)) {
+    const exists = await GameData.roomExists(roomCode)
+    console.log(typeof(exists))
+    console.log(exists == 1)
+    if (exists == 1) {
        // const room = await Room.findBy({ room_code: roomCode })
         const roomR = new GameData(roomCode)
        // if(!room) return next()
@@ -73,17 +75,17 @@ export const regUser: Action<any, any, any, any> = async(req, res, next) => {
                     'session_token': sessionToken,
                 }, true)
                 await roomR.addPlayer(username, player.id)
+                return res.status(200).send({ username, roomCode, sessionToken })
             } catch (err) {
+                // check
+                console.log(err.code)
                 console.log(`Error during creating player. Err : ${err}`)
-                return next(ERROR_ROOM_CREATE)
-            // use separate keys and arrays for palyers and stuff
-
+                return next(ERROR_REG_PLAYER)
             }
-            return res.status(200)
         }
-        // there isn't space (room is full)
 
+    } else {
+        res.statusCode = 404
+        return res.json({ ERR_MSG: 'Soba ne postoji.'})
     }
-    return res.json({ ERR_MSG: 'Soba ne postoji.'}).status(404)
-
 }

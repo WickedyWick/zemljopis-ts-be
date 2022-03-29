@@ -13,8 +13,12 @@ In MySQL database will be stored pernament data and in non relational databse wi
 enable coalation u /etc/locale.gen pa napravi coaliciju pa napravi bazu . 
 postgres linux user nije isti password za psql postgres usera -> alter user potgres PASSWORD 'passwrod';
 
+## TODO 
+Write tests
+
+### SELFNOTES
 reuse timer objects?
-redis for localdata , map for timerobjects ?
+
 
 sredi join room and odluci kako hoces rekonekotvanje
 

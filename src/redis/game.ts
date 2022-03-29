@@ -26,7 +26,7 @@ export class GameData {
 
     constructor (name: string) {
         this._name = name
-
+        console.log(this._name)
     }
     static roomExists = async(room: string) => {
         return await redisDb.exists(room)
@@ -73,10 +73,10 @@ export class GameData {
         await redisDb.hSet(`players_${this._name}`, { username: id })
     }
     getPlayerCount = async() => {
-        return await Number(redisDb.hGet(this._name, 'playerCount'))
+        return Number(await redisDb.hGet(this._name, 'playerCount'))
     }
     getPlayersJoined = async() => {
-        return await Number(redisDb.hGet(this._name, 'playerRegistered'))
+        return Number(await redisDb.hGet(this._name, 'playerRegistered'))
     }
     setHash = async(key: string, value: Partial<GameFields>) => {
         // @ts-ignore

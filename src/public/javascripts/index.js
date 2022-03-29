@@ -1,5 +1,5 @@
 const roomReg = /^[A-Za-z0-9]{8}$/g
-const usernameReg = /^[A-Za-zа-шА-ШčČćĆžŽšŠđĐђјљњћџЂЈЉЊЋЏ ]{4,16}$/g
+const usernameReg = /^[A-Za-z0-9а-шА-ШčČćĆžŽšŠđĐђјљњћџЂЈЉЊЋЏ ]{4,16}$/g
 const tokenReg = /^[A-Za-z0-9]{48}$/g
 let pridruziBtn = document.getElementById('pridruzi')
 let usernameInput = document.getElementById('txb_username')
@@ -83,16 +83,21 @@ pridruziBtn.addEventListener('click', (e) => {
                 "roomCode": room
             }
         }).then((res) => {
-            if (res.status == 500){
+            console.log(res.status)
+            console.log(res.data)
+            if (res.status >= 500){
                 myAlert(res.data["ERR_MSG"])
                 enableButtons()
             }else if(res.status >= 200 && res.status < 300) {
                 localStorage.setItem('sessionToken',res.data['sessionToken'])
                 window.location.href = `/game?roomCode=${res.data['roomCode']}&username=${res.data['username']}`
+            } else {
+                myAlert('Doslo je do problema!')
+                enableButtons()
             }
         }).catch((err) => {
             console.log(err)
-
+            enableButtons()
         })
     }
 
