@@ -26,15 +26,13 @@ export const gameCreateValidator = validator([
         .bail()
         .isLength({ min: 4, max: 30 })
         .bail()
-        .matches('^[A-Za-zа-шА-ШčČćĆžŽšŠđĐђјљњћџЂЈЉЊЋЏ ]{4,30}$')
-        .bail(),
+    ,
     check('roundTimeLimit')
         .escape()
         .bail()
         .exists({ checkFalsy: true })
         .bail()
         .custom(( value, { req }) => {
-            console.log(value)
             if (roundTimeLimit[value] === undefined) throw new Error('Incorrect round time limit value!')
             return true
         }),
@@ -43,12 +41,10 @@ export const gameCreateValidator = validator([
         .bail()
         .exists({ checkFalsy: true })
         .bail()
-        .isLength({ min: 1, max: 1})
+        .isLength({ min: 1, max: 2})
         .bail()
         .custom(( value, { req }) => {
             if (playerCount[value] === undefined) throw new Error('Invalid number of players')
             return true
         })
-        
-
 ])
