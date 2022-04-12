@@ -10,11 +10,10 @@ interface RoomBody {
     roundTimeLimit: number
 }
 export const createRoom: Action<any, RoomBody, any , any> = async (req, res, next) => {
-    const { username, playerCount, roundTimeLimit } = req.body
-    console.log(req.body)
-    console.log('here')
-    const roomCode = await makeRoomCode()
-    console.log(roomCode)
+    const { username, playerCount, roundTimeLimit } = await req.body
+    const uReg = new RegExp('^[A-Za-zа-ш0-9А-ШčČćĆžŽšŠđĐђјљњћџЂЈЉЊЋЏ ]{4,30}$','g')
+    if (!uReg.test(username)) return next(ERROR_ROOM_CREATE)
+    const roomCode:string = await makeRoomCode()
     if (roomCode === '') return next(ERROR_ROOM_CREATE)
     // check for unique
     try {
@@ -48,15 +47,13 @@ export const createRoom: Action<any, RoomBody, any , any> = async (req, res, nex
         console.log(`Error during creating player. Err : ${err}`)
         return next(ERROR_ROOM_CREATE)
     }
-
-    res.json({ roomCode, username, sessionToken }).status(200)
+    // change that to return only sess
+    res.status(201).json({ sessionToken , roomCode })
 }
 
 export const regUser: Action<any, any, any, any> = async(req, res, next) => {
     const { username, roomCode } = req.body
-    const exists = await GameData.roomExists(roomCode)
-    console.log(typeof(exists))
-    console.log(exists == 1)
+    const exists: number = await GameData.roomExists(roomCode)
     if (exists == 1) {
        // const room = await Room.findBy({ room_code: roomCode })
         const roomR = new GameData(roomCode)
@@ -75,7 +72,8 @@ export const regUser: Action<any, any, any, any> = async(req, res, next) => {
                     'session_token': sessionToken,
                 }, true)
                 await roomR.addPlayer(username, player.id)
-                return res.status(200).send({ username, roomCode, sessionToken })
+                //send only sess
+                return res.status(201).json({ username, roomCode, sessionToken })
             } catch (err) {
                 // check
                 console.log(err.code)
@@ -85,7 +83,6 @@ export const regUser: Action<any, any, any, any> = async(req, res, next) => {
         }
 
     } else {
-        res.statusCode = 404
-        return res.json({ ERR_MSG: 'Soba ne postoji.'})
+        return res.status(404).json({ ERR_MSG: 'Soba ne postoji.'})
     }
 }

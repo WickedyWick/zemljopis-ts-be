@@ -20,4 +20,4 @@ app.use(routes)
 io.on('connection', onConnection)
 
 export const dir = __dirname
-
+export default app
