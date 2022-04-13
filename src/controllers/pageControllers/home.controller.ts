@@ -10,9 +10,7 @@ interface RoomBody {
     roundTimeLimit: number
 }
 export const createRoom: Action<any, RoomBody, any , any> = async (req, res, next) => {
-    const { username, playerCount, roundTimeLimit } = await req.body
-    const uReg = new RegExp('^[A-Za-zа-ш0-9А-ШčČćĆžŽšŠđĐђјљњћџЂЈЉЊЋЏ ]{4,30}$','g')
-    if (!uReg.test(username)) return next(ERROR_ROOM_CREATE)
+    const { username, playerCount, roundTimeLimit } = await req.body 
     const roomCode:string = await makeRoomCode()
     if (roomCode === '') return next(ERROR_ROOM_CREATE)
     // check for unique

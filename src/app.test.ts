@@ -42,5 +42,15 @@ describe('Todos API', () => {
             .send({ username:'test1234' , roomCode: '11111111' })
             .expect(404)
     });
+    it('POST /home/regUser --> return 400', async() => {
+        const response = await request(app)
+            .post('/home/regUser')
+            .send({ username: 'test11' , roomCode: '11' })
+            .expect(400)
+        const response1 = await request(app)
+            .post('/home/regUser')
+            .send({ username: 'tet' , roomCode: '11111111' })
+            .expect(400)
+    })
 })
 
