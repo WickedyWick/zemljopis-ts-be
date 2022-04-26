@@ -62,14 +62,17 @@ export class GameData {
     }
     //ideally put this under 1 key
     static createPlayers = async(room: string, username: string, id: number) => {
-        await redisDb.hSet(`players_${room}`, { username: id })
+        await redisDb.hSet(`players_${room}`, { [username]: id })
     }
     static createRounds = async(room: string, roundNumber: number, id: number) => {
-        await redisDb.hSet(`rounds_${room}`, { roundNumber: id })
+        await redisDb.hSet(`rounds_${room}`, { [roundNumber]: id })
     }
 
     addPlayer = async(username: string, id: number ) => {
-        await redisDb.hSet(`players_${this._name}`, { username: id })
+        await redisDb.hSet(`players_${this._name}`, { [username]: id })
+    }
+    playerExists = async(username: string) => {
+        return Number(await redisDb.hExists(this._name, username))
     }
     getPlayerCount = async() => {
         return Number(await redisDb.hGet(this._name, 'playerCount'))
