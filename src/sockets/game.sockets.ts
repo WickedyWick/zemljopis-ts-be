@@ -10,6 +10,9 @@ export const EVENTS = {
 export const registerGameHandlers = async(io: Server, socket: Socket) => {
     socket.on(EVENTS.JOIN_ROOM, async({ username, roomCode, sessionToken }) => {
         const v: boolean = await joinRoomValidator(io, socket, username, roomCode, sessionToken)
-        if (v) await joinRoom(io, socket, username, roomCode, sessionToken)
+        if (v) joinRoom(io, socket, username, roomCode, sessionToken)
+    })
+    socket.on('test', () => {
+        socket.emit('test')
     })
 }

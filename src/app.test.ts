@@ -1,6 +1,8 @@
 
 import request from 'supertest'
 import app from 'index'
+const Client = require('socket.io-client')
+
 const express = require('express')
 const nameCreator = async() => {
     let result = ''
@@ -54,3 +56,11 @@ describe('Todos API', () => {
     })
 })
 
+describe('Sockets', () => {
+    it('should work', async()=> {
+        let socketClient = new Client('http://localhost:8000')
+        socketClient.emit('test', (test:string) => {
+            expect(test).toBe('test')
+        })
+    })
+})
