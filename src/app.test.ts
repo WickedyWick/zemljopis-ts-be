@@ -57,10 +57,28 @@ describe('Todos API', () => {
 })
 
 describe('Sockets', () => {
-    it('should work', async()=> {
-        let socketClient = new Client('http://localhost:8000')
+    it('test', async()=> {
+        const socketClient = await new Client('http://localhost:8000')
         socketClient.emit('test', (test:string) => {
             expect(test).toBe('test')
         })
     })
+    /*
+    it('Validate user', async() => {
+        const socketClient = await new Client('http://localhost:8000')
+        const name:string = await nameCreator()
+        const response = await request(app)
+            .post('/home/createGame')
+            .send({ username: name, playerCount: 1, roundTimeLimit: 60 })
+            .expect(201)
+        await expect(response.body.sessionToken).toEqual(expect.any(String))
+        await expect(response.body.roomCode).toEqual(expect.any(String))
+        const data = { username: name, sessionToken: response.body.sessionToken, roomCode: response.body.roomCode }
+        await socketClient.emit('test', (data) , (d:any) => {
+            expect(d.sessionToken).toBe('string')
+        })
+    })
+    */
 })
+
+

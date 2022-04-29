@@ -344,9 +344,8 @@ socket.on('voteKickCounterResponse',message=>{
 //glavni load listter
 //prikazuje sve podatke potrebne
 socket.on('joinRoom', (data) =>{
-    console.timeEnd('API')
     console.log(data)
-    if(1 == 1){
+    if(data.code == 200){
     
     $('#maxDiv').show()
     disableAllPButtons()
@@ -355,11 +354,11 @@ socket.on('joinRoom', (data) =>{
     localStorage.setItem("roomCode",roomCode)
     localStorage.setItem("username",username)   
     document.getElementById('lblRoomCode').textContent += String(roomCode)
-    lblPlayersReady.textContent = message['playersReady']
-    lblPlayerCount.textContent = message['playerCount']
-    roundNumber = message['roundNumber']
+    lblPlayersReady.textContent = data['0']
+    lblPlayerCount.textContent = data['1']
+    roundNumber = data['2']
     lblRoundNumber.textContent = roundNumber
-    vreme = message['vreme']
+    vreme = data['3']
     timer.textContent = String(vreme);
     for(let i =1;i<=roundNumber;i++){
         let opt = document.createElement('option');
@@ -369,19 +368,19 @@ socket.on('joinRoom', (data) =>{
         if(i == roundNumber)
         opt.selected = 'selected'
     }
-    points = message['points']
-    lblPoeni.textContent = String(message['points'])
+    points = data['points']
+    lblPoeni.textContent = String(data['points'])
     pList[username] = points
     pListKeys = Object.keys(pList)
     new Noty({
             theme : 'metroui',
             type : 'success',
             layout : 'topRight',
-            text : message['MSG'],
+            text : data['MSG'],
             timeout : 5000,
             progressBar :true
         }).show()
-    if(message['roundActive']){  
+    if(data['4']){  
         readyBtn.disabled = true;
         disableAllInputFields()
         gameStarted = true;
