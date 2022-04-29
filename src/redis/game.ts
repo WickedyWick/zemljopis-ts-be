@@ -67,7 +67,7 @@ export class GameData {
         await redisDb.hSet(`rounds_${room}`, { [roundNumber]: id })
     }
     retrieveJoinRoomData = async(username: string, code?: 200) => {
-        const res = await redisDb.hmGet(this._name, ['playersReady', 'playerCount', 'roundNumber', 'roundTimeLimit'])
+        const res = await redisDb.hmGet(this._name, ['playersReady', 'playerCount', 'roundNumber', 'roundTimeLimit', 'roundActive'])
         const points = await redisDb.hGet(`${username}_${this._name}`,'points')
         //care what you return dontexpose the ID
         return {
