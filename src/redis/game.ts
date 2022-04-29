@@ -53,7 +53,6 @@ export class GameData {
         await redisDb.hSet(room, value)
         // 12h
         //await redisDb.expireAt(room, 43200)
-        
         /*
         const t = await redisDb.hGet(room, 'playerCount')
         console.log(typeof(t))
@@ -61,18 +60,32 @@ export class GameData {
         */
     }
     //ideally put this under 1 key
-    static createPlayers = async(room: string, username: string, id: number) => {
-        await redisDb.hSet(`players_${room}`, { [username]: id })
+    static createPlayer = async(room: string, username: string, id: number, sessionToken: string) => {
+        await redisDb.hSet(`${username}_${room}`, { id: id, points: 0, sessionToken: sessionToken })
     }
     static createRounds = async(room: string, roundNumber: number, id: number) => {
         await redisDb.hSet(`rounds_${room}`, { [roundNumber]: id })
     }
-
+    retrieveJoinRoomData = async(username: string, code?: 200) => {
+        const res = await redisDb.hmGet(this._name, ['playersReady', 'playerCount', 'roundNumber', 'roundTimeLimit'])
+        const points = await redisDb.hGet(`${username}_${this._name}`,'points')
+        //care what you return dontexpose the ID
+        return {
+            code: 200,
+            ...res,
+            points
+        }
+    }
     addPlayer = async(username: string, id: number ) => {
-        await redisDb.hSet(`players_${this._name}`, { [username]: id })
+        // unique key
+        await redisDb.hSet(`${username}_${this._name}`, { id: id, points: 0, sessionToken: '' })
+    }
+    checkSessionToken = async(username: string, sessionToken: string) => {
+        const sT = await redisDb.hGet(`${username}_${this._name}`, 'sessionToken')
+        return sT == sessionToken
     }
     playerExists = async(username: string) => {
-        return Number(await redisDb.hExists(this._name, username))
+        return Number(await redisDb.exists(`${username}_${this._name}`))
     }
     getPlayerCount = async() => {
         return Number(await redisDb.hGet(this._name, 'playerCount'))
@@ -84,7 +97,6 @@ export class GameData {
         // @ts-ignore
         return await redisDb.hSet(key, value)
     }
-
     getHashByKey = async(setKey: string, valKey: string) => {
         return await redisDb.hGet(setKey, valKey)
     }

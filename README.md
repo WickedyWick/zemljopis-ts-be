@@ -17,9 +17,4 @@ postgres linux user nije isti password za psql postgres usera -> alter user potg
 Write tests
 
 ### SELFNOTES
-reuse timer objects?
-
-
-sredi join room and odluci kako hoces rekonekotvanje
-
-pridruzi i vrati isto dugme? dizajn
+Add error messages on FE and serve it and just send codes from server?

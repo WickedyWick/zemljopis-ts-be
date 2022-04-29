@@ -30,6 +30,7 @@ let lblRoundNumber =document.getElementById('roundNumber')
 let lblPoeni = document.getElementById('poeni')
 // dodaj start button za leadera
 serverAddress = serverAdress()
+serverAddress = 'http://localhost:8000'
 const socket = io(serverAddress);
 socket.on('message', message =>{
     
@@ -342,8 +343,10 @@ socket.on('voteKickCounterResponse',message=>{
 })
 //glavni load listter
 //prikazuje sve podatke potrebne
-socket.on('load', message =>{
-    if(message['Success']){
+socket.on('joinRoom', (data) =>{
+    console.timeEnd('API')
+    console.log(data)
+    if(1 == 1){
     
     $('#maxDiv').show()
     disableAllPButtons()
@@ -895,11 +898,15 @@ window.onload = (e)=>{
     })
     let roomReg = /^[A-Za-z0-9]{8}$/g
     const usernameReg = /^[A-Za-zа-шА-ШčČćĆžŽšŠđĐђјљњћџЂЈЉЊЋЏ ]{4,16}$/g
-    const sessionReg = /^[A-Za-z0-9/+]{48}$/g
+    const sessionReg = /^[A-Za-z0-9/+]{96}$/g
     if(roomReg.test(roomCode) && usernameReg.test(username)){
+        console.log('here')
         const sessionToken = localStorage.getItem('sessionToken') 
-        if(sessionReg.test(sessionToken))
-            socket.emit('joinRoomReq',({username,roomCode,sessionToken}))
+        
+        //if(sessionReg.test(sessionToken))
+        if(sessionReg.test(sessionToken)) {
+            socket.emit('joinRoom',({ username,roomCode,sessionToken }))
+        }
         else
             new Noty({
             theme : 'metroui',

@@ -40,7 +40,8 @@ export const createRoom: Action<any, RoomBody, any , any> = async (req, res, nex
             'room_code': roomCode,
             'session_token': sessionToken,
         }, true)
-        await GameData.createPlayers(roomCode, username, player.id)
+        console.log(sessionToken)
+        await GameData.createPlayer(roomCode, username, player.id, sessionToken)
     } catch (err) {
         console.log(`Error during creating player. Err : ${err}`)
         return next(ERROR_ROOM_CREATE)

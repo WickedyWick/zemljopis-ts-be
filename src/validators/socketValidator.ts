@@ -9,7 +9,7 @@ export const joinRoomValidator = async(
     try {
         const roomReg = await new RegExp('^[A-Za-z0-9]{8}$','g').test(roomCode)
         const usernameReg = await new RegExp('^[A-Za-z0-9а-шА-ШčČćĆžŽšŠđĐђјљњћџЂЈЉЊЋЏ ]{4,16}$','g').test(username)
-        const tokenReg = await new RegExp('^[A-Za-z0-9]{48}$','g').test(sessionToken)
+        const tokenReg = await new RegExp('^[A-Za-z0-9]{96}$','g').test(sessionToken)
         if(roomReg && usernameReg && tokenReg) return true
         return false
     } catch(e) {
