@@ -59,7 +59,7 @@ export class GameData {
         console.log(t)
         */
     }
-    //ideally put this under 1 key
+
     static createPlayer = async(room: string, username: string, id: number, sessionToken: string) => {
         await redisDb.hSet(`${username}_${room}`, { id: id, points: 0, sessionToken: sessionToken })
     }
@@ -115,15 +115,6 @@ export class GameData {
     }
     hashExists = async(key: string) => {
         return await redisDb.exists(key)
-    }
-
-    createRoom = async(room:string, playerCount: number, roundTimeLimit: number) => {
-        // this is default game room setup, moved to this function so controller looks more readable at first glance
-       
-    }
-
-    addPlayerMap = async(room: string, key: string, value: number) => {
-
     }
 
 }

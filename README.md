@@ -13,8 +13,14 @@ In MySQL database will be stored pernament data and in non relational databse wi
 enable coalation u /etc/locale.gen pa napravi coaliciju pa napravi bazu . 
 postgres linux user nije isti password za psql postgres usera -> alter user potgres PASSWORD 'passwrod';
 
+## Logic
+Redis data is somewhat split under different keys
+
+Every room has its own key with room data
+
+Every player is registered under unique key {username}_{room} which contains their id, points and sessionToken
 ## TODO 
-Write tests
+
 
 ### SELFNOTES
 Add error messages on FE and serve it and just send codes from server?
