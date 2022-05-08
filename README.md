@@ -19,8 +19,13 @@ Redis data is somewhat split under different keys
 Every room has its own key with room data
 
 Every player is registered under unique key {username}_{room} which contains their id, points and sessionToken
-## TODO 
+Player list for a room is under players_{room} key which is just an array of strings
 
+## TODO 
+Track socket id and make a room when first player joins ( i guess i can join every event cause if itdoesnt exist it will create a room)
+Register joining other players and make sure its all working propertly
+Implement translator on FE
+Extend db for data
 
 ### SELFNOTES
 Add error messages on FE and serve it and just send codes from server?

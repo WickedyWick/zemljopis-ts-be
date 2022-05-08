@@ -30,7 +30,7 @@ export class GameData {
     static roomExists = async(room: string) => {
         return await redisDb.exists(room)
     }
-    static createRoom = async(room: string, playerCount: number, roundTimeLimit: number) => {
+    static createRoom = async(room: string,username: string, playerCount: number, roundTimeLimit: number) => {
         const value: GameFields = {
             playerCount,
             playersReady: 0,
@@ -39,7 +39,7 @@ export class GameData {
             roundActive: 0,
             roundId: -1,
             roundIds: {},
-            players: {},
+            players: [],
             playersIds: {},
             availableLetters: defaultLetters,
             currentLetter: '',
@@ -51,33 +51,34 @@ export class GameData {
         }
         //@ts-ignore
         await redisDb.hSet(room, value)
+        await redisDb.rPush(`players_${room}`,username)
         // 12h
         //await redisDb.expireAt(room, 43200)
-        /*
-        const t = await redisDb.hGet(room, 'playerCount')
-        console.log(typeof(t))
-        console.log(t)
-        */
+
+        return new this(username)
     }
 
+    /*
     static createPlayer = async(room: string, username: string, id: number, sessionToken: string) => {
         await redisDb.hSet(`${username}_${room}`, { id: id, points: 0, sessionToken: sessionToken })
     }
+    */
     static createRounds = async(room: string, roundNumber: number, id: number) => {
         await redisDb.hSet(`rounds_${room}`, { [roundNumber]: id })
     }
     retrieveJoinRoomData = async(username: string, code?: 200) => {
         const res = await redisDb.hmGet(this._name, ['playersReady', 'playerCount', 'roundNumber', 'roundTimeLimit', 'roundActive'])
         const points = await redisDb.hGet(`${username}_${this._name}`,'points')
-        //care what you return dontexpose the ID
         return {
             code: 200,
             ...res,
             points
         }
     }
-    addPlayer = async(username: string, id: number ) => {
+    // same as craete Player
+    addPlayer = async(username: string, id: number, sessionToken: string ) => {
         // unique key
+        await redisDb.rPushX(`players_${this._name}`, username)
         await redisDb.hSet(`${username}_${this._name}`, { id: id, points: 0, sessionToken: '' })
     }
     checkSessionToken = async(username: string, sessionToken: string) => {

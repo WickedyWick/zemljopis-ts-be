@@ -1,5 +1,6 @@
 import { Action } from 'utils/typings'
 import { Room, Player } from 'database/models'
+import { RoomModel } from 'database/models/room'
 import { makeRoomCode } from 'utils/strings'
 import { ERROR_ROOM_CREATE, ERROR_REG_PLAYER } from 'utils/errors/home'
 import { randomBytes } from 'crypto'
@@ -13,7 +14,7 @@ export const createRoom: Action<any, RoomBody, any , any> = async (req, res, nex
     const { username, playerCount, roundTimeLimit } = await req.body 
     const roomCode:string = await makeRoomCode()
     if (roomCode === '') return next(ERROR_ROOM_CREATE)
-    // check for unique
+    // check for unique 
     try {
         const room = await Room.create({
             'player_count': playerCount,
@@ -23,6 +24,7 @@ export const createRoom: Action<any, RoomBody, any , any> = async (req, res, nex
 
         await GameData.createRoom(
             roomCode,
+            username,
             playerCount,
             roundTimeLimit,
         )
@@ -40,8 +42,6 @@ export const createRoom: Action<any, RoomBody, any , any> = async (req, res, nex
             'room_code': roomCode,
             'session_token': sessionToken,
         }, true)
-        console.log(sessionToken)
-        await GameData.createPlayer(roomCode, username, player.id, sessionToken)
     } catch (err) {
         console.log(`Error during creating player. Err : ${err}`)
         return next(ERROR_ROOM_CREATE)
@@ -70,7 +70,7 @@ export const regUser: Action<any, any, any, any> = async(req, res, next) => {
                     'room_code': roomCode,
                     'session_token': sessionToken,
                 }, true)
-                await roomR.addPlayer(username, player.id)
+                await roomR.addPlayer(username, player.id, sessionToken)
                 //send only sess
                 return res.status(201).json({ username, roomCode, sessionToken })
             } catch (err) {

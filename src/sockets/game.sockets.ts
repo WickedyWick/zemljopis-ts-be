@@ -2,7 +2,8 @@ import { Server, Socket } from "socket.io";
 import { joinRoomValidator } from "validators/socketValidator";
 import { joinRoom } from "controllers/socketHandlers/game.handler";
 export const EVENTS = {
-    JOIN_ROOM : 'joinRoom'
+    JOIN_ROOM : 'joinRoom',
+    PLAYER_JOINED: 'playerJoined'
 }
 export const registerGameHandlers = async(io: Server, socket: Socket) => {
     socket.on(EVENTS.JOIN_ROOM, async({ username, roomCode, sessionToken }) => {

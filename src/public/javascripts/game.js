@@ -39,68 +39,7 @@ socket.on('message', message =>{
 socket.on('joinMessage', message =>{
     
 })
-function disableAllPButtons(){
-    $("#predloziBtnDrzava").prop("disabled", true )
-    $("#predloziBtnGrad").prop("disabled", true )
-    $("#predloziBtnIme").prop("disabled", true )
-    $("#predloziBtnBiljka").prop("disabled", true )
-    $("#predloziBtnZivotinja").prop("disabled", true )
-    $("#predloziBtnPlanina").prop("disabled", true )
-    $("#predloziBtnReka").prop("disabled", true )
-    $("#predloziBtnPredmet").prop("disabled", true )
-}
-function enableAllPButtons(){
-    $("#predloziBtnDrzava").prop("disabled", false )
-    $("#predloziBtnGrad").prop("disabled", false )
-    $("#predloziBtnIme").prop("disabled", false )
-    $("#predloziBtnBiljka").prop("disabled", false )
-    $("#predloziBtnZivotinja").prop("disabled", false )
-    $("#predloziBtnPlanina").prop("disabled", false )
-    $("#predloziBtnReka").prop("disabled", false )
-    $("#predloziBtnPredmet").prop("disabled", false )
-}
-function hideAllHelp(){
-    $("#helpDrzava").hide()
-    $("#helpGrad").hide()
-    $("#helpPredmet").hide()
-    $("#helpIme").hide()
-    $("#helpBiljka").hide()
-    $("#helpReka").hide()
-    $("#helpPlanina").hide()
-    $("#helpZivotinja").hide()
-}
-function clearAllInputFields(){
-    $("#inputDrzava").val('')
-    $("#inputGrad").val('')
-    $("#inputPredmet").val('')
-    $("#inputIme").val('')
-    $("#inputBiljka").val('')
-    $("#inputReka").val('')
-    $("#inputPlanina").val('')
-    $("#inputZivotinja").val('')
-}
-function disableAllInputFields(){
-    $("#inputDrzava").prop("disabled", true )
-    $("#inputGrad").prop("disabled", true )
-    $("#inputPredmet").prop("disabled", true )
-    $("#inputIme").prop("disabled", true )
-    $("#inputBiljka").prop("disabled", true )
-    $("#inputReka").prop("disabled", true )
-    $("#inputPlanina").prop("disabled", true )
-    $("#inputZivotinja").prop("disabled", true )
 
-}
-function enableAllInputFields(){
-    $("#inputDrzava").prop("disabled", false )
-    $("#inputGrad").prop("disabled", false )
-    $("#inputPredmet").prop("disabled", false )
-    $("#inputIme").prop("disabled", false )
-    $("#inputBiljka").prop("disabled", false )
-    $("#inputReka").prop("disabled", false )
-    $("#inputPlanina").prop("disabled", false )
-    $("#inputZivotinja").prop("disabled", false )
-
-}
 function disableHistoryReq(){
     
     $("#localPlayer").css("pointer-events","none");
@@ -345,6 +284,8 @@ socket.on('voteKickCounterResponse',message=>{
 //prikazuje sve podatke potrebne
 socket.on('joinRoom', (data) =>{
     console.log(data)
+    joinRoom(data)
+    /*
     if(data.code == 200){
     
     $('#maxDiv').show()
@@ -395,16 +336,9 @@ socket.on('joinRoom', (data) =>{
     }
     }else{
     $('#maxDiv').hide()
-    new Noty({  
-            theme : 'metroui',
-            type : 'warning',
-            layout : 'topRight',
-            text : message['ERR_MSG'],
-            timeout : 5000,
-            progressBar :true
-        }).show()
+   
     }
-
+    */
 })  
 //ako soba ne postoji response ako je if(room in localData) tacan
 socket.on("roomNotExist",message =>{
@@ -718,13 +652,13 @@ socket.on('discMessage',message =>{
     }).show()
 })*/
 //playerjoin event ispis
-socket.on('playerJoinMsg', message =>{    
+socket.on('playerJoined', (data) =>{    
     
     new Noty({
         theme : 'metroui',
         type : 'success',
         layout : 'topRight',
-        text : message,
+        text : data.username,
         timeout : 5000,
         progressBar :true
     }).show()
