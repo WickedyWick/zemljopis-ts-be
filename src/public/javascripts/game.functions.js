@@ -6,6 +6,7 @@
 // roomCode lblRoomCode
 // timer counter
 // ready button btnReady
+// round list roundSelect
 const nType = {
     success: 'success',
     warning: 'warning'
@@ -85,6 +86,7 @@ function joinRoom(data) {
     2(roundNumber): string
     3(roundTimeLimit): string
     4(roundActive): string
+    players: Array<string>
     */
     if(data.code == 200) {
         $('#maxDiv').show()
@@ -97,6 +99,11 @@ function joinRoom(data) {
         $('#counter').text(data['3'])
         localStorage.setItem("roomCode",roomCode)
         localStorage.setItem("username",username)
+        for( let i =0; i < data['2']; i++) {
+            $('#roundSelect').append(`<option value="${i}">
+                ${i}
+            </option>`)
+        }
         notify(nType.success, 'Uspesno ste se pridruzili sobi')
         if(data['4']) {
             $('#btnReady').prop('disabled', true)

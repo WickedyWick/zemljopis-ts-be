@@ -14,22 +14,24 @@ export const joinRoom = async(io: Server, socket: Socket, username: string, room
         // Perhaps wrap validation fucntions in one function and one redis calls instead of 3
         // but due to relativly low amout of requests this will work in this case as well since redis is really fast
         // if this is making problems wrap functions in 1 and do 1 db call
-        if (!await room.playerExists(username) && !await room.checkSessionToken(username, sessionToken)) {
+        const p = await room.playerExists(username)
+        const s = await room.checkSessionToken(username, sessionToken)
+        if (!p && !s) {
             socket.emit(EVENTS.JOIN_ROOM, {
                 MSG: 'Igrac nije registrovan',
                 CODE: 404
             })
-        } else {
-            const data = await room.retrieveJoinRoomData(username)
-            await socket.join(roomCode)
-            socket.emit(EVENTS.JOIN_ROOM, {
-                ...data
-            })
-            socket.to(roomCode).emit(EVENTS.PLAYER_JOINED, {
-                username,
-                points: data.points
-            })
+            return
         }
+        const data = await room.retrieveJoinRoomData(username)
+        await socket.join(roomCode)
+        socket.emit(EVENTS.JOIN_ROOM, {
+            ...data
+        })
+        socket.to(roomCode).emit(EVENTS.PLAYER_JOINED, {
+            username,
+            points: data.points
+        })
     }
 
 }
