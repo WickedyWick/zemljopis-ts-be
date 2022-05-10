@@ -13,13 +13,19 @@ In MySQL database will be stored pernament data and in non relational databse wi
 enable coalation u /etc/locale.gen pa napravi coaliciju pa napravi bazu . 
 postgres linux user nije isti password za psql postgres usera -> alter user potgres PASSWORD 'passwrod';
 
+## Logic
+Redis data is somewhat split under different keys
+
+Every room has its own key with room data
+
+Every player is registered under unique key {username}_{room} which contains their id, points and sessionToken
+Player list for a room is under players_{room} key which is just an array of strings
+
 ## TODO 
-Write tests
+Track socket id and make a room when first player joins ( i guess i can join every event cause if itdoesnt exist it will create a room)
+Register joining other players and make sure its all working propertly
+Implement translator on FE
+Extend db for data
 
 ### SELFNOTES
-reuse timer objects?
-
-
-sredi join room and odluci kako hoces rekonekotvanje
-
-pridruzi i vrati isto dugme? dizajn
+Add error messages on FE and serve it and just send codes from server?

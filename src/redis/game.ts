@@ -30,7 +30,7 @@ export class GameData {
     static roomExists = async(room: string) => {
         return await redisDb.exists(room)
     }
-    static createRoom = async(room: string, playerCount: number, roundTimeLimit: number) => {
+    static createRoom = async(room: string,username: string, playerCount: number, roundTimeLimit: number) => {
         const value: GameFields = {
             playerCount,
             playersReady: 0,
@@ -39,7 +39,7 @@ export class GameData {
             roundActive: 0,
             roundId: -1,
             roundIds: {},
-            players: {},
+            players: [],
             playersIds: {},
             availableLetters: defaultLetters,
             currentLetter: '',
@@ -53,24 +53,44 @@ export class GameData {
         await redisDb.hSet(room, value)
         // 12h
         //await redisDb.expireAt(room, 43200)
-        
-        /*
-        const t = await redisDb.hGet(room, 'playerCount')
-        console.log(typeof(t))
-        console.log(t)
-        */
-    }
-    //ideally put this under 1 key
-    static createPlayers = async(room: string, username: string, id: number) => {
-        await redisDb.hSet(`players_${room}`, { username: id })
-    }
-    static createRounds = async(room: string, roundNumber: number, id: number) => {
-        await redisDb.hSet(`rounds_${room}`, { roundNumber: id })
+
+        return new this(username)
     }
 
-    addPlayer = async(username: string, id: number ) => {
-        await redisDb.hSet(`players_${this._name}`, { username: id })
+    static createPlayer = async(room: string, username: string, id: number, sessionToken: string) => {
+        await redisDb.hSet(`players_${room}`, { [username]: id})
+        await redisDb.hSet(`${username}_${room}`, { id: id, points: 0, sessionToken: sessionToken })
     }
+    
+    static createRounds = async(room: string, roundNumber: number, id: number) => {
+        await redisDb.hSet(`rounds_${room}`, { [roundNumber]: id })
+    }
+    retrieveJoinRoomData = async(username: string, code?: 200) => {
+        const res = await redisDb.hmGet(this._name, ['playersReady', 'playerCount', 'roundNumber', 'roundTimeLimit', 'roundActive'])
+        const players = await redisDb.hKeys(`players_${this._name}`)
+        const points = await redisDb.hGet(`${username}_${this._name}`,'points')
+        return {
+            code: 200,
+            ...res,
+            points,
+            players: players
+        }
+    }
+    // same as craete Player
+    addPlayer = async(username: string, id: number, sessionToken: string ) => {
+        // unique key
+        await redisDb.hSet(`players_${this._name}`, { [username]: id})
+        await redisDb.hSet(`${username}_${this._name}`, { id: id, points: 0, sessionToken: sessionToken })
+    }
+    checkSessionToken = async(username: string, sessionToken: string) => {
+        const sT = await redisDb.hGet(`${username}_${this._name}`, 'sessionToken')
+        return sT == sessionToken
+    }
+    playerExists = async(username: string) => {
+        return Number(await redisDb.exists(`${username}_${this._name}`))
+    }
+
+    // combine getplayer ciount and players joined in one query with hmGet?
     getPlayerCount = async() => {
         return Number(await redisDb.hGet(this._name, 'playerCount'))
     }
@@ -81,7 +101,6 @@ export class GameData {
         // @ts-ignore
         return await redisDb.hSet(key, value)
     }
-
     getHashByKey = async(setKey: string, valKey: string) => {
         return await redisDb.hGet(setKey, valKey)
     }
@@ -100,15 +119,6 @@ export class GameData {
     }
     hashExists = async(key: string) => {
         return await redisDb.exists(key)
-    }
-
-    createRoom = async(room:string, playerCount: number, roundTimeLimit: number) => {
-        // this is default game room setup, moved to this function so controller looks more readable at first glance
-       
-    }
-
-    addPlayerMap = async(room: string, key: string, value: number) => {
-
     }
 
 }

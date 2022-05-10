@@ -1,8 +1,16 @@
 import { Server, Socket } from "socket.io";
-
+import { joinRoomValidator } from "validators/socketValidator";
+import { joinRoom } from "controllers/socketHandlers/game.handler";
+export const EVENTS = {
+    JOIN_ROOM : 'joinRoom',
+    PLAYER_JOINED: 'playerJoined'
+}
 export const registerGameHandlers = async(io: Server, socket: Socket) => {
-    const test = ({}) => {
-        console.log('here')
-    }
-    socket.on('test', test)
+    socket.on(EVENTS.JOIN_ROOM, async({ username, roomCode, sessionToken }) => {
+        const v: boolean = await joinRoomValidator(io, socket, username, roomCode, sessionToken)
+        if (v) joinRoom(io, socket, username, roomCode, sessionToken)
+    })
+    socket.on('test', () => {
+        socket.emit('test')
+    })
 }

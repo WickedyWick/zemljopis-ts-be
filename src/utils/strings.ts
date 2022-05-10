@@ -14,3 +14,6 @@ export const makeRoomCode = async () => {
 }
 
 export const defaultLetters = ["a","b","c","č","ć","d","dž","đ","e","f","g","h","i","j","k","l","lj","m","n","nj","o","p","r","s","š","t","u","v","z","ž"]
+export const RoomCodeRegEx = '^[A-Za-z0-9]{8}$'
+export const UsernameRegEx = '^[A-Za-z0-9а-шА-ШčČćĆžŽšŠđĐђјљњћџЂЈЉЊЋЏ ]{4,16}$'
+export const SessionTokenRegEx = '^[A-Za-z0-9]{96}$'
