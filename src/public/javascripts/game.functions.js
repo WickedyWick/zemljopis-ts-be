@@ -99,17 +99,21 @@ function joinRoom(data) {
         $('#counter').text(data['3'])
         localStorage.setItem("roomCode",roomCode)
         localStorage.setItem("username",username)
-        for( let i =0; i < data['2']; i++) {
+        for( let i = 0; i < data['2']; i++) {
             $('#roundSelect').append(`<option value="${i}">
                 ${i}
             </option>`)
         }
         notify(nType.success, 'Uspesno ste se pridruzili sobi')
-        if(data['4']) {
+        if(data['4'] == '1') {
             $('#btnReady').prop('disabled', true)
             disableAllInputFields()
             gameStarted = true;
             notify(nType.success, 'Sačekajte sledecu rundu da bi ste nastavili da igrate!')
+        }
+        for( let i = 0; i < data['players'].length; i++) {
+            if(data['players'][i] != username)
+                $('#players').append(`<li>${data['players'][i]}</li>`)
         }
     } else {
         $('#maxDiv').hide()

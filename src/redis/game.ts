@@ -51,35 +51,36 @@ export class GameData {
         }
         //@ts-ignore
         await redisDb.hSet(room, value)
-        await redisDb.rPush(`players_${room}`,username)
         // 12h
         //await redisDb.expireAt(room, 43200)
 
         return new this(username)
     }
 
-    /*
     static createPlayer = async(room: string, username: string, id: number, sessionToken: string) => {
+        await redisDb.hSet(`players_${room}`, { [username]: id})
         await redisDb.hSet(`${username}_${room}`, { id: id, points: 0, sessionToken: sessionToken })
     }
-    */
+    
     static createRounds = async(room: string, roundNumber: number, id: number) => {
         await redisDb.hSet(`rounds_${room}`, { [roundNumber]: id })
     }
     retrieveJoinRoomData = async(username: string, code?: 200) => {
         const res = await redisDb.hmGet(this._name, ['playersReady', 'playerCount', 'roundNumber', 'roundTimeLimit', 'roundActive'])
+        const players = await redisDb.hKeys(`players_${this._name}`)
         const points = await redisDb.hGet(`${username}_${this._name}`,'points')
         return {
             code: 200,
             ...res,
-            points
+            points,
+            players: players
         }
     }
     // same as craete Player
     addPlayer = async(username: string, id: number, sessionToken: string ) => {
         // unique key
-        await redisDb.rPushX(`players_${this._name}`, username)
-        await redisDb.hSet(`${username}_${this._name}`, { id: id, points: 0, sessionToken: '' })
+        await redisDb.hSet(`players_${this._name}`, { [username]: id})
+        await redisDb.hSet(`${username}_${this._name}`, { id: id, points: 0, sessionToken: sessionToken })
     }
     checkSessionToken = async(username: string, sessionToken: string) => {
         const sT = await redisDb.hGet(`${username}_${this._name}`, 'sessionToken')
@@ -88,6 +89,8 @@ export class GameData {
     playerExists = async(username: string) => {
         return Number(await redisDb.exists(`${username}_${this._name}`))
     }
+
+    // combine getplayer ciount and players joined in one query with hmGet?
     getPlayerCount = async() => {
         return Number(await redisDb.hGet(this._name, 'playerCount'))
     }
