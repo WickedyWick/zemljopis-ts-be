@@ -1,10 +1,13 @@
-data = {}
+let data = {}
 const {username, roomCode} = Qs.parse(location.search,{
         ignoreQueryPrefix: true
     })
 let readyBtn = document.getElementById('btnReady')
 let gameStarted = false
 let ready = false;
+let sessionToken;
+let playersReady = 0;
+let playerCount
 let timer = document.getElementById('counter')
 let myInterval;
 let roundNumber;
@@ -29,9 +32,10 @@ let lblPlayersReady = document.getElementById('lblPlayersReady')
 let lblRoundNumber =document.getElementById('roundNumber')
 let lblPoeni = document.getElementById('poeni')
 // dodaj start button za leadera
-serverAddress = serverAdress()
-serverAddress = 'http://localhost:8000'
+//serverAddress = serverAdress()
+let serverAddress = 'http://localhost:8000'
 const socket = io(serverAddress);
+export default socket
 socket.on('message', message =>{
     
 })
@@ -280,66 +284,7 @@ socket.on('voteKickCounterResponse',message=>{
             progressBar :true
         }).show()
 })
-//glavni load listter
-//prikazuje sve podatke potrebne
-socket.on('joinRoom', (data) =>{
-    console.log(data)
-    joinRoom(data)
-    /*
-    if(data.code == 200){
-    
-    $('#maxDiv').show()
-    disableAllPButtons()
-    sessionToken = localStorage.getItem('sessionToken')
-    document.getElementById('localPlayer').textContent = username
-    localStorage.setItem("roomCode",roomCode)
-    localStorage.setItem("username",username)   
-    document.getElementById('lblRoomCode').textContent += String(roomCode)
-    lblPlayersReady.textContent = data['0']
-    lblPlayerCount.textContent = data['1']
-    roundNumber = data['2']
-    lblRoundNumber.textContent = roundNumber
-    vreme = data['3']
-    timer.textContent = String(vreme);
-    for(let i =1;i<=roundNumber;i++){
-        let opt = document.createElement('option');
-        opt.appendChild(document.createTextNode(i))
-        opt.value = i
-        select.appendChild(opt)
-        if(i == roundNumber)
-        opt.selected = 'selected'
-    }
-    points = data['points']
-    lblPoeni.textContent = String(data['points'])
-    pList[username] = points
-    pListKeys = Object.keys(pList)
-    new Noty({
-            theme : 'metroui',
-            type : 'success',
-            layout : 'topRight',
-            text : data['MSG'],
-            timeout : 5000,
-            progressBar :true
-        }).show()
-    if(data['4']){  
-        readyBtn.disabled = true;
-        disableAllInputFields()
-        gameStarted = true;
-        new Noty({
-            theme : 'metroui',
-            type : 'info',
-            layout : 'topRight',
-            text : 'Sačekajte sledecu rundu da bi ste nastavili da igrate!',
-            timeout : 5000,
-            progressBar :true
-        }).show()
-    }
-    }else{
-    $('#maxDiv').hide()
-   
-    }
-    */
-})  
+
 //ako soba ne postoji response ako je if(room in localData) tacan
 socket.on("roomNotExist",message =>{
     new Noty({  
@@ -602,6 +547,7 @@ socket.on('startVoteKickResponse',message=>{
 //player ready response
 socket.on('playerReadyResponse' , message =>{
     
+    /*
     if(message['Success'] == false){
     if(message['ERR_CODE'] == 1){
         //reset ready button
@@ -638,6 +584,7 @@ socket.on('playerReadyResponse' , message =>{
     }
     }
     readyBtn.disabled = false;
+    */
 })
 //player disc messsage event
 /*
@@ -833,11 +780,12 @@ window.onload = (e)=>{
     const usernameReg = /^[A-Za-zа-шА-ШčČćĆžŽšŠđĐђјљњћџЂЈЉЊЋЏ ]{4,16}$/g
     const sessionReg = /^[A-Za-z0-9/+]{96}$/g
     if(roomReg.test(roomCode) && usernameReg.test(username)){
-        console.log('here')
+        
         const sessionToken = localStorage.getItem('sessionToken') 
         
         //if(sessionReg.test(sessionToken))
         if(sessionReg.test(sessionToken)) {
+            console.log('sent')
             socket.emit('joinRoom',({ username,roomCode,sessionToken }))
         }
         else

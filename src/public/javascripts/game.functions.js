@@ -8,10 +8,21 @@
 // ready button btnReady
 // round list roundSelect
 const nType = {
-    success: 'success',
-    warning: 'warning'
+    SUCCESS: 'success',
+    WARNING: 'warning'
 }
 
+const btnColors = {
+    RED: 'red',
+    GREEN: 'green'
+}
+const btnStates = {
+    BTN_NOT_READY: 'Nisi spreman!',
+    BTN_REDAY: 'Spreman!'
+}
+const {username, roomCode} = Qs.parse(location.search,{
+    ignoreQueryPrefix: true
+})
 
 // maybe this should be wrapped in class
 function disableAllPButtons(){
@@ -88,15 +99,21 @@ function joinRoom(data) {
     4(roundActive): string
     players: Array<string>
     */
+    console.log(data)
     if(data.code == 200) {
+        console.log(data)
+        console.log(username, roomCode)
         $('#maxDiv').show()
-        $('#lblPlayerCount').text(data['1'])
-        $('#lblPlayersReady').text(data['0'])
+        playerCount = Number(data['1'])
+        $('#lblPlayerCount').text(playerCount)
+        playersReady= Number(data['0'])
+        $('#lblPlayersReady').text(playersReady)
         $('#roundNumber').text(data['2'])
         $('#poeni').text(data['points'])
         $('#localPlayer').text(username)
         $('#lblRoomCode').append(roomCode)
         $('#counter').text(data['3'])
+        sessionToken = localStorage.getItem('sessionToken')
         localStorage.setItem("roomCode",roomCode)
         localStorage.setItem("username",username)
         for( let i = 0; i < data['2']; i++) {
@@ -104,12 +121,12 @@ function joinRoom(data) {
                 ${i}
             </option>`)
         }
-        notify(nType.success, 'Uspesno ste se pridruzili sobi')
+        notify(nType.SUCCESS, 'Uspesno ste se pridruzili sobi')
         if(data['4'] == '1') {
             $('#btnReady').prop('disabled', true)
             disableAllInputFields()
             gameStarted = true;
-            notify(nType.success, 'Sačekajte sledecu rundu da bi ste nastavili da igrate!')
+            notify(nType.SUCCESS, 'Sačekajte sledecu rundu da bi ste nastavili da igrate!')
         }
         for( let i = 0; i < data['players'].length; i++) {
             if(data['players'][i] != username)
@@ -117,10 +134,63 @@ function joinRoom(data) {
         }
     } else {
         $('#maxDiv').hide()
-        notify(nType.warning, 'Korisnicko ime i ili soba nisu vazeci!')
+        notify(nType.WARNING, 'Korisnicko ime i ili soba nisu vazeci!')
     }
 }
 
+function playerReady(data) {
+    /*
+    username: string,
+    CODE: number
+    */
+    if(data.CODE > 400) {
+        //alert
+        $('#readyBtn').css('color', btnColors.RED)
+        $('#readyBtn').text(response.BTN_NOT_READY)
+        $('#readyBtn').prop('disabled', false)
+        ready = false
+        notify(nType.WARNING, 'Doslo je do problema pokusajte ponovo')
+        return
+    } 
+    if(data.username == username) {
+        $('#readyBtn').css('color', btnColors.GREEN)
+        $('#readyBtn').text(response.BTN_READY)
+        $('#readyBtn').prop('disabled', false)
+        ready = true
+        notify(nType.SUCCESS, 'Spremni ste!')
+    }
+    if(playersReady < playerCount)
+        playersReady++
+    $('#lblPlayersReady').text(playersReady)
+    
+}
+
+function playerUnReady(data) {
+    /*
+    username: string,
+    CODE: number
+    */
+    if(data.CODE > 400) {
+        //alert
+        $('#readyBtn').css('color', btnColors.RED)
+        $('#readyBtn').text(response.BTN_NOT_READY)
+        $('#readyBtn').prop('disabled', false)
+        ready = false
+        notify(nType.WARNING, 'Doslo je do problema pokusajte ponovo')
+        return
+    } 
+    if(data.username == username) {
+        $('#readyBtn').css('color', btnColors.GREEN)
+        $('#readyBtn').text(response.BTN_READY)
+        $('#readyBtn').prop('disabled', false)
+        ready = true
+        notify(nType.SUCCESS, 'Niste spremni')
+    }
+    // maybe return player count? :D
+    if(playersReady > 0)
+        playersReady--
+    $('#lblPlayersReady').text(playersReady)
+}
 function notify(type, message) {
     // type, warning, info, success
     new Noty({  

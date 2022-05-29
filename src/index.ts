@@ -14,6 +14,7 @@ const server = app.listen(process.env.PORT, () => {
 })
 const io = new Server<ClientToServerEvents, ServerToClientEvents, InterServerEvents>(server)
 const onConnection = async(socket: socketio.Socket) => {
+    socket.emit('test', 'test')
     registerGameHandlers(io, socket)
 }
 

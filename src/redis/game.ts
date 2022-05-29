@@ -97,7 +97,7 @@ export class GameData {
             return 0
         }
     }
-    
+
     retrieveJoinRoomData = async(username: string, code?: 200) => {
         const res = await redisDb.hmGet(this._name, ['playersReady', 'playerCount', 'roundNumber', 'roundTimeLimit', 'roundActive'])
         const players = await redisDb.hKeys(`players_${this._name}`)

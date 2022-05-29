@@ -4,7 +4,9 @@ import { EVENTS } from 'sockets/game.sockets'
 import { Player } from 'database/models'
 export const joinRoom = async(io: Server, socket: Socket, username: string, roomCode: string) => {
     // maybe insta search for player and then return somehting like wrong player and room combo
+    console.log('received')
     if (!await GameData.roomExists(roomCode)){
+        console.log('doesnt exitst')
         socket.emit(EVENTS.JOIN_ROOM, {
             MSG: 'Soba ne postoji',
             CODE: 404
@@ -20,11 +22,13 @@ export const joinRoom = async(io: Server, socket: Socket, username: string, room
                 MSG: 'Igrac nije registrovan',
                 CODE: 404
             })
+            console.log('doesnt exist')
             return
         }
         const data = await room.retrieveJoinRoomData(username)
         await socket.join(roomCode)
-        socket.emit(EVENTS.JOIN_ROOM, {
+        console.log(data)
+        socket.emit('joinRoom', {
             ...data
         })
         socket.to(roomCode).emit(EVENTS.PLAYER_JOINED, {
@@ -44,7 +48,8 @@ export const playerReady = async(io: Server, socket: Socket, username: string, r
     }
 
     io.to(roomCode).emit(EVENTS.PLAYER_READY, {
-        username
+        username,
+        CODE: 200
     })
 }
 export const playerUnReady = async(io: Server, socket: Socket, username: string, roomCode: string) => {
@@ -56,6 +61,7 @@ export const playerUnReady = async(io: Server, socket: Socket, username: string,
         return
     }
     io.to(roomCode).emit(EVENTS.PLAYER_UNREADY, {
-        username
+        username,
+        CODE: 200
     })
 }
