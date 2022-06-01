@@ -39,29 +39,24 @@ export const joinRoom = async(io: Server, socket: Socket, username: string, room
 }
 
 export const playerReady = async(io: Server, socket: Socket, username: string, roomCode: string) => {
+    try {
     const res = await GameData.playerReady(roomCode, username)
-    if (!res) {
-        socket.emit(EVENTS.PLAYER_READY, {
-            CODE: 500
+        io.to(roomCode).emit(EVENTS.PLAYER_READY, {
+            username,
+            CODE: res
         })
-        return
+    } catch(e) {
+        console.error(`Doslo je do problema prilikom slanja ready upa. SocketID: ${socket.id}\nERR: ${e}`)
     }
-
-    io.to(roomCode).emit(EVENTS.PLAYER_READY, {
-        username,
-        CODE: 200
-    })
 }
 export const playerUnReady = async(io: Server, socket: Socket, username: string, roomCode: string) => {
-    const res = await GameData.playerUnReady(roomCode, username)
-    if (!res) {
-        socket.emit(EVENTS.PLAYER_UNREADY, {
-            CODE: 500
+    try{
+        const res = await GameData.playerUnReady(roomCode, username)
+        io.to(roomCode).emit(EVENTS.PLAYER_UNREADY, {
+            username,
+            CODE: 200
         })
-        return
+    } catch(e) {
+        console.error(`Doslo je do problema prilikom slanja unready upa. SocketID: ${socket.id}\nERR : ${e}`)
     }
-    io.to(roomCode).emit(EVENTS.PLAYER_UNREADY, {
-        username,
-        CODE: 200
-    })
 }

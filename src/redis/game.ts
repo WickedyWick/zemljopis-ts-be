@@ -78,10 +78,12 @@ export class GameData {
                 await redisDb.hSet(`${username}_${room}`, 'ready', 1)
                 await redisDb.hSet(room, 'playersReady', Number(data[0]) + 1)
             }
-            return 1
+            return 200
         } catch(e) {
-            console.error(`Error during player ready up: ERR: ${e}`)
-            return 0
+            await redisDb.hSet(`${username}_${room}`, 'ready', 0)
+            await redisDb.hSet(room, 'playerReady', 0)
+            console.error(`Error during player ready up. Username|room: ${username}|${room}\nERR: ${e}`)
+            return 500
         }
     }
     static playerUnReady = async(room: string, username: string) => {
@@ -92,9 +94,15 @@ export class GameData {
                 await redisDb.hSet(`${username}_${room}`, 'ready', 1)
                 await redisDb.hSet(room, 'playersReady', Number(data[0]) - 1)
             }
-            return 1
+            /* this will return 200 even for 404
+             (can put if but it should never be the case) and edge case isnt that critical
+            */
+            return 200
         } catch(e) {
-            return 0
+            await redisDb.hSet(`${username}_${room}`, 'ready', 1)
+            await redisDb.hSet(room, 'playersReady', 0)
+            console.error(`Error during player unready up. Username|room: ${username}|${room}\nERR: ${e}`)
+            return 500
         }
     }
 

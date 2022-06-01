@@ -1,3 +1,4 @@
+/*
 let data = {}
 const {username, roomCode} = Qs.parse(location.search,{
         ignoreQueryPrefix: true
@@ -584,7 +585,7 @@ socket.on('playerReadyResponse' , message =>{
     }
     }
     readyBtn.disabled = false;
-    */
+    
 })
 //player disc messsage event
 /*
@@ -597,7 +598,7 @@ socket.on('discMessage',message =>{
         timeout : 5000,
         progressBar :true
     }).show()
-})*/
+})
 //playerjoin event ispis
 socket.on('playerJoined', (data) =>{    
     
@@ -832,3 +833,4 @@ function predlozi(field){
     dataReg.lastIndex = 0;
     document.getElementById(`predloziBtn${field}`).disabled = true;
 }
+*/

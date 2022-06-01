@@ -1,5 +1,5 @@
 import socket from './game.js'
-
+import { joinRoom, playerReady, playerUnReady } from './game.functions.js'
 socket.on('test',()=> {
     console.log("TEST")
 })

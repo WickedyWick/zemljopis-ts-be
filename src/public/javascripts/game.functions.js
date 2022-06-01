@@ -7,6 +7,11 @@
 // timer counter
 // ready button btnReady
 // round list roundSelect
+
+let playerCount = 0
+let playersReady = 0
+let sessionToken = ''
+let ready = false
 const nType = {
     SUCCESS: 'success',
     WARNING: 'warning'
@@ -87,7 +92,7 @@ function enableAllInputFields(){
     $("#inputZivotinja").prop("disabled", false )
 
 }
-function joinRoom(data) {
+export const joinRoom = (data) => {
     /*
     CODE: 200/404
     MSG?: string (error)
@@ -138,7 +143,7 @@ function joinRoom(data) {
     }
 }
 
-function playerReady(data) {
+export const playerReady = (data) => {
     /*
     username: string,
     CODE: number
@@ -165,7 +170,7 @@ function playerReady(data) {
     
 }
 
-function playerUnReady(data) {
+export const playerUnReady = (data) => {
     /*
     username: string,
     CODE: number
@@ -191,7 +196,8 @@ function playerUnReady(data) {
         playersReady--
     $('#lblPlayersReady').text(playersReady)
 }
-function notify(type, message) {
+
+const notify = (type, message) => {
     // type, warning, info, success
     new Noty({  
         theme : 'metroui',
