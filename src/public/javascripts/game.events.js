@@ -1,17 +1,14 @@
 
+import { playerReady, load } from './game.functions'
 
-$('#btnReady').on('click', (e) => {
-    if(gameStarted) {
-        // you will serve data here
-        return
-    } 
-    if(!ready) {
-        socket.emit('playerReady', ({ username, roomCode, sessionToken }))
-        $('#btnReady').prop('disabled', true)
-        return
-    }
-    socket.emit('playerUnReady', ({ username, roomCode, sessionToken }))
-    $('#btnReady').prob('disabled', true)
-    return
+document.getElementById('btnReady').addEventListener('click', () => {
+    playerReady()
 })
 
+window.onload = (e) => {
+    const {username, roomCode} = Qs.parse(location.search,{
+        ignoreQueryPrefix: true
+    })
+    const sessionToken =  localStorage.getItem('sessionToken')
+    load(username, roomCode, sessionToken)
+}
