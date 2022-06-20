@@ -1,5 +1,5 @@
-import {NType, BtnColors, BtnStates, SessionTokenRegEx, UsernameRegEx, RoomCodeRegEx  } from './game.consts'
-
+import { NType, BtnColors, BtnStates, SessionTokenRegEx, UsernameRegEx, RoomCodeRegEx  } from './game.consts.js'
+import socket , { SOCKET_EVENTS } from './game.sockets.js'
 // player count label lblPlayerCount
 // player ready label lblPlayersReady
 // round number label roundNumber
@@ -36,6 +36,9 @@ export const load = (_username, _roomCode, _sessionToken) => {
         username = _username
         roomCode = _roomCode
         sessionToken = _sessionToken
+        console.log(socket)
+        socket.emit(SOCKET_EVENTS.JOIN_ROOM, { username, roomCode, sessionToken })
+
     } else {
         //not and send back
     }
@@ -43,9 +46,7 @@ export const load = (_username, _roomCode, _sessionToken) => {
 }
 
 // maybe this should be wrapped in class
-
-
-export const joinRoom = (data) => {
+export const joinRoomResponse = (data) => {
     /*
     CODE: 200/404
     MSG?: string (error)

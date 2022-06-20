@@ -1,5 +1,5 @@
 
-import { playerReady, load } from './game.functions'
+import { playerReady, load } from './game.functions.js'
 
 document.getElementById('btnReady').addEventListener('click', () => {
     playerReady()
