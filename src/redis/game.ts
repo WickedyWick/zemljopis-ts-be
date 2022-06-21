@@ -60,7 +60,7 @@ export class GameData {
 
     static createPlayer = async(room: string, username: string, id: number, sessionToken: string) => {
         await redisDb.hSet(`players_${room}`, { [username]: id})
-        await redisDb.hSet(`${username}_${room}`, { id: id, points: 0, sessionToken: sessionToken })
+        await redisDb.hSet(`${username}_${room}`, { id: id, points: 0, sessionToken: sessionToken, ready: 0 })
     }
 
     static createRounds = async(room: string, roundNumber: number, id: number) => {
@@ -81,7 +81,7 @@ export class GameData {
             return 200
         } catch(e) {
             await redisDb.hSet(`${username}_${room}`, 'ready', 0)
-            await redisDb.hSet(room, 'playerReady', 0)
+            await redisDb.hSet(room, 'playersReady', 0)
             console.error(`Error during player ready up. Username|room: ${username}|${room}\nERR: ${e}`)
             return 500
         }
@@ -109,11 +109,14 @@ export class GameData {
     retrieveJoinRoomData = async(username: string, code?: 200) => {
         const res = await redisDb.hmGet(this._name, ['playersReady', 'playerCount', 'roundNumber', 'roundTimeLimit', 'roundActive'])
         const players = await redisDb.hKeys(`players_${this._name}`)
-        const points = await redisDb.hGet(`${username}_${this._name}`,'points')
+        const pointsAndReady = await redisDb.hmGet(`${username}_${this._name}`,['points', 'ready'])
+
+        // code consistency ?
         return {
             code: 200,
             ...res,
-            points,
+            points: pointsAndReady[0],
+            ready: pointsAndReady[1],
             players: players
         }
     }

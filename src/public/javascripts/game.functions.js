@@ -1,4 +1,4 @@
-import { NType, BtnColors, BtnStates, SessionTokenRegEx, UsernameRegEx, RoomCodeRegEx  } from './game.consts.js'
+import { N_TYPE, BTN_COLORS, BTN_STATES, SessionTokenRegEx, UsernameRegEx, RoomCodeRegEx  } from './game.consts.js'
 import socket , { SOCKET_EVENTS } from './game.sockets.js'
 // player count label lblPlayerCount
 // player ready label lblPlayersReady
@@ -18,14 +18,14 @@ let playersReady = 0
 let ready = false
 let gameStarted = false
 
-const lblPlayerCount = null
-const lblPlayerReady = null
-const lblRoundNumber = null
-const lblPoints = null
-const lblRoomCode = null
-const lblTimer = null
-const btnReady = null
-const ddlRoundSelect = null
+let lblPlayerCount = null
+let lblPlayerReady = null
+let lblRoundNumber = null
+let lblPoints = null
+let lblRoomCode = null
+let lblTimer = null
+let btnReady = null
+let ddlRoundSelect = null
 
 
 export const load = (_username, _roomCode, _sessionToken) => {
@@ -38,7 +38,15 @@ export const load = (_username, _roomCode, _sessionToken) => {
         sessionToken = _sessionToken
         console.log(socket)
         socket.emit(SOCKET_EVENTS.JOIN_ROOM, { username, roomCode, sessionToken })
-
+        // initialzie fields
+        lblPlayerCount = document.getElementById('lblPlayerCount')
+        lblPlayerReady = document.getElementById('lblPlayersReady')
+        lblRoundNumber = document.getElementById('lblRoundNumber')
+        lblPoints = document.getElementById('lblPoints')
+        lblRoomCode = document.getElementById('lblRoomCode')
+        lblTimer = document.getElementById('lblTimer')
+        btnReady = document.getElementById('btnReady')
+        ddlRoundSelect = document.getElementById('roundSelect')
     } else {
         //not and send back
     }
@@ -51,6 +59,7 @@ export const joinRoomResponse = (data) => {
     CODE: 200/404
     MSG?: string (error)
     points: string
+    ready: string
     0(playersReady): string
     1(playerCount): string
     2(roundNumber): string
@@ -63,6 +72,14 @@ export const joinRoomResponse = (data) => {
         console.log(data)
         console.log(username, roomCode)
         $('#maxDiv').show()
+        ready = data['ready'] === "1"
+        console.log(ready)
+        if (ready) {
+            setButtonReady()
+            btnReady.disabled = false
+            ready = true
+            notify(N_TYPE.SUCCESS, 'Spremni ste!')
+        }
         playerCount = Number(data['1'])
         $('#lblPlayerCount').text(playerCount)
         playersReady= Number(data['0'])
@@ -80,12 +97,12 @@ export const joinRoomResponse = (data) => {
                 ${i}
             </option>`)
         }
-        notify(NType.SUCCESS, 'Uspesno ste se pridruzili sobi')
+        notify(N_TYPE.SUCCESS, 'Uspesno ste se pridruzili sobi')
         if(data['4'] == '1') {
-            $('#btnReady').prop('disabled', true)
+            btnReady.disabled = true
             disableAllInputFields()
             gameStarted = true;
-            notify(NType.SUCCESS, 'Sačekajte sledecu rundu da bi ste nastavili da igrate!')
+            notify(N_TYPE.SUCCESS, 'Sačekajte sledecu rundu da bi ste nastavili da igrate!')
         }
         for( let i = 0; i < data['players'].length; i++) {
             if(data['players'][i] != username)
@@ -93,7 +110,7 @@ export const joinRoomResponse = (data) => {
         }
     } else {
         $('#maxDiv').hide()
-        notify(NType.WARNING, 'Korisnicko ime i ili soba nisu vazeci!')
+        notify(N_TYPE.WARNING, 'Korisnicko ime i ili soba nisu vazeci!')
     }
 }
 
@@ -104,19 +121,17 @@ export const playerReadyResponse = (data) => {
     */
     if(data.CODE >= 400) {
         //alert
-        $('#readyBtn').css('color', BtnColors.RED)
-        $('#readyBtn').text(response.BTN_NOT_READY)
-        $('#readyBtn').prop('disabled', false)
+        setButtonUnReady()
+        btnReady.disabled = false
         ready = false
-        notify(NType.WARNING, 'Doslo je do problema pokusajte ponovo')
+        notify(N_TYPE.WARNING, 'Doslo je do problema pokusajte ponovo')
         return
     } 
     if(data.username == username) {
-        $('#readyBtn').css('color', BtnColors.GREEN)
-        $('#readyBtn').text(response.BTN_READY)
-        $('#readyBtn').prop('disabled', false)
+        setButtonReady()
+        btnReady.disabled = false
         ready = true
-        notify(NType.SUCCESS, 'Spremni ste!')
+        notify(N_TYPE.SUCCESS, 'Spremni ste!')
     }
     if(playersReady < playerCount)
         playersReady++
@@ -131,19 +146,17 @@ export const playerUnReadyReadyResponse = (data) => {
     */
     if(data.CODE > 400) {
         //alert
-        $('#readyBtn').css('color', BtnColors.RED)
-        $('#readyBtn').text(response.BTN_NOT_READY)
-        $('#readyBtn').prop('disabled', false)
+        setButtonUnReady()
+        btnReady.disabled = false
         ready = false
-        notify(NType.WARNING, 'Doslo je do problema pokusajte ponovo')
+        notify(N_TYPE.WARNING, 'Doslo je do problema pokusajte ponovo')
         return
     } 
     if(data.username == username) {
-        $('#readyBtn').css('color', BtnColors.GREEN)
-        $('#readyBtn').text(response.BTN_READY)
-        $('#readyBtn').prop('disabled', false)
+        setButtonUnReady()
+        btnReady.disabled = false
         ready = true
-        notify(NType.SUCCESS, 'Niste spremni')
+        notify(N_TYPE.SUCCESS, 'Niste spremni')
     }
     // maybe return player count? :D
     if(playersReady > 0)
@@ -158,11 +171,11 @@ export const playerReady = () => {
     } 
     if(!ready) {
         socket.emit('playerReady', ({ username, roomCode, sessionToken }))
-        $('#btnReady').prop('disabled', true)
+        btnReady.disabled = true
         return
     }
     socket.emit('playerUnReady', ({ username, roomCode, sessionToken }))
-    $('#btnReady').prob('disabled', true)
+    btnReady.disabled = true
     return
 }
 
@@ -238,4 +251,14 @@ function enableAllInputFields(){
     $("#inputPlanina").prop("disabled", false )
     $("#inputZivotinja").prop("disabled", false )
 
+}
+
+function setButtonReady() {
+    btnReady.style.backgroundColor = BTN_COLORS.GREEN
+    btnReady.textContent = BTN_STATES.BTN_READY
+}
+
+function setButtonUnReady() {
+    btnReady.style.backgroundColor = BTN_COLORS.RED
+    btnReady.textContent = BTN_STATES.BTN_NOT_READY
 }
