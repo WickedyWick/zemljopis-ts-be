@@ -1,16 +1,58 @@
 {
+  "scripts": {
+    "dev": "nodemon",
+    "make:migration": "knex migrate:make",
+    "migrate": "knex migrate:latest",
+    "migrate:rollback": "knex migrate:rollback",
+    "migrate:up": "knex migrate:up",
+    "migrate:down": "knex migrate:down",
+    "migrate:generate": "knex migrate:make",
+    "dev:docker": "docker-compose build base && docker-compose -f docker-compose.yml up",
+    "start": "pm2-runtime ./ecosystem.config.js",
+    "build": "./scripts/build.sh",
+    "repl": "node --experimental-repl-await  -r ts-node/register -r tsconfig-paths/register ./build/utils/repl.js",
+    "start:docker": "docker build -t base . && docker run base",
+    "ps:api": "node --trace-warnings --inspect=0.0.0.0:9229 -r ts-node/register -r tsconfig-paths/register src/index.ts",
+    "test": "jest --watchAll"
+  },
   "dependencies": {
+    "@types/redis": "^4.0.11",
+    "@types/socket.io-client": "^3.0.0",
     "body-parser": "^1.19.0",
+    "commonjs": "^0.0.1",
     "cors": "^2.8.5",
+    "crypto-random-string": "^4.0.0",
+    "date-fns": "^2.28.0",
     "dotenv": "^10.0.0",
     "express": "^4.17.1",
+    "express-validator": "^6.14.0",
+    "http-status": "^1.5.0",
+    "jest": "^27.5.1",
+    "knex": "^1.0.2",
+    "knex-paginate": "^3.0.0",
     "morgan": "^1.10.0",
+    "mysql": "^2.18.1",
+    "nodemon": "^2.0.15",
+    "pg": "^8.7.1",
+    "pm2": "^5.1.2",
+    "redis": "^4.0.3",
+    "redis-rejson": "^1.0.0",
     "socket.io": "^4.4.0",
-    "ts-node": "^10.4.0"
+    "socket.io-client": "^4.5.0",
+    "supertest": "^6.2.2",
+    "ts-jest": "^27.1.4",
+    "ts-node": "^10.4.0",
+    "typescript": "^4.5.4"
   },
   "devDependencies": {
     "@types/express": "^4.17.13",
+    "@types/jest": "^27.4.1",
     "@types/morgan": "^1.9.3",
-    "@types/node": "^16.11.10"
+    "@types/multer": "^1.4.5",
+    "@types/node": "^16.11.22",
+    "@types/supertest": "^2.0.12",
+    "concurrently": "^6.0.2",
+    "nodemon": "^2.0.7",
+    "tsconfig-paths": "^3.9.0"
   }
 }
