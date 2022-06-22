@@ -10,4 +10,5 @@ node_modules
 *.sln
 *.sw?
 .log
-.rdb
+*.rdb
+.lock

@@ -6,9 +6,9 @@ import { routes } from './routes'
 import { ClientToServerEvents, InterServerEvents, ServerToClientEvents } from 'utils/socketTypes'
 const app = express()
 
-app.use(express.static(__dirname + '\\public'))
+
 configure(app)
-app.use(express.static('src/public'))
+app.use(express.static('src/public', { extensions: ['js'] }))
 const server = app.listen(process.env.PORT, () => {
     console.log(`--> Server started at http://localhost:${process.env.PORT}`)
 })

@@ -16,7 +16,8 @@
         <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
         <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.5.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-ho+j7jyWK8fNQe+A12Hb8AhRq26LrZ/JpcUGGOn+Y7RsweNrtN/tE3MoK7ZeZDyx" crossorigin="anonymous"></script>
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/noty/3.1.4/noty.css" integrity="sha512-NXUhxhkDgZYOMjaIgd89zF2w51Mub53Ru3zCNp5LTlEzMbNNAjTjDbpURYGS5Mop2cU4b7re1nOIucsVlrx9fA==" crossorigin="anonymous" />
-        
+        <script src="/socket.io/socket.io.js"></script>
+        <script type="module" type="text/javascript" src="../javascripts/game.sockets.js"></script>
         <meta name="viewport" content="width=device-width, initial-scale=1.0"> 
     </head>
     <body>
@@ -114,15 +115,15 @@
               </div>
               <div id="rundaDiv">
                 <label>Runda : </label>
-                <label id="roundNumber">1</label>
-                <label id="currentLetter"></label>
+                <label id="lblRoundNumber">1</label>
+                <label id="lblCurrentLetter"></label>
                 <br>
                 <label>Poeni : </label>
-                <label id="poeni">0</label>
+                <label id="lblPoeni">0</label>
             </div>
             <div>
                     <label>Vreme : </label>
-                    <label id="counter"></label>
+                    <label id="lblCounter"></label>
             </div>
             <div>
                 <label >Igrači : <label id="localPlayer" class="nameLabel"></label></label>
@@ -133,11 +134,14 @@
           </div>
       </div>
     </body>
-    <script src="/socket.io/socket.io.js"></script>
+ 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/qs/6.9.4/qs.min.js" integrity="sha512-BHtomM5XDcUy7tDNcrcX1Eh0RogdWiMdXl3wJcKB3PFekXb3l5aDzymaTher61u6vEZySnoC/SAj2Y/p918Y3w==" crossorigin="anonymous"></script>
+    <script type="module" type="text/javascript" src="../javascripts/game.js"></script>
     <script src="https://code.jquery.com/jquery-3.6.0.min.js" integrity="sha256-/xUj+3OJU5yExlq6GSYGSHk7tPXikynS7ogEvDej/m4=" crossorigin="anonymous"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/noty/3.1.4/noty.min.js" integrity="sha512-lOrm9FgT1LKOJRUXF3tp6QaMorJftUjowOWiDcG5GFZ/q7ukof19V0HKx/GWzXCdt9zYju3/KhBNdCLzK8b90Q==" crossorigin="anonymous"></script>
     <script src="../javascripts/config.js"></script>
-    <script src="../javascripts/game.functions.js"></script>
-    <script type="text/javascript" src="../javascripts/game.js"></script>
+    <script type="module" type="text/javascript" src="../javascripts/game.consts.js"></script>
+    <script type="module" type="text/javascript" src="../javascripts/game.functions.js"></script>
+    <script type="module" type="text/javascript" src="../javascripts/game.events.js"></script>
+
 </html>
