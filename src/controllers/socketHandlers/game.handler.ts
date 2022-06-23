@@ -24,6 +24,7 @@ export const joinRoom = async(io: Server, socket: Socket, username: string, room
         }
         const data = await room.retrieveJoinRoomData(username)
         await socket.join(roomCode)
+        await room.trackSocket(socket.id, username, roomCode)
         socket.emit('joinRoom', {
             ...data
         })
@@ -45,6 +46,7 @@ export const playerReady = async(io: Server, socket: Socket, username: string, r
         console.error(`Doslo je do problema prilikom slanja ready upa. SocketID: ${socket.id}\nERR: ${e}`)
     }
 }
+
 export const playerUnReady = async(io: Server, socket: Socket, username: string, roomCode: string) => {
     try{
         const res = await GameData.playerUnReady(roomCode, username)
