@@ -1,9 +1,10 @@
 import express from 'express'
 import { configure } from './utils/configure'
 import socketio, { Server } from 'socket.io'
-import { registerGameHandlers } from './sockets/game.sockets'
+import { registerGameHandlers, registerDisconnect } from './sockets/game.sockets'
 import { routes } from './routes'
 import { ClientToServerEvents, InterServerEvents, ServerToClientEvents } from 'utils/socketTypes'
+import { redisDb } from 'redis'
 const app = express()
 
 
@@ -15,6 +16,7 @@ const server = app.listen(process.env.PORT, () => {
 const io = new Server<ClientToServerEvents, ServerToClientEvents, InterServerEvents>(server)
 const onConnection = async(socket: socketio.Socket) => {
     registerGameHandlers(io, socket)
+    registerDisconnect(socket)
 }
 
 app.use(routes)

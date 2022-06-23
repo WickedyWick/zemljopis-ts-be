@@ -1,6 +1,7 @@
 import { Server, Socket } from "socket.io";
 import { joinRoomValidator, playeReadyValidator } from "validators/socketValidator";
 import { joinRoom, playerReady, playerUnReady } from "controllers/socketHandlers/game.handler";
+import { GameData } from "redis/game";
 export const EVENTS = {
     JOIN_ROOM : 'joinRoom',
     PLAYER_JOINED: 'playerJoined',
@@ -26,5 +27,11 @@ export const registerGameHandlers = async(io: Server, socket: Socket) => {
     })
     socket.on('test', () => {
         socket.emit('test')
+    })
+}
+
+export const registerDisconnect = async(socket: Socket) => {
+    socket.on('disconnect', () => {
+        GameData.unTrackSocket(socket.id)
     })
 }

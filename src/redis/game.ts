@@ -106,6 +106,22 @@ export class GameData {
         }
     }
 
+    trackSocket = async(socketId: string, username: string, room: string) => {
+        try {
+            await redisDb.hSet(socketId, { username: username, room: room })
+        } catch (e) {
+            console.error(`Error tracking socket. Username: ${ username }\nSocketID: ${ socketId }\nErr : ${e}`)
+        }
+    }
+
+    static unTrackSocket = async(socketId: string) => {
+        try {
+            await redisDb.del(socketId)
+        } catch(e) {
+            console.error(`Error untracking socket. SocketID: ${ socketId }\nErr : ${ e }`)
+        }
+    }
+
     retrieveJoinRoomData = async(username: string, code?: 200) => {
         const res = await redisDb.hmGet(this._name, ['playersReady', 'playerCount', 'roundNumber', 'roundTimeLimit', 'roundActive'])
         const players = await redisDb.hKeys(`players_${this._name}`)
