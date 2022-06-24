@@ -16,7 +16,7 @@ const server = app.listen(process.env.PORT, () => {
 const io = new Server<ClientToServerEvents, ServerToClientEvents, InterServerEvents>(server)
 const onConnection = async(socket: socketio.Socket) => {
     registerGameHandlers(io, socket)
-    registerDisconnect(socket)
+    registerDisconnect(io, socket)
 }
 
 app.use(routes)

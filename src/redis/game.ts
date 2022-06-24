@@ -1,6 +1,8 @@
 import { redisDb } from './index'
 import { defaultLetters } from 'utils/strings'
 import { RedisSearchLanguages } from '@node-redis/search/dist/commands'
+import { Server, Socket } from 'socket.io'
+import { EVENTS } from 'sockets/game.sockets'
 
 export interface GameFields {
     playerCount: number,
@@ -76,11 +78,16 @@ export class GameData {
             if(ready == '0') {
                 const data = await redisDb.hmGet(room, ['playersReady', 'playerCount'])
                 await redisDb.hSet(`${username}_${room}`, 'ready', 1)
-                await redisDb.hSet(room, 'playersReady', Number(data[0]) + 1)
+                const updated = Number(data[0]) + 1
+                console.log(updated)
+                if (updated <= Number(data[1]) && Number(data[0]) >= 0)
+                    await redisDb.hSet(room, 'playersReady', Number(data[0]) + 1)
+                else
+                    throw Error
             }
             return 200
         } catch(e) {
-            await redisDb.hSet(`${username}_${room}`, 'ready', 0)
+            await this.unReadyAll(room)
             await redisDb.hSet(room, 'playersReady', 0)
             console.error(`Error during player ready up. Username|room: ${username}|${room}\nERR: ${e}`)
             return 500
@@ -91,15 +98,22 @@ export class GameData {
             const ready = await redisDb.hGet(`${username}_${room}`, 'ready')
             if ( ready == '1') {
                 const data = await redisDb.hmGet(room, ['playersReady', 'playerCount'])
-                await redisDb.hSet(`${username}_${room}`, 'ready', 1)
-                await redisDb.hSet(room, 'playersReady', Number(data[0]) - 1)
+                await redisDb.hSet(`${username}_${room}`, 'ready', 0)
+                const updated = Number(data[0]) - 1
+                console.log('check')
+                console.log(updated)
+                if (updated >= 0 && Number(data[0]) <= Number(data[1]))
+                    await redisDb.hSet(room, 'playersReady', Number(data[0]) - 1)
+                else
+                    throw Error
             }
             /* this will return 200 even for 404
              (can put if but it should never be the case) and edge case isnt that critical
             */
             return 200
         } catch(e) {
-            await redisDb.hSet(`${username}_${room}`, 'ready', 1)
+            // need to set all to 0
+            await this.unReadyAll(room)
             await redisDb.hSet(room, 'playersReady', 0)
             console.error(`Error during player unready up. Username|room: ${username}|${room}\nERR: ${e}`)
             return 500
@@ -114,11 +128,24 @@ export class GameData {
         }
     }
 
-    static unTrackSocket = async(socketId: string) => {
+    static unTrackSocket = async(io: Server, socket: Socket) => {
         try {
-            await redisDb.del(socketId)
+            const { username, room } = await redisDb.hGetAll(socket.id)
+            await this.playerUnReady(room, username)
+            io.to(room).emit(EVENTS.PLAYER_UNREADY, {
+                username,
+                CODE: 200
+            })
+            await redisDb.del(socket.id)
         } catch(e) {
-            console.error(`Error untracking socket. SocketID: ${ socketId }\nErr : ${ e }`)
+            console.error(`Error untracking socket. SocketID: ${ socket.id }\nErr : ${ e }`)
+        }
+    }
+
+    static unReadyAll = async(room: string) => {
+        const keys = await redisDb.hKeys(room)
+        for (let i = 0 ; i < keys.length ; i++) {
+            await redisDb.hSet(`${keys[i]}_${room}`, 'ready', 0)
         }
     }
 

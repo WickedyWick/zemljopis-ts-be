@@ -30,8 +30,8 @@ export const registerGameHandlers = async(io: Server, socket: Socket) => {
     })
 }
 
-export const registerDisconnect = async(socket: Socket) => {
-    socket.on('disconnect', () => {
-        GameData.unTrackSocket(socket.id)
+export const registerDisconnect = async(io: Server, socket: Socket) => {
+    socket.on('disconnect', async() => {
+        await GameData.unTrackSocket(io, socket)
     })
 }
