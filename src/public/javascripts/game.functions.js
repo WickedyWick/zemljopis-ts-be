@@ -155,7 +155,7 @@ export const playerUnReadyReadyResponse = (data) => {
     if(data.username == username) {
         setButtonUnReady()
         btnReady.disabled = false
-        ready = true
+        ready = false
         notify(N_TYPE.SUCCESS, 'Niste spremni')
     }
     // maybe return player count? :D
