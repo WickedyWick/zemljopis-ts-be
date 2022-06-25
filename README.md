@@ -27,5 +27,50 @@ Register joining other players and make sure its all working propertly
 Implement translator on FE
 Extend db for data
 
+## SETUP
+setup db, fill .env file
+
+Install packages
+```
+yarn install 
+```
+
+Start postgresql database on linux:
+```
+sudo service postgresql start
+```
+
+Start redis server:
+```
+redis-server
+```
+
+Start application:
+```
+yarn dev
+```
+
+Run latest migrations:
+```
+yarn migrate
+```
+
+Seed database:
+```
+yarn seed
+```
+
+Run tests:
+```
+yarn test
+```
 ### SELFNOTES
 Add error messages on FE and serve it and just send codes from server?
+
+// export script
+sudo -u postgres psql -d zemljopis -c "copy player to '/tmp/test2.csv' with delimiter ',' csv header;"
+
+cachovati u 8x30 keyeva ili 8 keyeva sa svim slovima? vrv 8x30 katerorija x slovo
+
+db cuvati u cirlici jer nema kosenih nekosenih i to ce biti  -> nece moci ako ne konstienti bude input... 
+decision -> samo prihvati nekosenu latinicu i cirilicu. nepismeni neka ne igraju
