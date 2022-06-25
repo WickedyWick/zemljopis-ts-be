@@ -27,6 +27,43 @@ Register joining other players and make sure its all working propertly
 Implement translator on FE
 Extend db for data
 
+## SETUP
+setup db, fill .env file
+
+Install packages
+```
+yarn install 
+```
+
+Start postgresql database on linux:
+```
+sudo service postgresql start
+```
+
+Start redis server:
+```
+redis-server
+```
+
+Start application:
+```
+yarn dev
+```
+
+Run latest migrations:
+```
+yarn migrate
+```
+
+Seed database:
+```
+yarn seed
+```
+
+Run tests:
+```
+yarn test
+```
 ### SELFNOTES
 Add error messages on FE and serve it and just send codes from server?
 
