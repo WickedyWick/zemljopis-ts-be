@@ -1,10 +1,10 @@
-import { Model, BaseModel, ModelDate } from 'database/model'
+import { Model, BaseModel } from 'database/model'
 
 export interface FieldDataFields {
     id: number
     data: string
     letter: string
-    category: number
+    category_id: number
 }
 
 export interface FieldDataMethods {
@@ -18,7 +18,7 @@ export class FieldData extends BaseModel<FieldDataFields, FieldDataMethods> {
         'id',
         'data',
         'letter',
-        'category', 
+        'category_id'
     ]
 
     constructor () {
