@@ -25,3 +25,5 @@ export class Category extends BaseModel<CategoryFields, CategoryMethods> {
 
     }
 }
+
+export default new Category()
