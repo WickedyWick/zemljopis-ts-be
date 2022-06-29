@@ -118,6 +118,7 @@ export const playerReadyResponse = (data) => {
     /*
     username: string,
     CODE: number
+    playersReady: number
     */
     if(data.CODE >= 400) {
         //alert
@@ -133,9 +134,8 @@ export const playerReadyResponse = (data) => {
         ready = true
         notify(N_TYPE.SUCCESS, 'Spremni ste!')
     }
-    if(playersReady < playerCount)
-        playersReady++
-    $('#lblPlayersReady').text(playersReady)
+
+    $('#lblPlayersReady').text(data.playersReady)
     
 }
 
@@ -143,6 +143,7 @@ export const playerUnReadyReadyResponse = (data) => {
     /*
     username: string,
     CODE: number
+    playersReady: number
     */
     if(data.CODE > 400) {
         //alert
@@ -159,9 +160,7 @@ export const playerUnReadyReadyResponse = (data) => {
         notify(N_TYPE.SUCCESS, 'Niste spremni')
     }
     // maybe return player count? :D
-    if(playersReady > 0)
-        playersReady--
-    $('#lblPlayersReady').text(playersReady)
+    $('#lblPlayersReady').text(data.playersReady)
 }
 
 export const playerReady = () => {

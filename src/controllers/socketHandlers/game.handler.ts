@@ -40,7 +40,7 @@ export const playerReady = async(io: Server, socket: Socket, username: string, r
     const res = await GameData.playerReady(roomCode, username)
         io.to(roomCode).emit(EVENTS.PLAYER_READY, {
             username,
-            CODE: res
+            ...res
         })
     } catch(e) {
         console.error(`Doslo je do problema prilikom slanja ready upa. SocketID: ${socket.id}\nERR: ${e}`)
@@ -52,7 +52,7 @@ export const playerUnReady = async(io: Server, socket: Socket, username: string,
         const res = await GameData.playerUnReady(roomCode, username)
         io.to(roomCode).emit(EVENTS.PLAYER_UNREADY, {
             username,
-            CODE: 200
+            ...res
         })
     } catch(e) {
         console.error(`Doslo je do problema prilikom slanja unready upa. SocketID: ${socket.id}\nERR : ${e}`)

@@ -75,48 +75,61 @@ export class GameData {
     static playerReady = async(room: string, username: string) => {
         try {
             const ready = await redisDb.hGet(`${username}_${room}`, 'ready')
+            let pReady = -1
             if(ready == '0') {
                 const data = await redisDb.hmGet(room, ['playersReady', 'playerCount'])
                 await redisDb.hSet(`${username}_${room}`, 'ready', 1)
                 const updated = Number(data[0]) + 1
-                console.log(updated)
-                if (updated <= Number(data[1]) && Number(data[0]) >= 0)
-                    await redisDb.hSet(room, 'playersReady', Number(data[0]) + 1)
-                else
+                if (updated <= Number(data[1]) && Number(data[0]) >= 0) {
+                    pReady = await redisDb.hIncrBy(room, 'playersReady', 1)
+                }
+                else {
                     throw Error
+                }
+
             }
-            return 200
+
+            return {
+                CODE: 200,
+                playersReady: pReady
+            }
+
         } catch(e) {
             await this.unReadyAll(room)
             await redisDb.hSet(room, 'playersReady', 0)
             console.error(`Error during player ready up. Username|room: ${username}|${room}\nERR: ${e}`)
-            return 500
+            return {
+                CODE: 500,
+                playersReady: 0
+            }
         }
     }
     static playerUnReady = async(room: string, username: string) => {
         try {
             const ready = await redisDb.hGet(`${username}_${room}`, 'ready')
+            let pReady = -1
             if ( ready == '1') {
                 const data = await redisDb.hmGet(room, ['playersReady', 'playerCount'])
                 await redisDb.hSet(`${username}_${room}`, 'ready', 0)
                 const updated = Number(data[0]) - 1
-                console.log('check')
-                console.log(updated)
                 if (updated >= 0 && Number(data[0]) <= Number(data[1]))
-                    await redisDb.hSet(room, 'playersReady', Number(data[0]) - 1)
+                    pReady = await redisDb.hIncrBy(room, 'playersReady', - 1)
                 else
                     throw Error
             }
-            /* this will return 200 even for 404
-             (can put if but it should never be the case) and edge case isnt that critical
-            */
-            return 200
+            return {
+                CODE: 200,
+                playersReady: pReady
+            }
         } catch(e) {
             // need to set all to 0
             await this.unReadyAll(room)
             await redisDb.hSet(room, 'playersReady', 0)
             console.error(`Error during player unready up. Username|room: ${username}|${room}\nERR: ${e}`)
-            return 500
+            return {
+                CODE: 500,
+                playersReady: 0
+            }
         }
     }
 
@@ -131,10 +144,10 @@ export class GameData {
     static unTrackSocket = async(io: Server, socket: Socket) => {
         try {
             const { username, room } = await redisDb.hGetAll(socket.id)
-            await this.playerUnReady(room, username)
+            const res = await this.playerUnReady(room, username)
             io.to(room).emit(EVENTS.PLAYER_UNREADY, {
                 username,
-                CODE: 200
+                ...res
             })
             await redisDb.del(socket.id)
         } catch(e) {
