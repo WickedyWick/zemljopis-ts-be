@@ -135,7 +135,9 @@ export const playerReadyResponse = (data) => {
         notify(N_TYPE.SUCCESS, 'Spremni ste!')
     }
 
-    $('#lblPlayersReady').text(data.playersReady)
+    // -1 if nothing has to be changed saved some BE overhead ( maybe not worth it for sake of consistency?)
+    if(data.playersReady != -1)
+        $('#lblPlayersReady').text(data.playersReady)
     
 }
 
@@ -159,8 +161,9 @@ export const playerUnReadyReadyResponse = (data) => {
         ready = false
         notify(N_TYPE.SUCCESS, 'Niste spremni')
     }
-    // maybe return player count? :D
-    $('#lblPlayersReady').text(data.playersReady)
+    // -1 if nothing has to be changed 
+    if(data.playersReady != -1)
+        $('#lblPlayersReady').text(data.playersReady)
 }
 
 export const playerReady = () => {
