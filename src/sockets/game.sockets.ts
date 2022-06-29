@@ -1,5 +1,5 @@
 import { Server, Socket } from "socket.io";
-import { joinRoomValidator, playeReadyValidator } from "validators/socketValidator";
+import { joinRoomValidator, playerReadyValidator, playerUnReadyValidator } from "validators/socketValidator";
 import { joinRoom, playerReady, playerUnReady } from "controllers/socketHandlers/game.handler";
 import { GameData } from "redis/game";
 export const EVENTS = {
@@ -17,12 +17,12 @@ export const registerGameHandlers = async(io: Server, socket: Socket) => {
     })
 
     socket.on(EVENTS.PLAYER_READY, async({ username, roomCode, sessionToken }) => {
-        const v: boolean = await playeReadyValidator(io, socket, username, roomCode, sessionToken)
+        const v: boolean = await playerReadyValidator(io, socket, username, roomCode, sessionToken)
         if (v) playerReady(io, socket, username, roomCode)
     })
 
     socket.on(EVENTS.PLAYER_UNREADY, async({ username, roomCode, sessionToken }) => {
-        const v: boolean = await playeReadyValidator(io, socket, username, roomCode, sessionToken)
+        const v: boolean = await playerUnReadyValidator(io, socket, username, roomCode, sessionToken)
         if (v) playerUnReady(io, socket, username, roomCode)
     })
     socket.on('test', () => {
