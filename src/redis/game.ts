@@ -21,6 +21,7 @@ export interface GameFields {
     created_at: Date | string // not nessesarry in redis?
     active: boolean
     playersRegistered: number
+    gameInProgress: number
 }
  //pogledaj value ts
 
@@ -51,6 +52,7 @@ export class GameData {
             created_at: new Date(),
             active: true,
             playersRegistered: 1,
+            gameInProgress: 0,
         }
         //@ts-ignore
         await redisDb.hSet(room, value)
@@ -82,11 +84,14 @@ export class GameData {
                 const updated = Number(data[0]) + 1
                 if (updated <= Number(data[1]) && Number(data[0]) >= 0) {
                     pReady = await redisDb.hIncrBy(room, 'playersReady', 1)
+                    if (pReady == Number(data[1])) {
+                        // game start method
+                        console.log('GAME STARTS')
+                    }
                 }
                 else {
                     throw Error
                 }
-
             }
 
             return {
@@ -175,6 +180,9 @@ export class GameData {
             ready: pointsAndReady[1],
             players: players
         }
+    }
+    static checkGameState = async(room: string) => {
+        return redisDb.hGet(room, 'gameInProgress')
     }
     // same as craete Player
     addPlayer = async(username: string, id: number, sessionToken: string ) => {
