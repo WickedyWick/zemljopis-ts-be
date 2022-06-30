@@ -1,3 +1,5 @@
+import { GameData } from "redis/game"
+
 export const makeRoomCode = async () => {
     try {
         let result = ''
@@ -13,7 +15,21 @@ export const makeRoomCode = async () => {
 
 }
 
-export const defaultLetters = ["a","b","c","č","ć","d","dž","đ","e","f","g","h","i","j","k","l","lj","m","n","nj","o","p","r","s","š","t","u","v","z","ž"]
+export const chooseLetter = async(room: string) => {
+    const gameData = new GameData(room)
+
+    let letters = await gameData.getLetters()
+    if (letters == '') return letters
+
+    const charAt = Math.floor(Math.random() * letters.length)
+    const newLetter = letters[charAt]
+    await gameData.setLetters(letters.replace(newLetter, ''), newLetter)
+
+    return newLetter
+}
+
+
+export const defaultLetters = "abcčćddžđefghijklljmnnjoprsštuvzž"
 export const RoomCodeRegEx = '^[A-Za-z0-9]{8}$'
-export const UsernameRegEx = '^[A-Za-z0-9а-шА-ШčČćĆžŽšŠđĐђјљњћџЂЈЉЊЋЏ ]{4,16}$'
+export const UsernameRegEx = '^[A-Za-z0-9а-шА-ШčČćĆžŽšŠđĐђјљњћџЂЈЉЊЋЏ ]{416}$'
 export const SessionTokenRegEx = '^[A-Za-z0-9]{96}$'

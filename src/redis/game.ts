@@ -3,6 +3,7 @@ import { defaultLetters } from 'utils/strings'
 import { RedisSearchLanguages } from '@node-redis/search/dist/commands'
 import { Server, Socket } from 'socket.io'
 import { EVENTS } from 'sockets/game.sockets'
+import { gameStart } from 'controllers/socketHandlers/game.handler'
 
 export interface GameFields {
     playerCount: number,
@@ -14,7 +15,7 @@ export interface GameFields {
     roundIds: any,
     players: any,
     playersIds: any,
-    availableLetters: string[],
+    availableLetters: string,
     currentLetter: string,
     evalFuncExecuting: number,
     data: any, // strongtype this later
@@ -26,10 +27,10 @@ export interface GameFields {
  //pogledaj value ts
 
 export class GameData {
-    private _name: string
+    private _room: string
 
     constructor (name: string) {
-        this._name = name
+        this._room = name
     }
     static roomExists = async(room: string) => {
         return await redisDb.exists(room)
@@ -38,7 +39,7 @@ export class GameData {
         const value: GameFields = {
             playerCount,
             playersReady: 0,
-            roundNumber: 1,
+            roundNumber: 0,
             roundTimeLimit,
             roundActive: 0,
             roundId: -1,
@@ -74,7 +75,7 @@ export class GameData {
         const sT = await redisDb.hGet(`${username}_${room}`, 'sessionToken')
         return sT === sessionToken
     }
-    static playerReady = async(room: string, username: string) => {
+    static playerReady = async(io: Server, room: string, username: string) => {
         try {
             const ready = await redisDb.hGet(`${username}_${room}`, 'ready')
             let pReady = -1
@@ -85,8 +86,7 @@ export class GameData {
                 if (updated <= Number(data[1]) && Number(data[0]) >= 0) {
                     pReady = await redisDb.hIncrBy(room, 'playersReady', 1)
                     if (pReady == Number(data[1])) {
-                        // game start method
-                        console.log('GAME STARTS')
+                        gameStart(io, room)
                     }
                 }
                 else {
@@ -168,9 +168,9 @@ export class GameData {
     }
 
     retrieveJoinRoomData = async(username: string, code?: 200) => {
-        const res = await redisDb.hmGet(this._name, ['playersReady', 'playerCount', 'roundNumber', 'roundTimeLimit', 'roundActive'])
-        const players = await redisDb.hKeys(`players_${this._name}`)
-        const pointsAndReady = await redisDb.hmGet(`${username}_${this._name}`,['points', 'ready'])
+        const res = await redisDb.hmGet(this._room, ['playersReady', 'playerCount', 'roundNumber', 'roundTimeLimit', 'roundActive'])
+        const players = await redisDb.hKeys(`players_${this._room}`)
+        const pointsAndReady = await redisDb.hmGet(`${username}_${this._room}`,['points', 'ready'])
 
         // code consistency ?
         return {
@@ -182,29 +182,44 @@ export class GameData {
         }
     }
     static checkGameState = async(room: string) => {
-        return redisDb.hGet(room, 'gameInProgress')
+        return Number(redisDb.hGet(room, 'gameInProgress'))
+    }
+
+    setGameInProgress = async(state: number) => {
+        await redisDb.hSet(this._room, 'gameInProgress', state)
     }
     // same as craete Player
     addPlayer = async(username: string, id: number, sessionToken: string ) => {
         // unique key
-        await redisDb.hSet(`players_${this._name}`, { [username]: id})
-        await redisDb.hSet(`${username}_${this._name}`, { id: id, points: 0, sessionToken: sessionToken, ready: 0 })
+        await redisDb.hSet(`players_${this._room}`, { [username]: id})
+        await redisDb.hSet(`${username}_${this._room}`, { id: id, points: 0, sessionToken: sessionToken, ready: 0 })
     }
     playerExists = async(username: string) => {
-        return Number(await redisDb.exists(`${username}_${this._name}`))
+        return Number(await redisDb.exists(`${username}_${this._room}`))
     }
 
+    getLetters = async() => {
+        return redisDb.hGet(this._room, 'availableLetters')
+    }
+    setLetters = async(letters: string, currentLetter: string) => {
+        await redisDb.hSet(this._room, 'currentLetter', currentLetter)
+        return await redisDb.hSet(this._room, 'availableLetters', letters)
+    }
     // combine getplayer ciount and players joined in one query with hmGet?
     getPlayerCount = async() => {
-        return Number(await redisDb.hGet(this._name, 'playerCount'))
+        return Number(await redisDb.hGet(this._room, 'playerCount'))
     }
     getPlayersJoined = async() => {
-        return Number(await redisDb.hGet(this._name, 'playerRegistered'))
+        return Number(await redisDb.hGet(this._room, 'playerRegistered'))
     }
     setHash = async(key: string, value: Partial<GameFields>) => {
         // @ts-ignore
         return await redisDb.hSet(key, value)
     }
+    nextRound = async() => {
+        return await redisDb.hIncrBy(this._room, 'roundNumber', 1)
+    }
+
     getHashByKey = async(setKey: string, valKey: string) => {
         return await redisDb.hGet(setKey, valKey)
     }

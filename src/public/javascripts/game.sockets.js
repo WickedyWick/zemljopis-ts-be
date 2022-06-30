@@ -8,7 +8,8 @@ export const SOCKET_EVENTS = {
     JOIN_ROOM : 'joinRoom',
     PLAYER_JOINED: 'playerJoined',
     PLAYER_READY: 'playerReady',
-    PLAYER_UNREADY: 'playerUnReady'
+    PLAYER_UNREADY: 'playerUnReady',
+    GAME_START: 'gameStart'
 }
 
 socket.on('test',()=> {
