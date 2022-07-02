@@ -1,5 +1,5 @@
 import { Action } from "utils/typings";
-import { redisDb } from "redis";
+import { redisDb } from "redisDb";
 
 export const t: Action<any, any, any, any> = async(req, res ,next) => {
     let dic:any = {}

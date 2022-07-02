@@ -4,7 +4,7 @@ import { RoomModel } from 'database/models/room'
 import { makeRoomCode } from 'utils/strings'
 import { ERROR_ROOM_CREATE, ERROR_REG_PLAYER } from 'utils/errors/home'
 import { randomBytes } from 'crypto'
-import { GameData } from 'redis/game'
+import { GameData } from 'redisDb/game'
 interface RoomBody {
     username: string
     playerCount: number

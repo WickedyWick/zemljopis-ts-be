@@ -1,4 +1,4 @@
-import { GameData } from "redis/game"
+import { GameData } from "redisDb/game"
 
 export const makeRoomCode = async () => {
     try {
@@ -31,5 +31,5 @@ export const chooseLetter = async(room: string) => {
 
 export const defaultLetters = "abcčćddžđefghijklljmnnjoprsštuvzž"
 export const RoomCodeRegEx = '^[A-Za-z0-9]{8}$'
-export const UsernameRegEx = '^[A-Za-z0-9а-шА-ШčČćĆžŽšŠđĐђјљњћџЂЈЉЊЋЏ ]{416}$'
+export const UsernameRegEx = '^[A-Za-z0-9а-шА-ШčČćĆžŽšŠđĐђјљњћџЂЈЉЊЋЏ ]{4,16}$'
 export const SessionTokenRegEx = '^[A-Za-z0-9]{96}$'

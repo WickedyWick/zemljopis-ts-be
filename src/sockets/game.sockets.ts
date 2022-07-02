@@ -1,7 +1,7 @@
 import { Server, Socket } from "socket.io";
 import { joinRoomValidator, playerReadyValidator, playerUnReadyValidator } from "validators/socketValidator";
 import { joinRoom, playerReady, playerUnReady } from "controllers/socketHandlers/game.handler";
-import { GameData } from "redis/game";
+import { GameData } from "redisDb/game";
 export const EVENTS = {
     JOIN_ROOM : 'joinRoom',
     PLAYER_JOINED: 'playerJoined',

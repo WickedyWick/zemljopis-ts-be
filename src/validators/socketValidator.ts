@@ -1,7 +1,7 @@
 import { Server, Socket } from 'socket.io'
 import { EVENTS } from 'sockets/game.sockets'
 import { UsernameRegEx, RoomCodeRegEx, SessionTokenRegEx} from 'utils/strings'
-import { GameData } from 'redis/game'
+import { GameData } from 'redisDb/game'
 export const joinRoomValidator = async(
         io: Server,
         socket: Socket,

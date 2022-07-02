@@ -24,7 +24,7 @@ export class Round extends BaseModel<RoundFields, RoundMethods> {
     ]
 
     constructor () {
-        super('room')
+        super('round')
     }
 
     instanceMethods: RoundMethods = {
