@@ -1,4 +1,5 @@
-import { createClient } from '@node-redis/client';
+import { createClient } from '@redis/client';
+import * as test from '@node-redis/search'
 import * as dotenv from 'dotenv'
 
 dotenv.config()

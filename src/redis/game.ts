@@ -219,7 +219,8 @@ export class GameData {
     nextRound = async() => {
         return await redisDb.hIncrBy(this._room, 'roundNumber', 1)
     }
-
+    setRoundTimer = async() => {
+    }
     getHashByKey = async(setKey: string, valKey: string) => {
         return await redisDb.hGet(setKey, valKey)
     }

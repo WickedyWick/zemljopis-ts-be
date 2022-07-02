@@ -30,6 +30,8 @@ Implement translator on FE
 Extend db for data
 
 ## SETUP
+git clone --recursive https://github.com/RediSearch/RediSearch.git
+https://redis.io/docs/stack/search/quick_start/
 setup db, fill .env file
 
 Install packages
