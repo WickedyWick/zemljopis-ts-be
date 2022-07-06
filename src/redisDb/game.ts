@@ -3,10 +3,31 @@ import { defaultLetters } from 'utils/strings'
 import { Server, Socket } from 'socket.io'
 import { EVENTS } from 'sockets/game.sockets'
 import { gameStart } from 'controllers/socketHandlers/game.handler'
+import { StringMap } from 'ts-jest'
 
+export interface DataFields {
+    DRZAVA: 'dr',
+    GRAD: 'gr',
+    IME: 'im',
+    ZIVOTINJA: 'zv',
+    PLANINA: 'pl',
+    REKA: 'rk',
+    PREDMET: 'pr'
+}
+
+export interface ReceivedData {
+    dr: string
+    gr: string,
+    im: string,
+    zv: string,
+    pl: string,
+    rk: string,
+    pr: string
+}
 export interface GameFields {
     playerCount: number,
     playersReady: number,
+    numOfDataReceived: number,
     roundNumber: number,
     roundTimeLimit: number,
     roundActive: number,
@@ -24,6 +45,20 @@ export interface GameFields {
     gameInProgress: number
 }
 
+export interface PlayerValues {
+    id: number,
+    points: number,
+    sessionToken: string,
+    ready: number
+    dr: string,
+    gr: string,
+    im: string,
+    zv: string,
+    pl: string,
+    rk: string,
+    pr: string,
+    dataReceived: number
+}
 interface SearchValueFields {
     roundId: number,
     room: string,
@@ -44,6 +79,7 @@ export class GameData {
         const value: GameFields = {
             playerCount,
             playersReady: 0,
+            numOfDataReceived: 0,
             roundNumber: 0,
             roundTimeLimit,
             roundActive: 0,
@@ -65,12 +101,28 @@ export class GameData {
         // 12h
         //await redisDb.expireAt(room, 43200)
 
-        return new this(username)
+        return new this(room)
     }
 
     static createPlayer = async(room: string, username: string, id: number, sessionToken: string) => {
         await redisDb.hSet(`players_${room}`, { [username]: id})
-        await redisDb.hSet(`${username}_${room}`, { id: id, points: 0, sessionToken: sessionToken, ready: 0 })
+        const value: PlayerValues = {
+            id: id,
+            points: 0,
+            sessionToken: sessionToken,
+            ready: 0,
+            dr: '',
+            gr: '',
+            im: '',
+            zv: '',
+            pl: '',
+            rk: '',
+            pr: '',
+            dataReceived: 0
+        }
+
+        // @ts-ignore
+        await redisDb.hSet(`${username}_${room}`, value)
     }
 
     static createRounds = async(room: string, roundNumber: number, id: number) => {
@@ -150,7 +202,37 @@ export class GameData {
             console.error(`Error tracking socket. Username: ${ username }\nSocketID: ${ socketId }\nErr : ${e}`)
         }
     }
+    receiveData = async(username: string, data: ReceivedData) => {
+        try {
+            const receivedData = await this.checkIfDataIsReceived(username)
+            if (receivedData == 1) return { success: true, roundId: -1 }
+            // @ts-ignore
+            await redisDb.hSet(`${ username }_${this._room}`, data)
+            const numOfReceivedData = await redisDb.hIncrBy(this._room, 'numOfDataReceived', 1)
+            const prepData = await this.prepReceiveData()
+            if (Number(prepData[0]) == numOfReceivedData) {
+                const roundId = Number(prepData[1])
+                await this.deleteRoundTimer(roundId)
+                return {
+                    success: true,
+                    roundId
+                }
+            }
+        } catch(e) {
+            console.error(`There was an error during receiving data. Err : ${ e }.`)
+            return {
+                success: false,
+                roundId: -1
+            }
+        }
+    }
 
+    prepReceiveData = async() => {
+        return redisDb.hmGet(this._room, ['playerCount', 'roundId'])
+    }
+    checkIfDataIsReceived = async(username: string) => {
+        return Number(await redisDb.hGet(`${ username }_${ this._room }`, 'receivedData'))
+    }
     static unTrackSocket = async(io: Server, socket: Socket) => {
         try {
             const { username, room } = await redisDb.hGetAll(socket.id)
@@ -241,9 +323,9 @@ export class GameData {
     nextRound = async() => {
         return await redisDb.hIncrBy(this._room, 'roundNumber', 1)
     }
-    addRoundTimer = async(roundId: number, mode: 'endRound' | 'force') => {
+    addRoundTimer = async(roundId: number, mode: 'endRound' | 'force', delay: number) => {
         // adds unix timestamp to the index
-        const expiresAt = new Date().getTime() + 60000; // 60000 is one minute in ms
+        const expiresAt = new Date().getTime() + delay; // 60000 is one minute in ms
         console.log(expiresAt)
         return await redisDb.hSet(`round:timer:${roundId}`, {
             'roundId': roundId,
@@ -252,8 +334,14 @@ export class GameData {
             'mode': mode
         })
     }
+    getRoundTimeLimit = async(room: string) => {
+        return Number(await redisDb.hGet(room, 'roundTimeLimit'))
+    }
     static delRoundTimer = async(roundId: number) => {
         return await redisDb.del(`round:timer:${roundId}`)
+    }
+    deleteRoundTimer = async(roundId: number) => {
+
     }
     getHashByKey = async(setKey: string, valKey: string) => {
         return await redisDb.hGet(setKey, valKey)

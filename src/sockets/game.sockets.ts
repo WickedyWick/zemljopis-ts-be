@@ -1,12 +1,13 @@
 import { Server, Socket } from "socket.io";
-import { joinRoomValidator, playerReadyValidator, playerUnReadyValidator } from "validators/socketValidator";
-import { joinRoom, playerReady, playerUnReady } from "controllers/socketHandlers/game.handler";
+import { joinRoomValidator, playerReadyValidator, playerUnReadyValidator, receiveDataValidator } from "validators/socketValidator";
+import { joinRoom, playerReady, playerUnReady, receiveData } from "controllers/socketHandlers/game.handler";
 import { GameData } from "redisDb/game";
 export const EVENTS = {
     JOIN_ROOM : 'joinRoom',
     PLAYER_JOINED: 'playerJoined',
     PLAYER_READY: 'playerReady',
     PLAYER_UNREADY: 'playerUnReady',
+    RECEIVE_DATA: 'receiveData',
     GAME_START: 'gameStart'
 } as const
 
@@ -26,9 +27,15 @@ export const registerGameHandlers = async(io: Server, socket: Socket) => {
         const v: boolean = await playerUnReadyValidator(io, socket, username, roomCode, sessionToken)
         if (v) playerUnReady(io, socket, username, roomCode)
     })
+
+    socket.on(EVENTS.RECEIVE_DATA, async({ username, roomCode, sessionToken, dr, gr, im, zv, pl, rk, pr }) => {
+        const v: boolean = await receiveDataValidator(io, socket, username, roomCode, sessionToken)
+        if (v) receiveData(io, socket, username, roomCode, { dr, gr, im, zv, pl, rk, pr })
+    })
     socket.on('test', () => {
         socket.emit('test')
     })
+
 }
 
 export const registerDisconnect = async(io: Server, socket: Socket) => {

@@ -44,9 +44,11 @@ class Queue {
             if (data.mode == 'force') {
                 // evaluate
             } else {
-                // add to timer
+                // add to timer with 2 sec cd incase there are internet troubles ? but this doesn't make lots of sense lately
+                // better maybe just to give a bit of overhead on the first timer and things should be fine
+                // this prob has to exist for force finish , remove from redis if everyone sends tahta and call func directly that way its not in the queue
                 const gameData = new GameData(data.room)
-                await gameData.addRoundTimer(data.roundId, 'force')
+                await gameData.addRoundTimer(data.roundId, 'force', 2000)
             }
         }
     }

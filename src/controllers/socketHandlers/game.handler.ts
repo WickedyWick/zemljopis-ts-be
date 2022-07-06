@@ -1,5 +1,5 @@
 import { Server, Socket } from 'socket.io'
-import { GameData } from 'redis/game'
+import { GameData, ReceivedData } from 'redisDb/game'
 import { EVENTS } from 'sockets/game.sockets'
 import { Player, Round } from 'database/models'
 import { chooseLetter } from 'utils/strings'
@@ -76,15 +76,20 @@ export const gameStart = async(io: Server, room: string) => {
         const gameData = new GameData(room)
         let letter = await chooseLetter(room)
         const roundNumber = await gameData.nextRound()
-        const round = Round.create({
+        const round = await Round.create({
             room_code: room,
             letter,
             round_number: roundNumber,
 
         })
-        await gameData.setGameInProgress(1)
-        // Add to the index
 
+        await gameData.setGameInProgress(1, round.id)
+        // Add to the index
+        const roundTimeLimit: number = await gameData.getRoundTimeLimit(room)
+        // + 1500 is buffered time for data to come back from the client if client has bad itnernet
+        // if in that period data isnt't recieve there i extra 3s ? not sure if this is nessary
+        // and after that eval method exectuion will definitely happen
+        await gameData.addRoundTimer(round.id, 'endRound', roundTimeLimit * 1000 + 1500)
         io.to(room).emit(EVENTS.GAME_START, ({
             letter,
             roundNumber
@@ -93,3 +98,23 @@ export const gameStart = async(io: Server, room: string) => {
          // log and eit error 
     }
 }
+
+export const receiveData = async(io: Server, socket: Socket, username: string, room: string, data: ReceivedData) => {
+    try {
+        const gameData = await new GameData(room)
+        const res = await gameData.receiveData(username, data)
+
+        if (res.success) {
+            socket.emit(EVENTS.RECEIVE_DATA, {
+                CODE: 200
+            })
+            if (res.roundId == -1) return
+        }
+
+        // evaluate
+    } catch(e) {
+
+    }
+}
+
+//const evaluate = async(io: Server, socket: Socket, room: string)
