@@ -28,9 +28,9 @@ export const registerGameHandlers = async(io: Server, socket: Socket) => {
         if (v) playerUnReady(io, socket, username, roomCode)
     })
 
-    socket.on(EVENTS.RECEIVE_DATA, async({ username, roomCode, sessionToken, dr, gr, im, zv, pl, rk, pr }) => {
+    socket.on(EVENTS.RECEIVE_DATA, async({ username, roomCode, sessionToken, dr, gr, im, bl, zv, pl, rk, pr }) => {
         const v: boolean = await receiveDataValidator(io, socket, username, roomCode, sessionToken)
-        if (v) receiveData(io, socket, username, roomCode, { dr, gr, im, zv, pl, rk, pr })
+        if (v) receiveData(io, socket, username, roomCode, { dr, gr, im, bl, zv, pl, rk, pr })
     })
     socket.on('test', () => {
         socket.emit('test')

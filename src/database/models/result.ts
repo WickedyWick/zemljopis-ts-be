@@ -15,7 +15,8 @@ export interface ResultFields {
     points: number
 }
 
-export interface ResultMethods { }
+export interface ResultMethods {
+}
 
 export type ResultModel = Model<ResultFields, ResultMethods>
 
@@ -39,7 +40,7 @@ export class Result extends BaseModel<ResultFields, ResultMethods> {
         super('result')
     }
 
-    instanceMethods: {
+    instanceMethods = {
 
     }
 }

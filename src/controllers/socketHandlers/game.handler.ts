@@ -1,7 +1,7 @@
 import { Server, Socket } from 'socket.io'
 import { GameData, ReceivedData } from 'redisDb/game'
 import { EVENTS } from 'sockets/game.sockets'
-import { Player, Round } from 'database/models'
+import { Player, Round, Result } from 'database/models'
 import { chooseLetter } from 'utils/strings'
 
 export const joinRoom = async(io: Server, socket: Socket, username: string, roomCode: string) => {
@@ -21,7 +21,7 @@ export const joinRoom = async(io: Server, socket: Socket, username: string, room
     const data = await room.retrieveJoinRoomData(username)
     await socket.join(roomCode)
     await room.trackSocket(socket.id, username, roomCode)
-    socket.emit('joinRoom', {
+    socket.emit(EVENTS.JOIN_ROOM, {
         ...data
     })
     socket.to(roomCode).emit(EVENTS.PLAYER_JOINED, {
@@ -94,6 +94,8 @@ export const gameStart = async(io: Server, room: string) => {
             letter,
             roundNumber
         }))
+
+        
     } catch(e) {
          // log and eit error 
     }
@@ -112,9 +114,14 @@ export const receiveData = async(io: Server, socket: Socket, username: string, r
         }
 
         // evaluate
+        await evaluate(room)
     } catch(e) {
-
+        socket.emit(EVENTS.RECEIVE_DATA, {
+            CODE: 500
+        })
     }
 }
 
-//const evaluate = async(io: Server, socket: Socket, room: string)
+export const evaluate = async(room: string) => {
+    
+}

@@ -3,12 +3,12 @@ import { defaultLetters } from 'utils/strings'
 import { Server, Socket } from 'socket.io'
 import { EVENTS } from 'sockets/game.sockets'
 import { gameStart } from 'controllers/socketHandlers/game.handler'
-import { StringMap } from 'ts-jest'
 
 export interface DataFields {
     DRZAVA: 'dr',
     GRAD: 'gr',
     IME: 'im',
+    BILJKA: 'bl',
     ZIVOTINJA: 'zv',
     PLANINA: 'pl',
     REKA: 'rk',
@@ -19,6 +19,7 @@ export interface ReceivedData {
     dr: string
     gr: string,
     im: string,
+    bl: string,
     zv: string,
     pl: string,
     rk: string,
@@ -53,6 +54,7 @@ export interface PlayerValues {
     dr: string,
     gr: string,
     im: string,
+    bl: string,
     zv: string,
     pl: string,
     rk: string,
@@ -114,6 +116,7 @@ export class GameData {
             dr: '',
             gr: '',
             im: '',
+            bl: '',
             zv: '',
             pl: '',
             rk: '',

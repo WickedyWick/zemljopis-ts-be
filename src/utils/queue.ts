@@ -1,3 +1,4 @@
+import { evaluate } from "controllers/socketHandlers/game.handler"
 import { GameData } from "redisDb/game"
 
 export interface EnqueueData {
@@ -41,15 +42,7 @@ class Queue {
 
             // rethink this -> need to import data and c heck iof there is data sent
             const data: EnqueueData = await this.dequeue()
-            if (data.mode == 'force') {
-                // evaluate
-            } else {
-                // add to timer with 2 sec cd incase there are internet troubles ? but this doesn't make lots of sense lately
-                // better maybe just to give a bit of overhead on the first timer and things should be fine
-                // this prob has to exist for force finish , remove from redis if everyone sends tahta and call func directly that way its not in the queue
-                const gameData = new GameData(data.room)
-                await gameData.addRoundTimer(data.roundId, 'force', 2000)
-            }
+            await evaluate(data.room)
         }
     }
 

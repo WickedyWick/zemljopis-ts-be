@@ -21,5 +21,6 @@ const onConnection = async(socket: socketio.Socket) => {
 startTimerAndQueue()
 app.use(routes)
 io.on('connection', onConnection)
+export const IO = io
 export const dir = __dirname
 export default app

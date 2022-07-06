@@ -9,7 +9,9 @@ export interface RoundFields {
     updated_at: ModelDate
 }
 
-export interface RoundMethods { }
+export interface RoundMethods {
+    createEmptyResults: (playerIds: number[]) => Promise<boolean>
+ }
 
 export type RoundModel = Model<RoundFields, RoundMethods>
 
@@ -28,7 +30,11 @@ export class Round extends BaseModel<RoundFields, RoundMethods> {
     }
 
     instanceMethods: RoundMethods = {
-
+        async createEmptyResults(playerIds: number[]) {
+            // Precreate empty results so less load on evaluation method and
+            // its covering edge case where client disconnects and doesn't return data
+            return true
+        }
     }
 }
 
