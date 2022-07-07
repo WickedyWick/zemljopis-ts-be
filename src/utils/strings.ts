@@ -1,4 +1,4 @@
-import { GameData } from "redisDb/game"
+import { GameData } from 'redisDb/game'
 
 export const makeRoomCode = async () => {
     try {
@@ -25,11 +25,46 @@ export const chooseLetter = async(room: string) => {
     const newLetter = letters[charAt]
     await gameData.setLetters(letters.replace(newLetter, ''), newLetter)
 
-    return newLetter
+    return await cirilicaLatinica.get(newLetter)
 }
 
+export const cirilicaLatinica = new Map<string, string>([
+    ['А','A'],
+    ['Б','B'],
+    ['В','V'],
+    ['Г','G'],
+    ['Д','D'],
+    ['Ђ','Đ'],
+    ['Е','E'],
+    ['Ж','Ž'],
+    ['З','Z'],
+    ['И','I'],
+    ['Ј','J'],
+    ['К','K'],
+    ['Л','L'],
+    ['Љ','LJ'],
+    ['М','M'],
+    ['Н','N'],
+    ['Њ','NJ'],
+    ['О','O'],
+    ['П','P'],
+    ['Р','R'],
+    ['С','S'],
+    ['Т','T'],
+    ['Ћ','Ć'],
+    ['У','U'],
+    ['Ф','F'],
+    ['X','H'],
+    ['Ц','C'],
+    ['Ч','Č'],
+    ['Џ','DŽ'],
+    ['Ш','Š'],
+    ['', '']
+])
 
-export const defaultLetters = "abcčćddžđefghijklljmnnjoprsštuvzž"
+// I want application in latinic but letters are in cirilic cause some latinic
+// letters are 2 chars and it won't work with curren't implementation of selecting letters
+export const defaultLetters = 'АБВГДЂЕЖЗИЈКЛЉМНЊОПРСТЋУФХЦЧЏШ'
 export const RoomCodeRegEx = '^[A-Za-z0-9]{8}$'
 export const UsernameRegEx = '^[A-Za-z0-9а-шА-ШčČćĆžŽšŠđĐђјљњћџЂЈЉЊЋЏ ]{4,16}$'
 export const SessionTokenRegEx = '^[A-Za-z0-9]{96}$'

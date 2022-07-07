@@ -85,5 +85,10 @@ cachovati u 8x30 keyeva ili 8 keyeva sa svim slovima? vrv 8x30
     -> Drzava_A : alzir: "1" ("1" je dummy data)
 
 
+FT.CREATE round-timer-idx ON HASH PREFIX 1 "round:timer:" SCHEMA roundId NUMERIC SORTABLE room TEXT NOSTEM SORTABLE expiresAt NUMERIC SORTABLE mode TEXT NOSTEM SORTABLE --> index command napravi u respu
+
 db cuvaa kosenih nekti u cirlici jer nemosenih i to ce biti  -> nece moci ako ne konstienti bude input... 
 decision -> samo prihvati nekosenu latinicu i cirilicu. nepismeni neka ne igraju
+
+
+On new round create empty results as well

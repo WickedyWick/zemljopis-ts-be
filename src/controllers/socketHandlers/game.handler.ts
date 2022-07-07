@@ -3,6 +3,7 @@ import { GameData, ReceivedData } from 'redisDb/game'
 import { EVENTS } from 'sockets/game.sockets'
 import { Player, Round, Result } from 'database/models'
 import { chooseLetter } from 'utils/strings'
+import { PlayerIdsInterface } from 'database/models/round'
 
 export const joinRoom = async(io: Server, socket: Socket, username: string, roomCode: string) => {
     // maybe insta search for player and then return somehting like wrong player and room combo
@@ -94,23 +95,37 @@ export const gameStart = async(io: Server, room: string) => {
             letter,
             roundNumber
         }))
-
-        
+        const playerIds = await gameData.getPlayerIds()
+        await round.createEmptyResults(playerIds)
     } catch(e) {
          // log and eit error 
+
     }
 }
 
 export const receiveData = async(io: Server, socket: Socket, username: string, room: string, data: ReceivedData) => {
     try {
         const gameData = await new GameData(room)
-        const res = await gameData.receiveData(username, data)
+        const prepData = await gameData.prepReceiveData()
+        const result = await Result.findBy({ id: Number(prepData[1]) })
+        // if this fails it will return 500 
+        await result.update({
+            drzava: data.dr,
+            grad: data.gr,
+            ime: data.im,
+            biljka: data.bl,
+            zivotinja: data.zv,
+            planina: data.pl,
+            reka: data.rk,
+            predmet: data.pr
+        })
 
+        const res = await gameData.receiveData(username, Number(prepData[1]), Number(prepData[0]), data)
         if (res.success) {
             socket.emit(EVENTS.RECEIVE_DATA, {
                 CODE: 200
             })
-            if (res.roundId == -1) return
+            if (!res.eval) return
         }
 
         // evaluate
@@ -123,5 +138,19 @@ export const receiveData = async(io: Server, socket: Socket, username: string, r
 }
 
 export const evaluate = async(room: string) => {
-    
+    const gameData = new GameData(room)
+    const letter = await gameData.getLetter()
+    const playerNameId: PlayerIdsInterface = await gameData.getPlayerIds()
+    const playerNames: string[] = []
+    const playerIds: number[] = []
+
+    for ( const [key, value] of Object.entries(playerNameId)) {
+        playerNames.push(key)
+        playerIds.push(Number(value))
+    }
+    const playersData: Map<string, string[]> = await gameData.getPlayerFieldData(playerNames)
+    const pointedData: Map<string, number> = await gameData.givePointsToData(playersData, letter)
+
+    // do alg as in notebook
 }
+
