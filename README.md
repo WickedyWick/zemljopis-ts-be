@@ -82,16 +82,27 @@ decision -> samo prihvati nekosenu latinicu i cirilicu. nepismeni neka ne igraju
 ### Current sprint (Run to Alpha)
 #### DONE
 Middleware
+
 Room, round, player creation
+
 Join room
+
 Ready up
+
 Track sockets
+
 Handle disconnect
+
 Fill database with data
+
 Precache data into redis
+
 Handle round timers
+
 Save player guesses
+
 Use HINCRBY
+
 Expand db schema
 
 #### IN WORK / TODO
