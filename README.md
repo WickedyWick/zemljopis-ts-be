@@ -2,6 +2,10 @@
 
 This project is rewritten and upgraded version of https://github.com/WickedyWick/Zemljopis-NacionalnaGeografija
 
+Old version hosted - [www.zemljopis.rs](www.zemljopis.rs)
+Old version is working but its code and design is flawed and under bit more traffic it would cause problems.
+I decided to rewritten it with new knowledge acquired to be up to industries standards
+
 ## Status
     In development (dev branch)
 
@@ -10,6 +14,24 @@ This project is rewritten and upgraded version of https://github.com/WickedyWick
 
 ## Tech stack
 NodeJS, Express, SocketsIO, Redis, postgresql, knex, jest
+
+## About
+Zemljopis grew from personal challenge to project that will is hosted and will be used by many people.
+
+Idea is to help people learn about geography with fun.
+
+This is digital version of IRL version of the game where you are playing on paper with group of friends that are next to you.
+
+Using this application you can play with your friends anywhere and anytime.
+
+Crossplay enabled.
+
+Prototype mobile application already exists but is not yet published and will probably be rewritten in Flutter instead of Java to support all platforms and make it even more accessible.
+
+[Existing prototype](https://github.com/WickedyWick/Zemljopis-Android)
+
+This project is FREE and will stay FREE forever.
+
 ## Logic (work in progress)
 Redis data is somewhat split under different keys
 
@@ -78,6 +100,14 @@ FT.CREATE round-timer-idx ON HASH PREFIX 1 "round:timer:" SCHEMA roundId NUMERIC
 
 decision -> samo prihvati nekosenu latinicu i cirilicu. nepismeni neka ne igraju
 
+### Current biggest obstacle (mini blog)
+Since this is a round based game there are timers, many timers.
+I do not like idea of having lots of timer objects running at the same time.
+
+Solution was to create index in redis with basic informaton about the room and expiresAt field that stores unix timestamp of when timer is supposed to expire and having one global timer running at 1 second interval.
+
+At timer execution redis index is checked for any records wheere expiresAt < current timestamp. Since nodejs timers work that way if all things needed are not executed in set interval next execution won't start and it can cause delay.
+Workaround this is just to dump tiny data fetched from redis to queue and delete redis key. Then queue is working on its own pace and not ommiting timer.
 
 ### Current sprint (Run to Alpha)
 #### DONE
@@ -107,36 +137,47 @@ Expand db schema
 
 #### IN WORK / TODO
 FE handling
+
 Evaluation method
+
 Testing
+
 Look into TDD
+
 Prep for alpha
+
 Update README
 
 
 ### Backlog
 UI/UX rework
+
 IO should be global 
+
 Transaction and full object loading instead of hot loading?
+
 Use promise all
+
 Reference id and not room_code
+
 Redis OM?
+
 Clearing data from redis after x amount of time
+
 Implement match history
+
 Implement kick
+
 Socket auth
+
 Implement word suggestion
+
 Rethink ready logic
+
 Accounts and leaderboards?
+
 Public matches?
+
 Basic chat
 
-
-### Current biggest obstacle (mini blog)
-Since this is a round based game there are timers, many timers.
-I do not like idea of having lots of timer objects running at the same time.
-
-Solution was to create index in redis with basic informaton about the room and expiresAt field that stores unix timestamp of when timer is supposed to expire and having one global timer running at 1 second interval.
-
-At timer execution redis index is checked for any records wheere expiresAt < current timestamp. Since nodejs timers work that way if all things needed are not executed in set interval next execution won't start and it can cause delay.
-Workaround this is just to dump tiny data fetched from redis to queue and delete redis key. Then queue is working on its own pace and not ommiting timer.
+Rethink redis class logic
