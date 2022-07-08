@@ -3,31 +3,23 @@
 This project is rewritten and upgraded version of https://github.com/WickedyWick/Zemljopis-NacionalnaGeografija
 
 ## Status
-    In development
+    In development (dev branch)
 
-## Relational and Non-relational DB will be used
+## Current branch
+    origin/feature/game_start_1202487634315800
 
-In MySQL database will be stored pernament data and in non relational databse will be stored temporary data about active room for faster fetching and updating live data
-
-
-enable coalation u /etc/locale.gen pa napravi coaliciju pa napravi bazu . 
-postgres linux user nije isti password za psql postgres usera -> alter user potgres PASSWORD 'passwrod';
-
-## Logic
+## Tech stack
+NodeJS, Express, SocketsIO, Redis, postgresql, knex, jest
+## Logic (work in progress)
 Redis data is somewhat split under different keys
 
 Every room has its own key with room data
 
 Every player is registered under unique key {username}_{room} which contains their id, points and sessionToken
-Player list for a room is under players_{room} key which is just an array of strings
 
-Data is precached into redis as hset of field_letter: field_data: 1 ; where field_letter isname of the hash set amnd
+Player list for a room is under players_{room} key which is just an array of strings (rethink)
 
-## TODO 
-Track socket id and make a room when first player joins ( i guess i can join every event cause if itdoesnt exist it will create a room)
-Register joining other players and make sure its all working propertly
-Implement translator on FE
-Extend db for data
+Data is precached into redis as hset of field_letter: field_data: 1 ; where field_letter is name of the hash set
 
 ## SETUP
 git clone --recursive https://github.com/RediSearch/RediSearch.git
@@ -47,11 +39,6 @@ python3 ./seeds/convertToRedisProtocol.py
 Start postgresql database on linux:
 ```
 sudo service postgresql start
-```
-
-Start redis server:
-```
-redis-server
 ```
 
 Run latest migrations:
@@ -82,13 +69,63 @@ sudo -u postgres psql -d zemljopis -c "copy player to '/tmp/test2.csv' with deli
 
 cachovati u 8x30 keyeva ili 8 keyeva sa svim slovima? vrv 8x30
     letter and category are normalized to match postgres db , this is only exception for this format in redis
-    -> Drzava_A : alzir: "1" ("1" je dummy data)
+    -> drzava_A : alzir: "1" ("1" je dummy data)
 
+enable coalation u /etc/locale.gen pa napravi coaliciju pa napravi bazu . 
+postgres linux user nije isti password za psql postgres usera -> alter user potgres PASSWORD 'passwrod';
 
 FT.CREATE round-timer-idx ON HASH PREFIX 1 "round:timer:" SCHEMA roundId NUMERIC SORTABLE room TEXT NOSTEM SORTABLE expiresAt NUMERIC SORTABLE mode TEXT NOSTEM SORTABLE --> index command napravi u respu
 
-db cuvaa kosenih nekti u cirlici jer nemosenih i to ce biti  -> nece moci ako ne konstienti bude input... 
 decision -> samo prihvati nekosenu latinicu i cirilicu. nepismeni neka ne igraju
 
 
-On new round create empty results as well
+### Current sprint (Run to Alpha)
+#### DONE
+Middleware
+Room, round, player creation
+Join room
+Ready up
+Track sockets
+Handle disconnect
+Fill database with data
+Precache data into redis
+Handle round timers
+Save player guesses
+Use HINCRBY
+Expand db schema
+
+#### IN WORK / TODO
+FE handling
+Evaluation method
+Testing
+Look into TDD
+Prep for alpha
+Update README
+
+
+### Backlog
+UI/UX rework
+IO should be global 
+Transaction and full object loading instead of hot loading?
+Use promise all
+Reference id and not room_code
+Redis OM?
+Clearing data from redis after x amount of time
+Implement match history
+Implement kick
+Socket auth
+Implement word suggestion
+Rethink ready logic
+Accounts and leaderboards?
+Public matches?
+Basic chat
+
+
+### Current biggest obstacle (mini blog)
+Since this is a round based game there are timers, many timers.
+I do not like idea of having lots of timer objects running at the same time.
+
+Solution was to create index in redis with basic informaton about the room and expiresAt field that stores unix timestamp of when timer is supposed to expire and having one global timer running at 1 second interval.
+
+At timer execution redis index is checked for any records wheere expiresAt < current timestamp. Since nodejs timers work that way if all things needed are not executed in set interval next execution won't start and it can cause delay.
+Workaround this is just to dump tiny data fetched from redis to queue and delete redis key. Then queue is working on its own pace and not ommiting timer.
