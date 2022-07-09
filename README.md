@@ -6,7 +6,7 @@ Old version hosted - [www.zemljopis.rs](www.zemljopis.rs)
 
 Old version is working but its code and design is flawed and under bit more traffic it would cause problems.
 
-I decided to rewritten it with new knowledge acquired to be up to industries standards
+I decided to rewritte it with new knowledge acquired to be up to industries standards and scalable.
 
 ## Status
     In development (dev branch)
