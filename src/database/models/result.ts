@@ -59,6 +59,14 @@ export class Result extends BaseModel<ResultFields, ResultMethods> {
     instanceMethods = {
 
     }
+
+    updateWhere = async(roundId: number, playerId: number, data: Partial<ResultFields>) => {
+        try {
+            await this.q.where('round_id', '=', roundId).andWhere('player_id', '=', playerId).update(data)
+        } catch(e) {
+            console.error(`Error during updating field points.\n Err : ${e}`)
+        }
+    }
 }
 
 export default new Result()

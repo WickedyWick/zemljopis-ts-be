@@ -17,7 +17,7 @@ export async function up(knex: Knex): Promise<void> {
         t.string('zivotinja').defaultTo('').notNullable()
         t.integer('points_zv').defaultTo(0).notNullable()
         t.string('planina').defaultTo('').notNullable()
-        t.integer('point_pl').defaultTo(0).notNullable()
+        t.integer('points_pl').defaultTo(0).notNullable()
         t.string('reka').defaultTo('').notNullable()
         t.integer('points_rk').defaultTo(0).notNullable()
         t.string('predmet').defaultTo('').notNullable()

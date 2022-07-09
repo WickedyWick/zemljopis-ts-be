@@ -3,7 +3,9 @@
 This project is rewritten and upgraded version of https://github.com/WickedyWick/Zemljopis-NacionalnaGeografija
 
 Old version hosted - [www.zemljopis.rs](www.zemljopis.rs)
+
 Old version is working but its code and design is flawed and under bit more traffic it would cause problems.
+
 I decided to rewritten it with new knowledge acquired to be up to industries standards
 
 ## Status

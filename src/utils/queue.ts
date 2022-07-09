@@ -39,7 +39,6 @@ class Queue {
     startQueue = async() => {
         while(await !this.isEmpty()) {
             // posibly have it input more than 1 like last 3 or 5
-
             // rethink this -> need to import data and c heck iof there is data sent
             const data: EnqueueData = await this.dequeue()
             await evaluate(data.room)

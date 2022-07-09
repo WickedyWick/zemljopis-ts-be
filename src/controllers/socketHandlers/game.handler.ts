@@ -4,6 +4,7 @@ import { EVENTS } from 'sockets/game.sockets'
 import { Player, Round, Result } from 'database/models'
 import { chooseLetter } from 'utils/strings'
 import { PlayerIdsInterface } from 'database/models/round'
+import { IO } from 'index'
 
 export const joinRoom = async(io: Server, socket: Socket, username: string, roomCode: string) => {
     // maybe insta search for player and then return somehting like wrong player and room combo
@@ -148,9 +149,10 @@ export const evaluate = async(room: string) => {
         playerNames.push(key)
         playerIds.push(Number(value))
     }
-    const playersData: Map<string, string[]> = await gameData.getPlayerFieldData(playerNames)
-    const pointedData: Map<string, number> = await gameData.givePointsToData(playersData, letter)
-
-    // do alg as in notebook
+    const playerFieldData: Map<string, string[]> = await gameData.getPlayerFieldData(playerNames)
+    const pointedData: Map<string, number> = await gameData.setPointsToData(playerFieldData, letter)
+    const results = await Object.fromEntries(pointedData)
+    IO.to(room).emit(EVENTS.RESULT, results)
+    await gameData.setPointsToField(playerFieldData, pointedData, playerNameId)
 }
 

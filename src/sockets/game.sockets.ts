@@ -8,7 +8,8 @@ export const EVENTS = {
     PLAYER_READY: 'playerReady',
     PLAYER_UNREADY: 'playerUnReady',
     RECEIVE_DATA: 'receiveData',
-    GAME_START: 'gameStart'
+    GAME_START: 'gameStart',
+    RESULT: 'result'
 } as const
 
 export const registerGameHandlers = async(io: Server, socket: Socket) => {

@@ -1,4 +1,5 @@
 import { Model, BaseModel, ModelDate } from 'database/model'
+import { Result } from '.'
 
 export interface RoundFields {
     id: number,
@@ -9,8 +10,11 @@ export interface RoundFields {
     updated_at: ModelDate
 }
 
+export interface PlayerIdsInterface {
+    [key: string]: string
+}
 export interface RoundMethods {
-    createEmptyResults: (playerIds: number[]) => Promise<boolean>
+    createEmptyResults: (playerIds: PlayerIdsInterface) => Promise<boolean>
  }
 
 export type RoundModel = Model<RoundFields, RoundMethods>
@@ -30,9 +34,16 @@ export class Round extends BaseModel<RoundFields, RoundMethods> {
     }
 
     instanceMethods: RoundMethods = {
-        async createEmptyResults(playerIds: number[]) {
+        async createEmptyResults(playerIds: PlayerIdsInterface) {
             // Precreate empty results so less load on evaluation method and
             // its covering edge case where client disconnects and doesn't return data
+            for ( const [ key, value] of Object.entries(playerIds)) {
+                const r = await Result.create({
+                    round_id: this.round_id,
+                    player_id: Number(value),
+                    points: 0
+                })
+            }
             return true
         }
     }

@@ -3,8 +3,9 @@ import { defaultLetters } from 'utils/strings'
 import { Server, Socket } from 'socket.io'
 import { EVENTS } from 'sockets/game.sockets'
 import { gameStart } from 'controllers/socketHandlers/game.handler'
-import { stringify } from 'querystring'
-import internal from 'stream'
+import { Result } from 'database/models'
+import player from 'database/models/player'
+import { PlayerIdsInterface } from 'database/models/round'
 
 export const FieldIndex = {
     0: 'drzava',
@@ -15,6 +16,17 @@ export const FieldIndex = {
     5: 'planina',
     6: 'reka',
     7: 'predmet'
+}
+
+export const PointFieldIndex = {
+    0: 'points_dr',
+    1: 'points_gr',
+    2: 'points_im',
+    3: 'points_bl',
+    4: 'points_zv',
+    5: 'points_pl',
+    6: 'points_rk',
+    7: 'points_pr'
 }
 export interface ReceivedData {
     dr: string
@@ -249,25 +261,63 @@ export class GameData {
     getLetter = async() => {
         return await redisDb.hGet(this._room, 'letter')
     }
-    givePointsToData = async(data: Map<string, string[]>, letter: string) => {
+    setPointsToData = async(playerData: Map<string, string[]>, letter: string) => {
         const pointedData: Map<string, number> = new Map<string, number>()
+        const nonExistData: Map<string, number> = new Map<string, number>()
         // if collection would be bigger i could have nonExist Map for rejected values
-        for ( const [key, val] of data.entries()) {
+        // rename this data to data_cat so you dont ahve to tru each but just tru smaller dictionary size
+        for ( const [key, val] of playerData.entries()) {
             for (let i = 0; i < val.length; i++) {
+                if(nonExistData.has(val[i]))
+                    continue
                 // @ts-ignore
                 const exists = await redisDb.hExists(`${FieldIndex[i]}_${letter}`, val[i])
-                if (!exists) continue
-                if (!pointedData.has(val[i]))
-                    pointedData.set(val[i], 20)
+                if (!exists) {
+                    pointedData.set(`${val[i]}_${i}`, 0)
+                    nonExistData.set(val[i], 1)
+                    continue
+                }
+                // val_cat(index) so its easier to set field points for db
+                if (!pointedData.has(`${val[i]}_${i}`))
+                    pointedData.set(`${val[i]}_${i}`, 20)
                 else
-                    pointedData.set(val[i], 10)
+                    pointedData.set(`${val[i]}_${i}`, 10)
             }
         }
         return pointedData
     }
+    setPointsToField = async(playerFieldData: Map<string, string[]>, pointedData: Map<string, number>, playerData: PlayerIdsInterface) => {
+        // final
+        const promiseArr:Promise<void>[] = []
+        const roundId = await this.getRoundId()
+        // key is playername and val is arr of his fields
+        for ( const [key, val] of playerFieldData.entries()) {
+            // have another map for non good vals?
+            const pointsData = {}
+            let sum = 0
+            for (let i =0 ; i < val.length; i++) {
+                const points = pointedData.get(`${val[i]}_${i}`)
+                // @ts-ignore
+                pointsData[PointFieldIndex[i]] = points
+                sum += points
+            }
+            if (sum == 0) continue
+            promiseArr.push(this.updatePoints(key, sum))
+            const pId = Number(playerData[key])
+            // update player by id
 
+            await Result.updateWhere(roundId, pId, pointsData)
+        }
+        await Promise.all(promiseArr)
+    }
+
+    updatePoints = async(username: string, value: number) => {
+        // resets player state as well 
+        await redisDb.hSet(`${username}_${this._room}`, { 'ready' : 0, 'dataReceived': 0})
+        await redisDb.hIncrBy(`${username}_${this._room}`, 'points', value)
+    }
     prepReceiveData = async() => {
-        return redisDb.hmGet(this._room, ['playerCount', 'roundId'])
+        return await redisDb.hmGet(this._room, ['playerCount', 'roundId'])
     }
     checkIfDataIsReceived = async(username: string) => {
         return Number(await redisDb.hGet(`${ username }_${ this._room }`, 'receivedData'))
@@ -307,8 +357,8 @@ export class GameData {
             players: players
         }
     }
-    getRoundId = async(room: string) => {
-        return await redisDb.hGet(room, 'roundId')
+    getRoundId = async() => {
+        return Number(await redisDb.hGet(this._room, 'roundId'))
     }
     static checkGameState = async(room: string) => {
         return Number(await redisDb.hGet(room, 'gameInProgress'))
