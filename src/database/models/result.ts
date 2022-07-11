@@ -1,4 +1,4 @@
-import { BaseModel, Model } from "database/model";
+import { BaseModel, Model, ModelDate } from "database/model";
 
 export interface ResultFields {
     id: number
@@ -20,7 +20,8 @@ export interface ResultFields {
     points_rk: number
     predmet: string
     points_pr: number
-    points: number
+    created_at: ModelDate,
+    updated_at: ModelDate,
 }
 
 export interface ResultMethods {
@@ -49,7 +50,8 @@ export class Result extends BaseModel<ResultFields, ResultMethods> {
         'points_rk',
         'predmet',
         'points_pr',
-        'points',
+        'created_at',
+        'updated_at'
     ]
 
     constructor () {

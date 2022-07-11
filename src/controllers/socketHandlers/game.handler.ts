@@ -43,10 +43,13 @@ export const playerReady = async(io: Server, socket: Socket, username: string, r
         }
 
         const res = await GameData.playerReady(io, roomCode, username)
-            io.to(roomCode).emit(EVENTS.PLAYER_READY, {
-                username,
-                ...res
-            })
+        io.to(roomCode).emit(EVENTS.PLAYER_READY, {
+            username,
+            ...res
+        })
+        if (res.gameStart) {
+            await gameStart(io, roomCode)
+        }
     } catch(e) {
         console.error(`Doslo je do problema prilikom slanja ready upa. SocketID: ${socket.id}\nERR: ${e}`)
     }
@@ -78,12 +81,12 @@ export const gameStart = async(io: Server, room: string) => {
         const gameData = new GameData(room)
         let letter = await chooseLetter(room)
         const roundNumber = await gameData.nextRound()
+
         const round = await Round.create({
             room_code: room,
             letter,
             round_number: roundNumber,
-
-        })
+        }, true)
 
         await gameData.setGameInProgress(1, round.id)
         // Add to the index

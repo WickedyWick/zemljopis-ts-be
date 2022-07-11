@@ -1,6 +1,6 @@
 import { Model, BaseModel, ModelDate } from 'database/model'
 import { Result } from '.'
-
+import { db } from 'database'
 export interface RoundFields {
     id: number,
     room_code: string,
@@ -38,15 +38,16 @@ export class Round extends BaseModel<RoundFields, RoundMethods> {
             // Precreate empty results so less load on evaluation method and
             // its covering edge case where client disconnects and doesn't return data
             for ( const [ key, value] of Object.entries(playerIds)) {
+                //await db('round').insert({ round_id: this.id , player_id: value})
                 const r = await Result.create({
-                    round_id: this.round_id,
-                    player_id: Number(value),
-                    points: 0
-                })
+                     round_id: this.id,
+                     player_id: Number(value),
+                }, true)
             }
             return true
         }
     }
-}
+
+}   
 
 export default new Round()

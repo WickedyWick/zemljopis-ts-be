@@ -160,16 +160,28 @@ export class GameData {
                 if (updated <= Number(data[1]) && Number(data[0]) >= 0) {
                     pReady = await redisDb.hIncrBy(room, 'playersReady', 1)
                     if (pReady == Number(data[1])) {
-                        gameStart(io, room)
+                        return {
+                            CODE: 200,
+                            gameStart: true,
+                            playersReady: pReady
+                        }
                     }
                 }
                 else {
-                    throw Error
+                    await this.unReadyAll(room)
+                    await redisDb.hSet(room, 'playersReady', 0)
+                    console.error(`Error during player ready up. Username|room: ${username}|${room}\nERR: values out of range`)
+                    return {
+                        CODE: 500,
+                        gameStart: false,
+                        playersReady: 0
+                    }
                 }
             }
 
             return {
                 CODE: 200,
+                gameStart: false,
                 playersReady: pReady
             }
 
@@ -179,6 +191,7 @@ export class GameData {
             console.error(`Error during player ready up. Username|room: ${username}|${room}\nERR: ${e}`)
             return {
                 CODE: 500,
+                gameStart: false,
                 playersReady: 0
             }
         }
@@ -212,7 +225,7 @@ export class GameData {
         }
     }
     getPlayerIds = async() => {
-        return await redisDb.hGetAll(this._room)
+        return await redisDb.hGetAll(`players_${this._room}`)
     }
     trackSocket = async(socketId: string, username: string, room: string) => {
         try {
@@ -331,6 +344,7 @@ export class GameData {
                 ...res
             })
             await redisDb.del(socket.id)
+            await socket.leave(room)
         } catch(e) {
             console.error(`Error untracking socket. SocketID: ${ socket.id }\nErr : ${ e }`)
         }

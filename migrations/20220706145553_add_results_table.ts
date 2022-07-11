@@ -4,8 +4,8 @@ import { Knex } from "knex";
 export async function up(knex: Knex): Promise<void> {
     return knex.schema.createTable('result', (t) => {
         t.increments('id').primary()
-        t.integer('player_id').references('id').inTable('player').notNullable()
-        t.integer('round_id').references('id').inTable('round').notNullable()
+        t.foreign('player_id').references('id').inTable('player').notNullable()
+        t.foreign('round_id').references('id').inTable('round').notNullable()
         t.string('drzava').defaultTo('').notNullable()
         t.integer('points_dr').defaultTo(0).notNullable()
         t.string('grad').defaultTo('').notNullable()
@@ -22,6 +22,7 @@ export async function up(knex: Knex): Promise<void> {
         t.integer('points_rk').defaultTo(0).notNullable()
         t.string('predmet').defaultTo('').notNullable()
         t.integer('points_pr').defaultTo(0).notNullable()
+        t.timestamps()
     })
 }
 
