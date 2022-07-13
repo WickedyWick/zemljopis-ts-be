@@ -281,13 +281,13 @@ export class GameData {
         // rename this data to data_cat so you dont ahve to tru each but just tru smaller dictionary size
         for ( const [key, val] of playerData.entries()) {
             for (let i = 0; i < val.length; i++) {
-                if(nonExistData.has(val[i]))
+                if(nonExistData.has(`${val[i]}_${i}`))
                     continue
                 // @ts-ignore
                 const exists = await redisDb.hExists(`${FieldIndex[i]}_${letter}`, val[i])
                 if (!exists) {
                     pointedData.set(`${val[i]}_${i}`, 0)
-                    nonExistData.set(val[i], 1)
+                    nonExistData.set(`${val[i]}_${i}`, 1)
                     continue
                 }
                 // val_cat(index) so its easier to set field points for db
@@ -300,34 +300,46 @@ export class GameData {
         return pointedData
     }
     setPointsToField = async(playerFieldData: Map<string, string[]>, pointedData: Map<string, number>, playerData: PlayerIdsInterface) => {
-        // final
-        const promiseArr:Promise<void>[] = []
-        const roundId = await this.getRoundId()
-        // key is playername and val is arr of his fields
-        for ( const [key, val] of playerFieldData.entries()) {
-            // have another map for non good vals?
-            const pointsData = {}
-            let sum = 0
-            for (let i =0 ; i < val.length; i++) {
-                const points = pointedData.get(`${val[i]}_${i}`)
-                // @ts-ignore
-                pointsData[PointFieldIndex[i]] = points
-                sum += points
+        try {
+            // final
+            const promiseArr:Promise<void>[] = []
+            const roundId = await this.getRoundId()
+            // key is playername and val is arr of his fields
+            for ( const [key, val] of playerFieldData.entries()) {
+                // have another map for non good vals?
+                const pointsData = {}
+                let sum = 0
+                console.log(key,val)
+                for (let i =0 ; i < val.length; i++) {
+                    let points = 0
+                    if(val[i] != '') points = pointedData.get(`${val[i]}_${i}`)
+                    // @ts-ignore
+                    pointsData[PointFieldIndex[i]] = points
+                    console.log(i)
+                    sum += points
+                }
+                // maybe in separate function
+                await redisDb.hSet(`${key}_${this._room}`, { 'ready' : 0, 'dataReceived': 0})
+                if (sum == 0) continue
+                promiseArr.push(this.updatePoints(key, sum))
+                const pId = Number(playerData[key])
+                // update player by id
+                await Result.updateWhere(roundId, pId, pointsData)
             }
-            if (sum == 0) continue
-            promiseArr.push(this.updatePoints(key, sum))
-            const pId = Number(playerData[key])
-            // update player by id
-
-            await Result.updateWhere(roundId, pId, pointsData)
+            await Promise.all(promiseArr).catch((e) => {
+                console.log(e)
+            })
+        } catch(e) {
+            console.log(`Error during setting points to field. Err: ${ e }`)
         }
-        await Promise.all(promiseArr)
     }
 
     updatePoints = async(username: string, value: number) => {
-        // resets player state as well 
-        await redisDb.hSet(`${username}_${this._room}`, { 'ready' : 0, 'dataReceived': 0})
-        await redisDb.hIncrBy(`${username}_${this._room}`, 'points', value)
+        try {
+            await redisDb.hIncrBy(`${username}_${this._room}`, 'points', value)
+        } catch(e) {
+            console.log(`ERROR FOR UDPATE :${e}`)
+        }
     }
     prepReceiveData = async() => {
         return await redisDb.hmGet(this._room, ['playerCount', 'roundId'])
@@ -431,9 +443,10 @@ export class GameData {
     }
     addRoundTimer = async(roundId: number, mode: 'endRound' | 'force', delay: number) => {
         // adds unix timestamp to the index
-        const expiresAt = new Date().getTime() + delay; // 60000 is one minute in ms
+       // const expiresAt = new Date().getTime() + delay + 3000; // 60000 is one minute in ms
+       const expiresAt = new Date().getTime() + 5000
         console.log(expiresAt)
-        return await redisDb.hSet(`round:timer:${roundId}`, {
+        return await redisDb.hSet(`round:timer:${ roundId }`, {
             'roundId': roundId,
             'room': this._room,
             'expiresAt': expiresAt,

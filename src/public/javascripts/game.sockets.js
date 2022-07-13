@@ -10,7 +10,8 @@ export const SOCKET_EVENTS = {
     PLAYER_READY: 'playerReady',
     PLAYER_UNREADY: 'playerUnReady',
     GAME_START: 'gameStart',
-    RECEIVE_DATA: 'receiveData'
+    RECEIVE_DATA: 'receiveData',
+    RESULT: 'result'
 }
 
 socket.on('test',()=> {
@@ -32,6 +33,10 @@ socket.on(SOCKET_EVENTS.PLAYER_UNREADY, (data) => {
     playerUnReadyReadyResponse(data)
 })
 
+socket.on(SOCKET_EVENTS.RESULT, (data) => {
+    console.log(data)
+    
+})
 /**
  * Game start socket event 
  * @param {string} letter - Letter that words should start with

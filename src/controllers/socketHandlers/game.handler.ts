@@ -142,6 +142,7 @@ export const receiveData = async(io: Server, socket: Socket, username: string, r
 }
 
 export const evaluate = async(room: string) => {
+    console.time('timeEvaluation')
     const gameData = new GameData(room)
     const letter = await gameData.getLetter()
     const playerNameId: PlayerIdsInterface = await gameData.getPlayerIds()
@@ -157,5 +158,6 @@ export const evaluate = async(room: string) => {
     const results = await Object.fromEntries(pointedData)
     IO.to(room).emit(EVENTS.RESULT, results)
     await gameData.setPointsToField(playerFieldData, pointedData, playerNameId)
+    console.timeEnd('timeEvaluation')
 }
 

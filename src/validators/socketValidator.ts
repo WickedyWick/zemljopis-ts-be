@@ -174,6 +174,7 @@ export const receiveDataValidator = async(
         })
         return false
     } catch(e) {
+        console.error(`Error : ${e}`)
         socket.emit(EVENTS.RECEIVE_DATA, {
             MSG: 'Doslo je do problema.',
             CODE: 500

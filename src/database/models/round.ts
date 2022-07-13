@@ -47,7 +47,6 @@ export class Round extends BaseModel<RoundFields, RoundMethods> {
             return true
         }
     }
-
 }   
 
 export default new Round()

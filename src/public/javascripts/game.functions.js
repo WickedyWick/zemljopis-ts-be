@@ -1,6 +1,5 @@
-import { N_TYPE, BTN_COLORS, BTN_STATES, SessionTokenRegEx, UsernameRegEx, RoomCodeRegEx, FieldDataRegExString  } from './game.consts.js'
+import { N_TYPE, BTN_COLORS, BTN_STATES, SessionTokenRegEx, UsernameRegEx, RoomCodeRegEx, FieldDataRegExString, letterDictionary } from './game.consts.js'
 import socket , { SOCKET_EVENTS } from './game.sockets.js'
-import { letterDictionary, FieldDataRegExString } from './game.consts.js'
 // player count label lblPlayerCount
 // player ready label lblPlayersReady
 // round number label roundNumber
@@ -187,7 +186,7 @@ export const playerUnReadyReadyResponse = (data) => {
         $('#lblPlayersReady').text(data.playersReady)
 }
 
-export const btnClickHandler = () => {
+export const btnClickHandler = async() => {
     if(gameStarted) {
         const res = await checkAndCollectData()
         if (!res) {
@@ -207,6 +206,16 @@ export const btnClickHandler = () => {
     return
 }
 
+/**
+ * Function that handles result response
+ * @param  {[key: string]: string} data - Pointed data
+ */
+export const resultResponse = (data) => {
+    gameStarted = false
+    ready = false
+    enableAllPButtons()
+    console.log(data)
+}
 
 /**
  * Game start function handler
@@ -225,13 +234,16 @@ export const gameStart = async(data) => {
     lblTimer.textContent = roundTimeLimitConst
     roundTimeLimit = roundTimeLimitConst
     // start timer
-    let intervalId = setInterval(() => {
+    let intervalId = setInterval(async() => {
         roundTimeLimit--
         lblTimer.textContent = String(roundTimeLimit)
         if(roundTimeLimit == 0) {
             const data = await collectData()
             await convertDataToLatinic(data)
             await sendFieldData(data)
+            btnReady.disabled = true
+            disableAllInputFields()
+            disableAllPButtons()
             clearInterval(intervalId)
         }
     }, 1000)
@@ -408,7 +420,7 @@ const collectData = async() => {
  * This function iterates data and alters it to make sure its latinic
  * @param  {[key: string]: string} data - Original data that may be altered
  */
-convertDataToLatinic = async(data) => {
+const convertDataToLatinic = async(data) => {
     for (const [key, val] of Object.entries(data)) {
         const word = cyrilicToLatinic(val)
         data[key] = word
@@ -421,7 +433,16 @@ convertDataToLatinic = async(data) => {
  * @param  {[key: string]: string} data - Field data that is send to the backend
  */
 const sendFieldData = (data) => {
-    socket.emit(SOCKET_EVENTS.RECEIVE_DATA, data)
+    socket.emit(
+        SOCKET_EVENTS.RECEIVE_DATA,
+        {
+            username,
+            roomCode,
+            sessionToken,
+            ...data
+        }
+    )
+
 }
 
 
@@ -435,7 +456,7 @@ const cyrilicToLatinic = async(word) => {
     for (let i =0; i < word.length; i++) {
         try {
             if (letterDictionary.has(word[i]))
-                ewWord+= letterDictionary.get(word[i])
+                newWord+= letterDictionary.get(word[i])
             else 
                 newWord += word[i]
         } catch(e) {
