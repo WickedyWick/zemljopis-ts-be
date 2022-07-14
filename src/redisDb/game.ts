@@ -170,7 +170,7 @@ export class GameData {
                 else {
                     await this.unReadyAll(room)
                     await redisDb.hSet(room, 'playersReady', 0)
-                    console.error(`Error during player ready up. Username|room: ${username}|${room}\nERR: values out of range`)
+                    console.error(`${new Date()}: Error during player ready up. Username|room: ${username}|${room}\nERR: values out of range`)
                     return {
                         CODE: 500,
                         gameStart: false,
@@ -188,7 +188,7 @@ export class GameData {
         } catch(e) {
             await this.unReadyAll(room)
             await redisDb.hSet(room, 'playersReady', 0)
-            console.error(`Error during player ready up. Username|room: ${username}|${room}\nERR: ${e}`)
+            console.error(`${new Date('')}: Error during player ready up. Username|room: ${username}|${room}\nERR: ${e}`)
             return {
                 CODE: 500,
                 gameStart: false,
@@ -341,8 +341,12 @@ export class GameData {
             console.log(`ERROR FOR UDPATE :${e}`)
         }
     }
-    prepReceiveData = async() => {
-        return await redisDb.hmGet(this._room, ['playerCount', 'roundId'])
+    prepReceiveData = async(username: string) => {
+        const data: string[] =  await redisDb.hmGet(this._room, ['playerCount', 'roundId'])
+        const id = await redisDb.hGet(`${username}_${this._room}`, 'id')
+        data.push(id)
+        return data
+
     }
     checkIfDataIsReceived = async(username: string) => {
         return Number(await redisDb.hGet(`${ username }_${ this._room }`, 'receivedData'))
@@ -444,7 +448,7 @@ export class GameData {
     addRoundTimer = async(roundId: number, mode: 'endRound' | 'force', delay: number) => {
         // adds unix timestamp to the index
        // const expiresAt = new Date().getTime() + delay + 3000; // 60000 is one minute in ms
-       const expiresAt = new Date().getTime() + 5000
+       const expiresAt = new Date().getTime() + delay + 3000
         console.log(expiresAt)
         return await redisDb.hSet(`round:timer:${ roundId }`, {
             'roundId': roundId,

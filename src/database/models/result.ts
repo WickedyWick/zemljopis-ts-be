@@ -66,7 +66,7 @@ export class Result extends BaseModel<ResultFields, ResultMethods> {
         try {
             await this.q.where('round_id', '=', roundId).andWhere('player_id', '=', playerId).update(data)
         } catch(e) {
-            console.error(`Error during updating field points.\n Err : ${e}`)
+            console.error(`${ new Date().toLocaleString() }: Error during updating field points.\n Err : ${e}`)
         }
     }
 }

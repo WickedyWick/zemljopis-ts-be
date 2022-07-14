@@ -262,56 +262,56 @@ const checkAndCollectData = async() => {
        
         let dr = txbDrzava.value
         if (fieldDataRegEx.test(dr))
-            data['dr'] = dr
+            data['dr'] = dr.toLowerCase()
         else 
             return false
         fieldDataRegEx.lastIndex = -1
         
         let gr = txbGrad.value
         if (fieldDataRegEx.test(gr))
-            data['gr'] = gr
+            data['gr'] = gr.toLowerCase().toLowerCase()
         else 
             return false
         fieldDataRegEx.lastIndex = -1
         
         let im = txbIme.value
         if (fieldDataRegEx.test(im))
-            data['im'] = im
+            data['im'] = im.toLowerCase()
         else 
             return false
         fieldDataRegEx.lastIndex = -1
     
         let bl = txbBiljka.value
         if (fieldDataRegEx.test(bl))
-            data['bl'] =bl
+            data['bl'] =bl.toLowerCase()
         else 
             return false
         fieldDataRegEx.lastIndex = -1
     
         let zv = txbZivotinja.value
         if (fieldDataRegEx.test(zv))
-            data['zv'] = zv
+            data['zv'] = zv.toLowerCase()
         else 
             return false
         fieldDataRegEx.lastIndex = -1
     
         let pl = txbPlanina.value
         if (fieldDataRegEx.test(pl))
-            data['pl'] = pl
+            data['pl'] = pl.toLowerCase()
         else 
             return false
         fieldDataRegEx.lastIndex = -1
     
         let rk = txbReka.value
         if (fieldDataRegEx.test(rk))
-            data['rk'] = rk
+            data['rk'] = rk.toLowerCase()
         else 
             return false
         fieldDataRegEx.lastIndex = -1
     
         let pr = txbPredmet.value
         if (fieldDataRegEx.test(pr))
-            data['pr'] = pr
+            data['pr'] = pr.toLowerCase()
         else 
             return false
         fieldDataRegEx.lastIndex = pr
@@ -345,56 +345,56 @@ const collectData = async() => {
        
         let dr = txbDrzava.value
         if (fieldDataRegEx.test(dr))
-            data['dr'] = dr
+            data['dr'] = dr.toLowerCase()
         else 
             data['dr'] = ''
         fieldDataRegEx.lastIndex = -1
         
         let gr = txbGrad.value
         if (fieldDataRegEx.test(gr))
-            data['gr'] = gr
+            data['gr'] = gr.toLowerCase()
         else 
             data['gr'] = ''
         fieldDataRegEx.lastIndex = -1
     
         let im = txbIme.value
         if (fieldDataRegEx.test(im))
-            data['im'] = im
+            data['im'] = im.toLowerCase()
         else 
             data['im'] = ''
         fieldDataRegEx.lastIndex = -1
     
         let bl = txbBiljka.value
         if (fieldDataRegEx.test(bl))
-            data['bl'] =bl
+            data['bl'] =bl.toLowerCase()
         else 
             data['bl'] = ''
         fieldDataRegEx.lastIndex = -1
     
         let zv = txbZivotinja.value
         if (fieldDataRegEx.test(zv))
-            data['zv'] = zv
+            data['zv'] = zv.toLowerCase()
         else 
             data['zv'] = ''
         fieldDataRegEx.lastIndex = -1
     
         let pl = txbPlanina.value
         if (fieldDataRegEx.test(pl))
-            data['pl'] = pl
+            data['pl'] = pl.toLowerCase()
         else 
             data['pl'] = ''
         fieldDataRegEx.lastIndex = -1
     
         let rk = txbReka.value
         if (fieldDataRegEx.test(rk))
-            data['rk'] = rk
+            data['rk'] = rk.toLowerCase()
         else 
             data['rk'] = ''
         fieldDataRegEx.lastIndex = -1
     
         let pr = txbPredmet.value
         if (fieldDataRegEx.test(pr))
-            data['pr'] = pr
+            data['pr'] = pr.toLowerCase()
         else 
             data['pr'] = ''
         fieldDataRegEx.lastIndex = pr

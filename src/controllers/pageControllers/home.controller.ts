@@ -29,9 +29,9 @@ export const createRoom: Action<any, RoomBody, any , any> = async (req, res, nex
             roundTimeLimit,
         )
 
-    } catch (err) {
+    } catch (e) {
         //check if its dupe
-        console.error(err)
+        console.error(`${ new Date().toLocaleString() }: ${ e }`)
         return next(ERROR_ROOM_CREATE)
     }
     let sessionToken;

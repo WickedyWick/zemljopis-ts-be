@@ -10,13 +10,17 @@ export interface EnqueueData {
     mode: "endRound" | "force"
 }
 
-let taskQueue = queue<EnqueueData, Error>(async(task, callback) => {
+const taskQueue = queue<EnqueueData, string>(async(task, callback) => {
     try {
+        console.log(`${ new Date().toLocaleString() }: ${task.room} evaluation started`)
         await evaluate(task.room)
+        await GameData.delRoundTimer(task.roundId as number)
+        callback(`${ new Date().toLocaleString() }: ${task.room} evaluation finished successufully`)
     } catch(e) {
-        console.log("LOLOKLOOLOLOLOLOLOLOLOLOOLOLOLOLOLOL")
-    }
-}, 1)
+        console.error(`${ new Date().toLocaleString() }: Error during perfoming queue task. RoundId: ${ task.roundId }.\n ERR : ${ e }`)
+        callback(`${ new Date().toLocaleString() }: Error during perfoming queue task. RoundId: ${ task.roundId }.\n ERR : ${ e }`)
 
-//taskQueue.pushAsync({ room: "", mode: "endRound", roundId: 1})
+    }
+}, Number(process.env.CONCURENT_WORKERS) ?? 5)
+
 export const Queue = taskQueue

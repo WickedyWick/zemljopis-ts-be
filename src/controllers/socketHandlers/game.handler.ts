@@ -51,7 +51,7 @@ export const playerReady = async(io: Server, socket: Socket, username: string, r
             await gameStart(io, roomCode)
         }
     } catch(e) {
-        console.error(`Doslo je do problema prilikom slanja ready upa. SocketID: ${socket.id}\nERR: ${e}`)
+        console.error(`${ new Date().toLocaleString() }: Doslo je do problema prilikom slanja ready upa. SocketID: ${socket.id}\nERR: ${e}`)
     }
 }
 
@@ -71,7 +71,7 @@ export const playerUnReady = async(io: Server, socket: Socket, username: string,
             ...res
         })
     } catch(e) {
-        console.error(`Doslo je do problema prilikom slanja unready upa. SocketID: ${socket.id}\nERR : ${e}`)
+        console.error(`${new Date()}: Doslo je do problema prilikom slanja unready upa. SocketID: ${socket.id}\nERR : ${e}`)
     }
 }
 
@@ -86,7 +86,7 @@ export const gameStart = async(io: Server, room: string) => {
             room_code: room,
             letter,
             round_number: roundNumber,
-        }, true)
+        })
 
         await gameData.setGameInProgress(1, round.id)
         // Add to the index
@@ -94,7 +94,7 @@ export const gameStart = async(io: Server, room: string) => {
         // + 1500 is buffered time for data to come back from the client if client has bad itnernet
         // if in that period data isnt't recieve there i extra 3s ? not sure if this is nessary
         // and after that eval method exectuion will definitely happen
-        await gameData.addRoundTimer(round.id, 'endRound', roundTimeLimit * 1000 + 1500)
+        await gameData.addRoundTimer(round.id, 'endRound', roundTimeLimit * 1000)
         io.to(room).emit(EVENTS.GAME_START, ({
             letter,
             roundNumber
@@ -110,9 +110,11 @@ export const gameStart = async(io: Server, room: string) => {
 export const receiveData = async(io: Server, socket: Socket, username: string, room: string, data: ReceivedData) => {
     try {
         const gameData = await new GameData(room)
-        const prepData = await gameData.prepReceiveData()
-        const result = await Result.findBy({ id: Number(prepData[1]) })
-        // if this fails it will return 500 
+        const prepData = await gameData.prepReceiveData(username)
+        console.log(prepData)
+        const result = await Result.findBy({ round_id: Number(prepData[1]), player_id: Number(prepData[2]) })
+        console.log(data)
+        // if this fails it will return 500
         await result.update({
             drzava: data.dr,
             grad: data.gr,
@@ -135,6 +137,7 @@ export const receiveData = async(io: Server, socket: Socket, username: string, r
         // evaluate
         await evaluate(room)
     } catch(e) {
+        console.log(`${ new Date().toLocaleString() } Error during receiving data. ERR : ${ e }`)
         socket.emit(EVENTS.RECEIVE_DATA, {
             CODE: 500
         })
