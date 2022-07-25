@@ -236,8 +236,12 @@ export class GameData {
     }
     receiveData = async(username: string, roundId: number, playerCount: number, data: ReceivedData) => {
         try {
+
+            // TODO 
+            // have recieveddata set at one and use HSETEX and del when you want to 0 it
             const receivedData = await this.checkIfDataIsReceived(username)
             if (receivedData == 1) return { success: true, eval: false }
+            console.log('DATAAAAA', data)
             // @ts-ignore
             await redisDb.hSet(`${ username }_${this._room}`, data)
             const numOfReceivedData = await redisDb.hIncrBy(this._room, 'numOfDataReceived', 1)
@@ -247,6 +251,10 @@ export class GameData {
                     success: true,
                     eval: true,
                 }
+            }
+            return {
+                success: true,
+                eval: false
             }
         } catch(e) {
             console.error(`There was an error during receiving data. Err : ${ e }.`)
@@ -264,6 +272,7 @@ export class GameData {
         const map: Map<string, string[]> = new Map<string, string[]>()
         for ( let i =0; i < playerNames.length; i++) {
             const data = await redisDb.hmGet(`${playerNames[i]}_${this._room}`, ['dr','gr','im', 'bl', 'zv', 'pl', 'rk', 'pr'])
+            console.log('DATA', data)
             await map.set(playerNames[i], data)
         }
         /*
@@ -283,6 +292,8 @@ export class GameData {
             for (let i = 0; i < val.length; i++) {
                 if(nonExistData.has(`${val[i]}_${i}`))
                     continue
+                console.log(val)
+                console.log(val[i])
                 // @ts-ignore
                 const exists = await redisDb.hExists(`${FieldIndex[i]}_${letter}`, val[i])
                 if (!exists) {
@@ -297,6 +308,10 @@ export class GameData {
                     pointedData.set(`${val[i]}_${i}`, 10)
             }
         }
+        // console.log('RESULTS1') 
+        // pointedData.forEach((key, val) => {
+        //     console.log(key, val)
+        // })
         return pointedData
     }
     setPointsToField = async(playerFieldData: Map<string, string[]>, pointedData: Map<string, number>, playerData: PlayerIdsInterface) => {
@@ -309,7 +324,7 @@ export class GameData {
                 // have another map for non good vals?
                 const pointsData = {}
                 let sum = 0
-                console.log(key,val)
+
                 for (let i =0 ; i < val.length; i++) {
                     let points = 0
                     if(val[i] != '') points = pointedData.get(`${val[i]}_${i}`)
@@ -359,7 +374,7 @@ export class GameData {
                 username,
                 ...res
             })
-            await redisDb.del(socket.id)
+            await redisDb.unlink(socket.id)
             await socket.leave(room)
         } catch(e) {
             console.error(`Error untracking socket. SocketID: ${ socket.id }\nErr : ${ e }`)
@@ -461,10 +476,10 @@ export class GameData {
         return Number(await redisDb.hGet(room, 'roundTimeLimit'))
     }
     static delRoundTimer = async(roundId: number) => {
-        return await redisDb.del(`round:timer:${roundId}`)
+        return await redisDb.unlink(`round:timer:${roundId}`)
     }
     deleteRoundTimer = async(roundId: number) => {
-        return await redisDb.del(`round:timer:${roundId}`)
+        return await redisDb.unlink(`round:timer:${roundId}`)
     }
     getHashByKey = async(setKey: string, valKey: string) => {
         return await redisDb.hGet(setKey, valKey)

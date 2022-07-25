@@ -188,13 +188,14 @@ export const playerUnReadyReadyResponse = (data) => {
 
 export const btnClickHandler = async() => {
     if(gameStarted) {
-        const res = await checkAndCollectData()
+        const res = Object.fromEntries(await checkAndCollectData())
         if (!res) {
             notify('warning', 'Format podatak nije validan!')
             return
         }
         await convertDataToLatinic(res)
-        sendFieldData(res)
+        await sendFieldData(res)
+        return
     } 
     if(!ready) {
         socket.emit('playerReady', ({ username, roomCode, sessionToken }))
@@ -238,7 +239,7 @@ export const gameStart = async(data) => {
         roundTimeLimit--
         lblTimer.textContent = String(roundTimeLimit)
         if(roundTimeLimit == 0) {
-            const data = await collectData()
+            const data = Object.fromEntries(await collectData())
             await convertDataToLatinic(data)
             await sendFieldData(data)
             btnReady.disabled = true
@@ -257,61 +258,61 @@ export const gameStart = async(data) => {
 
 const checkAndCollectData = async() => {
     try {
-        const data = {}
+        const data = new Map()
         const fieldDataRegEx = new RegExp(FieldDataRegExString,'g')
        
-        let dr = txbDrzava.value
+        let dr = txbDrzava.value.toLowerCase()
         if (fieldDataRegEx.test(dr))
-            data['dr'] = dr.toLowerCase()
+            data.set('dr', dr)
         else 
             return false
         fieldDataRegEx.lastIndex = -1
         
-        let gr = txbGrad.value
+        let gr = txbGrad.value.toLowerCase()
         if (fieldDataRegEx.test(gr))
-            data['gr'] = gr.toLowerCase().toLowerCase()
+            data.set('gr',gr)
         else 
             return false
         fieldDataRegEx.lastIndex = -1
         
-        let im = txbIme.value
+        let im = txbIme.value.toLowerCase()
         if (fieldDataRegEx.test(im))
-            data['im'] = im.toLowerCase()
+            data.set('im',im)
         else 
             return false
         fieldDataRegEx.lastIndex = -1
     
-        let bl = txbBiljka.value
+        let bl = txbBiljka.value.toLowerCase()
         if (fieldDataRegEx.test(bl))
-            data['bl'] =bl.toLowerCase()
+            data.set('bl', bl)
         else 
             return false
         fieldDataRegEx.lastIndex = -1
     
-        let zv = txbZivotinja.value
+        let zv = txbZivotinja.value.toLowerCase()
         if (fieldDataRegEx.test(zv))
-            data['zv'] = zv.toLowerCase()
+            data.set('zv', zv)
         else 
             return false
         fieldDataRegEx.lastIndex = -1
     
-        let pl = txbPlanina.value
+        let pl = txbPlanina.value.toLowerCase()
         if (fieldDataRegEx.test(pl))
-            data['pl'] = pl.toLowerCase()
+            data.set('pl', pl)
         else 
             return false
         fieldDataRegEx.lastIndex = -1
     
-        let rk = txbReka.value
+        let rk = txbReka.value.toLowerCase()
         if (fieldDataRegEx.test(rk))
-            data['rk'] = rk.toLowerCase()
+            data.set('rk', rk)
         else 
             return false
         fieldDataRegEx.lastIndex = -1
     
-        let pr = txbPredmet.value
+        let pr = txbPredmet.value.toLowerCase()
         if (fieldDataRegEx.test(pr))
-            data['pr'] = pr.toLowerCase()
+            data.set('pr', pr)
         else 
             return false
         fieldDataRegEx.lastIndex = pr
@@ -319,16 +320,7 @@ const checkAndCollectData = async() => {
         return data
     } catch (e) {
         console.log(e)
-        return {
-            'dr': '',
-            'gr': '',
-            'im': '',
-            'bl': '',
-            'zv': '',
-            'pl': '',
-            'rk': '',
-            'pr': ''
-        }
+        return false
     }  
 }
 
@@ -343,66 +335,67 @@ const collectData = async() => {
         const data = {}
         const fieldDataRegEx = new RegExp(FieldDataRegExString,'g')
        
-        let dr = txbDrzava.value
+        let dr = txbDrzava.value.toLowerCase()
         if (fieldDataRegEx.test(dr))
-            data['dr'] = dr.toLowerCase()
+            data.set('dr', dr)
         else 
-            data['dr'] = ''
+            data.set('dr', '')
         fieldDataRegEx.lastIndex = -1
         
-        let gr = txbGrad.value
+        let gr = txbGrad.value.toLowerCase()
         if (fieldDataRegEx.test(gr))
-            data['gr'] = gr.toLowerCase()
+            data.set('gr', gr)
         else 
-            data['gr'] = ''
+            data.set('gr', '')
         fieldDataRegEx.lastIndex = -1
     
-        let im = txbIme.value
+        let im = txbIme.value.toLowerCase()
         if (fieldDataRegEx.test(im))
-            data['im'] = im.toLowerCase()
+            data.set('im', im)
         else 
-            data['im'] = ''
+            data.set('im', '')
         fieldDataRegEx.lastIndex = -1
     
-        let bl = txbBiljka.value
+        let bl = txbBiljka.value.toLowerCase()
         if (fieldDataRegEx.test(bl))
-            data['bl'] =bl.toLowerCase()
+            data.set('bl', bl)
         else 
-            data['bl'] = ''
+            data.set('bl', '')
         fieldDataRegEx.lastIndex = -1
     
-        let zv = txbZivotinja.value
+        let zv = txbZivotinja.value.toLowerCase()
         if (fieldDataRegEx.test(zv))
-            data['zv'] = zv.toLowerCase()
+            data.set('zv', zv)
         else 
-            data['zv'] = ''
+            data.set('zv', '')
         fieldDataRegEx.lastIndex = -1
     
-        let pl = txbPlanina.value
+        let pl = txbPlanina.value.toLowerCase()
         if (fieldDataRegEx.test(pl))
-            data['pl'] = pl.toLowerCase()
+            data.set('pl', pl)
         else 
-            data['pl'] = ''
+            data.set('pl', '')
         fieldDataRegEx.lastIndex = -1
     
-        let rk = txbReka.value
+        let rk = txbReka.value.toLowerCase()
         if (fieldDataRegEx.test(rk))
-            data['rk'] = rk.toLowerCase()
+            data.set('rk', rk)
         else 
-            data['rk'] = ''
+            data.set('rk', '')
         fieldDataRegEx.lastIndex = -1
     
-        let pr = txbPredmet.value
+        let pr = txbPredmet.value.toLowerCase()
         if (fieldDataRegEx.test(pr))
-            data['pr'] = pr.toLowerCase()
+            data.set('pr', pr)
         else 
-            data['pr'] = ''
-        fieldDataRegEx.lastIndex = pr
+            data.set('pr', '')
+        fieldDataRegEx.lastIndex = -1
     
         return data
     } catch (e) {
+
         console.log(e)
-        return {
+        return await new Map(Object.entries({
             'dr': '',
             'gr': '',
             'im': '',
@@ -411,7 +404,7 @@ const collectData = async() => {
             'pl': '',
             'rk': '',
             'pr': ''
-        }
+        }))
     }  
 }
 
@@ -432,14 +425,22 @@ const convertDataToLatinic = async(data) => {
  * This function sends field data to the backend
  * @param  {[key: string]: string} data - Field data that is send to the backend
  */
-const sendFieldData = (data) => {
+const sendFieldData = async(data) => {
+    console.log(await data.dr)
     socket.emit(
         SOCKET_EVENTS.RECEIVE_DATA,
         {
             username,
             roomCode,
             sessionToken,
-            ...data
+            dr: await data.dr,
+            gr: await data.gr,
+            im: await data.im,
+            bl: await data.bl,
+            zv: await data.zv,
+            pl: await data.pl,
+            rk: await data.rk,
+            pr: await data.pr
         }
     )
 

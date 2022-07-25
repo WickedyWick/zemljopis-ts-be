@@ -111,9 +111,7 @@ export const receiveData = async(io: Server, socket: Socket, username: string, r
     try {
         const gameData = await new GameData(room)
         const prepData = await gameData.prepReceiveData(username)
-        console.log(prepData)
         const result = await Result.findBy({ round_id: Number(prepData[1]), player_id: Number(prepData[2]) })
-        console.log(data)
         // if this fails it will return 500
         await result.update({
             drzava: data.dr,

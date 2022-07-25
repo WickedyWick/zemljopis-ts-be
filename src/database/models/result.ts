@@ -30,7 +30,7 @@ export interface ResultMethods {
 export type ResultModel = Model<ResultFields, ResultMethods>
 
 export class Result extends BaseModel<ResultFields, ResultMethods> {
-    fields: [
+    fields = [
         'id',
         'round_id',
         'player_id',
