@@ -46,15 +46,11 @@ export interface GameFields {
     roundTimeLimit: number,
     roundActive: number,
     roundId: number | null,
-    roundIds: any,
-    players: any,
-    playersIds: any,
     availableLetters: string,
     currentLetter: string,
     evalFuncExecuting: number,
-    data: any, // strongtype this later
     created_at: Date | string // not nessesarry in redis?
-    active: boolean
+    active: number
     playersRegistered: number
     gameInProgress: number
 }
@@ -91,7 +87,7 @@ export class GameData {
         return await redisDb.exists(room)
     }
 
-    static createRoom = async(room: string,username: string, playerCount: number, roundTimeLimit: number) => {
+    static createRoom = async(room: string, username: string, playerCount: number, roundTimeLimit: number) => {
         const value: GameFields = {
             playerCount,
             playersReady: 0,
@@ -100,20 +96,18 @@ export class GameData {
             roundTimeLimit,
             roundActive: 0,
             roundId: -1,
-            roundIds: {},
-            players: [],
-            playersIds: {},
             availableLetters: defaultLetters,
             currentLetter: '',
             evalFuncExecuting: 0,
-            data: {},
-            created_at: new Date(),
-            active: true,
+            created_at: new Date().toLocaleDateString(),
+            active: 1,
             playersRegistered: 1,
             gameInProgress: 0,
         }
+        console.log(value)
         //@ts-ignore
         await redisDb.hSet(room, value)
+        console.log('log2')
         // 12h
         //await redisDb.expireAt(room, 43200)
 

@@ -21,6 +21,6 @@ const taskQueue = queue<EnqueueData, string>(async(task, callback) => {
         callback(`${ new Date().toLocaleString() }: Error during perfoming queue task. RoundId: ${ task.roundId }.\n ERR : ${ e }`)
 
     }
-}, Number(process.env.CONCURENT_WORKERS) ?? 5)
+}, Number(process.env.CONCURENT_WORKERS) ?? 1)
 
 export const Queue = taskQueue

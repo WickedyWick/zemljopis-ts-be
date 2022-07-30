@@ -55,3 +55,14 @@ export const letterDictionary = new Map([
     ['ш', 'š'],
     [' ', ' ']
 ])
+
+export const IndexField = {
+    0: 'dr',
+    1: 'gr',
+    2: 'im',
+    3: 'bl',
+    4: 'zv',
+    5: 'pl',
+    6: 'rk',
+    7: 'pr'
+}

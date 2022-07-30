@@ -1,4 +1,4 @@
-import { N_TYPE, BTN_COLORS, BTN_STATES, SessionTokenRegEx, UsernameRegEx, RoomCodeRegEx, FieldDataRegExString, letterDictionary } from './game.consts.js'
+import { N_TYPE, BTN_COLORS, BTN_STATES, SessionTokenRegEx, UsernameRegEx, RoomCodeRegEx, FieldDataRegExString, letterDictionary, IndexField } from './game.consts.js'
 import socket , { SOCKET_EVENTS } from './game.sockets.js'
 // player count label lblPlayerCount
 // player ready label lblPlayersReady
@@ -37,7 +37,7 @@ let txbZivotinja = null
 let txbPlanina = null
 let txbReka = null
 let txbPredmet = null
-
+let fieldData = new Map()
 export const load = (_username, _roomCode, _sessionToken) => {
     const usernameReg = new RegExp(UsernameRegEx, 'g').test(_username)
     const roomCodeReg = new RegExp(RoomCodeRegEx, 'g').test(_roomCode)
@@ -188,7 +188,8 @@ export const playerUnReadyReadyResponse = (data) => {
 
 export const btnClickHandler = async() => {
     if(gameStarted) {
-        const res = Object.fromEntries(await checkAndCollectData())
+        fieldData = await checkAndCollectData()
+        const res = Object.fromEntries(fieldData)
         if (!res) {
             notify('warning', 'Format podatak nije validan!')
             return
@@ -211,9 +212,23 @@ export const btnClickHandler = async() => {
  * Function that handles result response
  * @param  {[key: string]: string} data - Pointed data
  */
-export const resultResponse = (data) => {
+export const parseResponse = async(data) => {
     gameStarted = false
     ready = false
+    if (await data.CODE != 200) {
+        // error
+    }
+    await delete data.CODE
+    for (const [key, val] of Object.entries(data)) {
+        const splitted = key.split('_')
+
+        if (fieldData.has(`${splitted[0]}_${IndexField[i]}`)) {
+            updateFieldWithPoints(splitted[1], val)
+            continue
+        }
+        updateFieldWithPoints(splitted[1], 0)
+
+    }
     enableAllPButtons()
     console.log(data)
 }
@@ -239,9 +254,10 @@ export const gameStart = async(data) => {
         roundTimeLimit--
         lblTimer.textContent = String(roundTimeLimit)
         if(roundTimeLimit == 0) {
-            const data = Object.fromEntries(await collectData())
-            await convertDataToLatinic(data)
-            await sendFieldData(data)
+            data = await collectData()
+            const res = Object.fromEntries(data)
+            await convertDataToLatinic(res)
+            await sendFieldData(res)
             btnReady.disabled = true
             disableAllInputFields()
             disableAllPButtons()
@@ -249,8 +265,39 @@ export const gameStart = async(data) => {
         }
     }, 1000)
 }
-
-
+/**
+ * Updates field by category with its value
+ * @param  {number} index - Category
+ * @param  {number} value - Number of points 
+ */
+const updateFieldWithPoints = async(category, value) => {
+    switch (category) {
+        case 0:
+            txbDrzava.value += `  + ${ value }`
+            break;
+        case 1:
+            txbGrad.value += `  + ${ value }`
+            break;
+        case 2:
+            txbIme.value += `  + ${ value }`
+            break;
+        case 3:
+            txbBiljka.value += `  + ${ value }`
+            break;
+        case 4:
+            txbZivotinja.value += `  + ${ value }`
+            break;
+        case 5:
+            txbPlanina.value += `  + ${ value }`
+            break;
+        case 6:
+            txbReka.value += `  + ${ value }`
+            break;
+        case 7:
+            txbPredmet.value += `  + ${ value }`
+            break;
+    }
+}
 /**
  * This function collects , validates and returns boolean and data if its valid
  * @returns {boolean}
@@ -332,7 +379,7 @@ const checkAndCollectData = async() => {
 
 const collectData = async() => {
     try {
-        const data = {}
+        const data = new Map()
         const fieldDataRegEx = new RegExp(FieldDataRegExString,'g')
        
         let dr = txbDrzava.value.toLowerCase()
