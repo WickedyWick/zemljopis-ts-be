@@ -235,7 +235,7 @@ export class GameData {
             // have recieveddata set at one and use HSETEX and del when you want to 0 it
             const receivedData = await this.checkIfDataIsReceived(username)
             if (receivedData == 1) return { success: true, eval: false }
-            console.log('DATAAAAA', data)
+
             // @ts-ignore
             await redisDb.hSet(`${ username }_${this._room}`, data)
             const numOfReceivedData = await redisDb.hIncrBy(this._room, 'numOfDataReceived', 1)
@@ -266,7 +266,6 @@ export class GameData {
         const map: Map<string, string[]> = new Map<string, string[]>()
         for ( let i =0; i < playerNames.length; i++) {
             const data = await redisDb.hmGet(`${playerNames[i]}_${this._room}`, ['dr','gr','im', 'bl', 'zv', 'pl', 'rk', 'pr'])
-            console.log('DATA', data)
             await map.set(playerNames[i], data)
         }
         /*
@@ -275,7 +274,7 @@ export class GameData {
         return map
     }
     getLetter = async() => {
-        return await redisDb.hGet(this._room, 'letter')
+        return await redisDb.hGet(this._room, 'currentLetter')
     }
     setPointsToData = async(playerData: Map<string, string[]>, letter: string) => {
         const pointedData: Map<string, number> = new Map<string, number>()
@@ -290,6 +289,11 @@ export class GameData {
                 console.log(val[i])
                 // @ts-ignore
                 const exists = await redisDb.hExists(`${FieldIndex[i]}_${letter}`, val[i])
+                // @ts-ignore
+                console.log(`${val[i]} is ${exists} in ${FieldIndex[i]}_${letter}`)
+                // @ts-ignore
+                const get = await redisDb.hGet(`grad_E`, 'estonija')
+                console.log(`GET: ${get}`)
                 if (!exists) {
                     pointedData.set(`${val[i]}_${i}`, 0)
                     nonExistData.set(`${val[i]}_${i}`, 1)
@@ -437,8 +441,10 @@ export class GameData {
         return redisDb.hGet(this._room, 'availableLetters')
     }
     setLetters = async(letters: string, currentLetter: string) => {
-        await redisDb.hSet(this._room, 'currentLetter', currentLetter)
-        return await redisDb.hSet(this._room, 'availableLetters', letters)
+        await redisDb.hSet(this._room, {
+            'currentLetter': currentLetter,
+            'availableLetters': letters
+        })
     }
     // combine getplayer ciount and players joined in one query with hmGet?
     getPlayerCount = async() => {

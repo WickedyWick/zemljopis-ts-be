@@ -134,6 +134,12 @@ export const joinRoomResponse = (data) => {
     }
 }
 
+/**
+ * This function handles playerReady response from the server
+ * @param  {string} username
+ * @param  {number} CODE
+ * @param  {number} playersReady
+ */
 export const playerReadyResponse = (data) => {
     /*
     username: string,
@@ -161,12 +167,13 @@ export const playerReadyResponse = (data) => {
     
 }
 
-export const playerUnReadyReadyResponse = (data) => {
-    /*
-    username: string,
-    CODE: number
-    playersReady: number
-    */
+/**
+ * This function handles playerUnReady response from the server
+ * @param  {string} username
+ * @param  {number} CODE
+ * @param  {number} playersReady
+ */
+export const playerUnReadyReadyHandler = (data) => {
     if(data.CODE > 400) {
         //alert
         setButtonUnReady()
@@ -212,24 +219,29 @@ export const btnClickHandler = async() => {
  * Function that handles result response
  * @param  {[key: string]: string} data - Pointed data
  */
-export const parseResponse = async(data) => {
+export const resultHandler = async(data) => {
     gameStarted = false
     ready = false
-    if (await data.CODE != 200) {
+    disableAllInputFields()
+    enableAllPButtons()
+    setButtonUnReady()
+    roundTimeLimit = -1
+    if (data.CODE != 200) {
         // error
+        notify('warning', `Došlo je do problema prilikom evaluacije rešenja.`)
+        return
     }
     await delete data.CODE
     for (const [key, val] of Object.entries(data)) {
         const splitted = key.split('_')
-
-        if (fieldData.has(`${splitted[0]}_${IndexField[i]}`)) {
-            updateFieldWithPoints(splitted[1], val)
-            continue
-        }
-        updateFieldWithPoints(splitted[1], 0)
-
+        const resultValue = splitted[0]
+        const category = splitted[1]
+        const localValue = await fieldData.get(IndexField[category])
+        if (localValue == resultValue)
+            updateFieldWithPoints(category, val)
+        else
+            updateFieldWithPoints(category, 0)
     }
-    enableAllPButtons()
     console.log(data)
 }
 
@@ -263,6 +275,8 @@ export const gameStart = async(data) => {
             disableAllPButtons()
             clearInterval(intervalId)
         }
+        if (roundTimeLimit < 0)
+            clearInterval(intervalId)
     }, 1000)
 }
 /**
@@ -271,30 +285,33 @@ export const gameStart = async(data) => {
  * @param  {number} value - Number of points 
  */
 const updateFieldWithPoints = async(category, value) => {
+    console.log(category)
     switch (category) {
-        case 0:
+        case '0':
             txbDrzava.value += `  + ${ value }`
             break;
-        case 1:
+        case '1':
             txbGrad.value += `  + ${ value }`
             break;
-        case 2:
+        case '2':
             txbIme.value += `  + ${ value }`
             break;
-        case 3:
+        case '3':
             txbBiljka.value += `  + ${ value }`
             break;
-        case 4:
+        case '4':
             txbZivotinja.value += `  + ${ value }`
             break;
-        case 5:
+        case '5':
             txbPlanina.value += `  + ${ value }`
             break;
-        case 6:
+        case '6':
             txbReka.value += `  + ${ value }`
             break;
-        case 7:
+        case '7':
             txbPredmet.value += `  + ${ value }`
+            break;
+        default: 
             break;
     }
 }
@@ -521,7 +538,7 @@ const cyrilicToLatinic = async(word) => {
  * @param  {string} message - Message to be shown
  */
 const notify = (type, message) => {
-    // type, warning, info, success
+    // type: warning, info, success
     new Noty({  
         theme : 'metroui',
         type : type,
@@ -607,4 +624,11 @@ const setButtonUnReady = () => {
 const setButtonGameStarted = () => {
     btnReady.style.backgroundColor = BTN_COLORS.GREEN
     btnReady.textContent = BTN_STATES.BTN_GAME_STARTED
+}
+
+const updateRound = () => {
+    lblRoundNumber.textContent = String(Number(lblRoundNumber.textContent) + 1)
+}
+const stopTimer = () => {
+
 }

@@ -22,10 +22,9 @@ export const chooseLetter = async(room: string) => {
     if (letters == '') return letters
 
     const charAt = Math.floor(Math.random() * letters.length)
-    const newLetter = letters[charAt]
+    const newLetter = await cirilicaLatinica.get(letters[charAt])
     await gameData.setLetters(letters.replace(newLetter, ''), newLetter)
-
-    return await cirilicaLatinica.get(newLetter)
+    return newLetter
 }
 
 export const cirilicaLatinica = new Map<string, string>([

@@ -143,22 +143,31 @@ export const receiveData = async(io: Server, socket: Socket, username: string, r
 }
 
 export const evaluate = async(room: string) => {
-    console.time('timeEvaluation')
-    const gameData = new GameData(room)
-    const letter = await gameData.getLetter()
-    const playerNameId: PlayerIdsInterface = await gameData.getPlayerIds()
-    const playerNames: string[] = []
-    const playerIds: number[] = []
-
-    for ( const [key, value] of Object.entries(playerNameId)) {
-        playerNames.push(key)
-        playerIds.push(Number(value))
+    try {
+        console.time('timeEvaluation')
+        const gameData = new GameData(room)
+        const letter = await gameData.getLetter()
+        const playerNameId: PlayerIdsInterface = await gameData.getPlayerIds()
+        const playerNames: string[] = []
+        const playerIds: number[] = []
+    
+        for ( const [key, value] of Object.entries(playerNameId)) {
+            playerNames.push(key)
+            playerIds.push(Number(value))
+        }
+        const playerFieldData: Map<string, string[]> = await gameData.getPlayerFieldData(playerNames)
+        const pointedData: Map<string, number> = await gameData.setPointsToData(playerFieldData, letter)
+        const results = await Object.fromEntries(pointedData)
+        results['CODE'] = 200
+        IO.to(room).emit(EVENTS.RESULT, results)
+        await gameData.setPointsToField(playerFieldData, pointedData, playerNameId)
+        console.timeEnd('timeEvaluation')
+    } catch(e) {
+        console.error(`${ new Date().toLocaleDateString() }`)
+        IO.to(room).emit(EVENTS.RESULT, {
+            CODE: 500
+        })
     }
-    const playerFieldData: Map<string, string[]> = await gameData.getPlayerFieldData(playerNames)
-    const pointedData: Map<string, number> = await gameData.setPointsToData(playerFieldData, letter)
-    const results = await Object.fromEntries(pointedData)
-    IO.to(room).emit(EVENTS.RESULT, results)
-    await gameData.setPointsToField(playerFieldData, pointedData, playerNameId)
-    console.timeEnd('timeEvaluation')
+    
 }
 
