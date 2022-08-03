@@ -123,17 +123,17 @@ export class BaseModel<Fields extends {}, Methods> implements ModelShape<Fields,
         fields.created_at =  formatISO(new Date())
         // @ts-ignore
         fields.updated_at = formatISO(new Date())
-
         const record = (
             await this
                 .q
-                .returning([
+                .returning([ 
                     'id',
                     ...(returning ? Array.isArray(returning) ? returning : Object.keys(fields) : this.fields)
                 ])
                 //@ts-ignore
                 .insert(fields)
         )[0] as Model<Fields,Methods>
+
         // maybe this should go before first record creation
         if (this.hooks?.create) {
             await this.hooks.create(record)

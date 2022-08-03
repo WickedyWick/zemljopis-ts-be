@@ -1,10 +1,11 @@
-import { createClient } from '@node-redis/client';
+import { createClient } from 'redis'
 import * as dotenv from 'dotenv'
 
 dotenv.config()
 
+// await this
 const redis = createClient({
-    url: process.env.REDIS_HOSTNAME,
+    url: process.env.REDIS_URL,
 })
 
 redis.connect()

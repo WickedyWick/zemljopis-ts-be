@@ -6,13 +6,13 @@ export async function seed(knex: Knex): Promise<void> {
 
     // Inserts seed entries
     await knex('category').insert([
-        { id: 0, category: 'Drzava' },
-        { id: 1, category: 'Grad' },
-        { id: 2, category: 'Ime' },
-        { id: 3, category: 'Biljka' },
-        { id: 4, category: 'Zivotinja' },
-        { id: 5, category: 'Planina' },
-        { id: 6, category: 'Reka' },
-        { id: 7, category: 'Predmet' }
+        { id: 0, category: 'drzava' },
+        { id: 1, category: 'grad' },
+        { id: 2, category: 'ime' },
+        { id: 3, category: 'biljka' },
+        { id: 4, category: 'zivotinja' },
+        { id: 5, category: 'planina' },
+        { id: 6, category: 'reka' },
+        { id: 7, category: 'predmet' }
     ]);
 };

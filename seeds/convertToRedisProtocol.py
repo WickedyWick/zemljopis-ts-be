@@ -3,7 +3,7 @@ import csv
 '''
 Script used to generate REsp protocol from csv file to bulk load data in redis
 '''
-fieldNums = ['Država', 'Grad', 'Ime', 'Biljka', 'Životinja', 'Planina', 'Reka', 'Predmet']
+fieldNums = ['drzava', 'grad', 'ime', 'biljka', 'zivotinja', 'planina', 'reka', 'predmet']
 # header is data,letter,category_id
 redisProtocolFile = open('./seeds/redisProtocol.txt', 'w', encoding='UTF-8')
 with open('./seeds/fieldData.csv', 'r', encoding='UTF-8') as f:

@@ -1,12 +1,15 @@
 import { Server, Socket } from "socket.io";
-import { joinRoomValidator, playeReadyValidator } from "validators/socketValidator";
-import { joinRoom, playerReady, playerUnReady } from "controllers/socketHandlers/game.handler";
-import { GameData } from "redis/game";
+import { joinRoomValidator, playerReadyValidator, playerUnReadyValidator, receiveDataValidator } from "validators/socketValidator";
+import { joinRoom, playerReady, playerUnReady, receiveData } from "controllers/socketHandlers/game.handler";
+import { GameData } from "redisDb/game";
 export const EVENTS = {
     JOIN_ROOM : 'joinRoom',
     PLAYER_JOINED: 'playerJoined',
     PLAYER_READY: 'playerReady',
-    PLAYER_UNREADY: 'playerUnReady'
+    PLAYER_UNREADY: 'playerUnReady',
+    RECEIVE_DATA: 'receiveData',
+    GAME_START: 'gameStart',
+    RESULT: 'result'
 } as const
 
 export const registerGameHandlers = async(io: Server, socket: Socket) => {
@@ -17,17 +20,24 @@ export const registerGameHandlers = async(io: Server, socket: Socket) => {
     })
 
     socket.on(EVENTS.PLAYER_READY, async({ username, roomCode, sessionToken }) => {
-        const v: boolean = await playeReadyValidator(io, socket, username, roomCode, sessionToken)
+        const v: boolean = await playerReadyValidator(io, socket, username, roomCode, sessionToken)
         if (v) playerReady(io, socket, username, roomCode)
     })
 
     socket.on(EVENTS.PLAYER_UNREADY, async({ username, roomCode, sessionToken }) => {
-        const v: boolean = await playeReadyValidator(io, socket, username, roomCode, sessionToken)
+        const v: boolean = await playerUnReadyValidator(io, socket, username, roomCode, sessionToken)
         if (v) playerUnReady(io, socket, username, roomCode)
+    })
+
+    socket.on(EVENTS.RECEIVE_DATA, async({ username, roomCode, sessionToken, dr, gr, im, bl, zv, pl, rk, pr }) => {
+        console.log('DR', dr)
+        const v: boolean = await receiveDataValidator(io, socket, username, roomCode, sessionToken)
+        if (v) receiveData(io, socket, username, roomCode, { dr: dr, gr: gr, im: im, bl:bl, zv: zv, pl: pl, rk: rk, pr: pr })
     })
     socket.on('test', () => {
         socket.emit('test')
     })
+
 }
 
 export const registerDisconnect = async(io: Server, socket: Socket) => {

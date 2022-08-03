@@ -17,7 +17,6 @@
     "seed": "knex seed:run"
   },
   "dependencies": {
-    "@types/redis": "^4.0.11",
     "@types/socket.io-client": "^3.0.0",
     "body-parser": "^1.19.0",
     "commonjs": "^0.0.1",
@@ -37,7 +36,7 @@
     "nodemon": "^2.0.15",
     "pg": "^8.7.1",
     "pm2": "^5.1.2",
-    "redis": "^4.0.3",
+    "redis": "^4.1.1",
     "redis-rejson": "^1.0.0",
     "socket.io": "^4.4.0",
     "socket.io-client": "^4.5.0",

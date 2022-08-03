@@ -4,14 +4,14 @@ import { RoomModel } from 'database/models/room'
 import { makeRoomCode } from 'utils/strings'
 import { ERROR_ROOM_CREATE, ERROR_REG_PLAYER } from 'utils/errors/home'
 import { randomBytes } from 'crypto'
-import { GameData } from 'redis/game'
+import { GameData } from 'redisDb/game'
 interface RoomBody {
     username: string
     playerCount: number
     roundTimeLimit: number
 }
 export const createRoom: Action<any, RoomBody, any , any> = async (req, res, next) => {
-    const { username, playerCount, roundTimeLimit } = await req.body 
+    const { username, playerCount, roundTimeLimit } = await req.body
     const roomCode:string = await makeRoomCode()
     if (roomCode === '') return next(ERROR_ROOM_CREATE)
     // check for unique 
@@ -29,9 +29,9 @@ export const createRoom: Action<any, RoomBody, any , any> = async (req, res, nex
             roundTimeLimit,
         )
 
-    } catch (err) {
+    } catch (e) {
         //check if its dupe
-        console.error(err)
+        console.error(`${ new Date().toLocaleString() }: ${ e }`)
         return next(ERROR_ROOM_CREATE)
     }
     let sessionToken;

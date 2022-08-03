@@ -4,7 +4,7 @@ import socketio, { Server } from 'socket.io'
 import { registerGameHandlers, registerDisconnect } from './sockets/game.sockets'
 import { routes } from './routes'
 import { ClientToServerEvents, InterServerEvents, ServerToClientEvents } from 'utils/socketTypes'
-import { redisDb } from 'redis'
+import { startTimerAndQueue } from 'utils/timer'
 const app = express()
 
 
@@ -18,8 +18,9 @@ const onConnection = async(socket: socketio.Socket) => {
     registerGameHandlers(io, socket)
     registerDisconnect(io, socket)
 }
-
+startTimerAndQueue()
 app.use(routes)
 io.on('connection', onConnection)
+export const IO = io
 export const dir = __dirname
 export default app
