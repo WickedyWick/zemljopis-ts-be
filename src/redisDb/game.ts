@@ -332,7 +332,7 @@ export class GameData {
                     sum += points
                 }
                 // maybe in separate function
-                await redisDb.hSet(`${key}_${this._room}`, { 'ready' : 0, 'dataReceived': 0})
+                await redisDb.hSet(`${key}_${this._room}`, { 'ready' : 0, 'dataReceived': 0 })
                 if (sum == 0) continue
                 promiseArr.push(this.updatePoints(key, sum))
                 const pId = Number(playerData[key])
@@ -423,10 +423,17 @@ export class GameData {
         */
         return await redisDb.ft.search('round-timer-idx', `@expiresAt:[1000000000 ${date}]`)
     }
-    setGameInProgress = async(state: number, roundId: number) => {
-        await redisDb.hSet(this._room, 'gameInProgress', state)
-        await redisDb.hSet(this._room, 'roundId', roundId)
+    setGameInProgressAndRoundId = async(state: number, roundId: number) => {
+        await redisDb.hSet(this._room, {
+            'gameInProgress': state,
+            'roundId': roundId
+        })
     }
+
+    setGameInProgress = async(state: number) => {
+        await redisDb.hSet(this._room, 'gameInProgress', state)
+    }
+    
     // same as craete Player
     addPlayer = async(username: string, id: number, sessionToken: string ) => {
         // unique key

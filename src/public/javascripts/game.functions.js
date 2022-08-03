@@ -146,11 +146,13 @@ export const playerReadyResponse = (data) => {
     CODE: number
     playersReady: number
     */
+   console.log(data)
     if(data.CODE >= 400) {
         //alert
         setButtonUnReady()
         btnReady.disabled = false
         ready = false
+        console.log(data.MSG)
         notify(N_TYPE.WARNING, 'Doslo je do problema pokusajte ponovo')
         return
     } 
@@ -179,6 +181,7 @@ export const playerUnReadyReadyHandler = (data) => {
         setButtonUnReady()
         btnReady.disabled = false
         ready = false
+        console.log("PUERROR")
         notify(N_TYPE.WARNING, 'Doslo je do problema pokusajte ponovo')
         return
     } 
@@ -275,8 +278,10 @@ export const gameStart = async(data) => {
             disableAllPButtons()
             clearInterval(intervalId)
         }
-        if (roundTimeLimit < 0)
+        if (roundTimeLimit < 0) {
+            lblTimer.textContent = '0'
             clearInterval(intervalId)
+        } 
     }, 1000)
 }
 /**

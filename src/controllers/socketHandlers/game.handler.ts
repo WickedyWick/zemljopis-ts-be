@@ -88,7 +88,7 @@ export const gameStart = async(io: Server, room: string) => {
             round_number: roundNumber,
         })
 
-        await gameData.setGameInProgress(1, round.id)
+        await gameData.setGameInProgressAndRoundId(1, round.id)
         // Add to the index
         const roundTimeLimit: number = await gameData.getRoundTimeLimit(room)
         // + 1500 is buffered time for data to come back from the client if client has bad itnernet
@@ -161,6 +161,7 @@ export const evaluate = async(room: string) => {
         results['CODE'] = 200
         IO.to(room).emit(EVENTS.RESULT, results)
         await gameData.setPointsToField(playerFieldData, pointedData, playerNameId)
+        await gameData.setGameInProgress(0)
         console.timeEnd('timeEvaluation')
     } catch(e) {
         console.error(`${ new Date().toLocaleDateString() }`)

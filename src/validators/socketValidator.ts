@@ -86,6 +86,7 @@ export const playerReadyValidator = async(
         })
         return false
     } catch(e) {
+        console.log(`Error : ${e}`)
         socket.emit(EVENTS.PLAYER_READY, {
             MSG: 'Doslo je do problema.',
             CODE: 500
