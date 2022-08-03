@@ -17,7 +17,6 @@ I decided to rewritte it with new knowledge acquired to be up to industries stan
 ## Tech stack
 NodeJS, Express, SocketsIO, Redis, postgresql, knex, jest
 
-## About
 Zemljopis grew from personal challenge to project that is hosted and will be used by many people.
 
 Idea is to help people learn about geography with fun.
@@ -111,6 +110,7 @@ FT.CREATE round-timer-idx ON HASH PREFIX 1 "round:timer:" SCHEMA roundId NUMERIC
 decision -> samo prihvati nekosenu latinicu i cirilicu. nepismeni neka ne igraju
 
 localdb pass postgres
+
 ### Current biggest obstacle (mini blog)
 Since this is a round based game there are timers, many timers.
 I do not like idea of having lots of timer objects running at the same time.
