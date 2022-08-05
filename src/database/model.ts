@@ -2,6 +2,7 @@ import knex from 'knex'
 import { db } from 'database'
 import { Keyed, Maybe } from 'utils/typings'
 import { formatISO } from 'date-fns'
+import { logError } from 'utils/logger'
 
 
 export type ModelDate = Date | string
@@ -140,6 +141,7 @@ export class BaseModel<Fields extends {}, Methods> implements ModelShape<Fields,
         }
 
         return record
+       
     }
 
     findOrCreateBy = async(fields: Partial<Fields> & Keyed = {}) => {
