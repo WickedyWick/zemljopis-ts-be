@@ -172,13 +172,15 @@ export class GameData {
         }
         
         //@ts-ignore
-        const playerCount = getReply[0]
+        const playerCount = getReply[1]
+        console.log(setNXReply)
         if (setNXReply) {
             await redisDb.watch(`${username}_${room}`)
             const [ pReady ] = await redisDb
                 .multi()
                 .hIncrBy(room, 'playersReady', 1)
                 .exec()
+            console.log(pReady, playerCount)
             if (pReady == playerCount){
                 await redisDb.hSet(room, 'gameInProgress', 1)
                 return {
@@ -391,6 +393,7 @@ export class GameData {
     static unTrackSocket = async(io: Server, socket: Socket) => {
         try {
             const { username, room } = await redisDb.hGetAll(socket.id)
+            if (!username || !room) return
             const res = await this.playerUnReady(room, username)
             io.to(room).emit(EVENTS.PLAYER_UNREADY, {
                 username,
@@ -468,7 +471,23 @@ export class GameData {
     addPlayer = async(username: string, id: number, sessionToken: string ) => {
         // unique key
         await redisDb.hSet(`players_${this._room}`, { [username]: id})
-        await redisDb.hSet(`${username}_${this._room}`, { id: id, points: 0, sessionToken: sessionToken, ready: 0 })
+        const value: PlayerValues = {
+            id: id,
+            points: 0,
+            sessionToken: sessionToken,
+            dr: '',
+            gr: '',
+            im: '',
+            bl: '',
+            zv: '',
+            pl: '',
+            rk: '',
+            pr: '',
+            dataReceived: 0
+        }
+
+        // @ts-ignore
+        await redisDb.hSet(`${username}_${this._room}`, value)
     }
     playerExists = async(username: string) => {
         return Number(await redisDb.exists(`${username}_${this._room}`))

@@ -21,7 +21,6 @@ export const joinRoomValidator = async(
 
         const s = await GameData.checkSessionToken(roomCode, username, sessionToken)
         if (!s) {
-            console.log('par')
             socket.emit(EVENTS.JOIN_ROOM, {
                 MSG: "Parametri nisu validni",
                 CODE: 400
@@ -34,7 +33,7 @@ export const joinRoomValidator = async(
         const tokenReg = await new RegExp(SessionTokenRegEx,'g').test(sessionToken)
         if(roomReg && usernameReg && tokenReg) return true
         // return socket msg not false 
-        console.log(roomReg, usernameReg, tokenReg)
+
         socket.emit(EVENTS.JOIN_ROOM, {
             MSG: "Parametri nisu validni",
             CODE: 400
