@@ -173,14 +173,13 @@ export class GameData {
         
         //@ts-ignore
         const playerCount = getReply[1]
-        console.log(setNXReply)
         if (setNXReply) {
             await redisDb.watch(`${username}_${room}`)
             const [ pReady ] = await redisDb
                 .multi()
                 .hIncrBy(room, 'playersReady', 1)
                 .exec()
-            console.log(pReady, playerCount)
+
             if (pReady == playerCount){
                 await redisDb.hSet(room, 'gameInProgress', 1)
                 return {
