@@ -1,4 +1,5 @@
 import { RedisClientType } from "redis";
+import { logError } from "utils/logger";
 
 
 export class transactionClient {
@@ -19,39 +20,47 @@ export class transactionClient {
     playerReady = async(username: string) => {
         // Lua scripts might be better here
         // multiple clients needed for something like this?
-        await this.client.watch(this.room)
-        await this.client.watch(`${username}_${this.room}`)
-        let pReady = -1
-        const [setNXReply, getReply] = await this.client
-            .multi()
-            .hSetNX(`${username}_${this.room}`, 'ready', '1')
-            .hmGet(this.room, ['playersReady', 'playerCount'])
-            .exec()
-        
-        // race condition error
-        // @ts-ignore
-        if (setNXReply == null || getReply.length != 2) {
-            return {
-                CODE: 500,
-                gameStart: false,
-                playersReady: pReady
-            }
-        }
-        
-        //@ts-ignore
-        const playerCount = getReply[1]
-        if (setNXReply) {
+        try {
+            await this.client.watch(this.room)
             await this.client.watch(`${username}_${this.room}`)
-            const [ pReady ] = await this.client
+            let pReady = -1
+            const [setNXReply, getReply] = await this.client
                 .multi()
-                .hIncrBy(this.room, 'playersReady', 1)
+                .hSetNX(`${username}_${this.room}`, 'ready', '1')
+                .hmGet(this.room, ['playersReady', 'playerCount'])
                 .exec()
+            
+            // race condition error
+            // @ts-ignore
+            if (setNXReply == null || getReply.length != 2) {
+                return {
+                    CODE: 500,
+                    gameStart: false,
+                    playersReady: pReady
+                }
+            }
+            
+            //@ts-ignore
+            const playerCount = getReply[1]
+            if (setNXReply) {
+                await this.client.watch(`${username}_${this.room}`)
+                const [ pReady ] = await this.client
+                    .multi()
+                    .hIncrBy(this.room, 'playersReady', 1)
+                    .exec()
 
-            if (pReady == playerCount){
-                await this.client.hSet(this.room, 'gameInProgress', 1)
+                if (pReady == playerCount){
+                    await this.client.hSet(this.room, 'gameInProgress', 1)
+                    return {
+                        CODE: 200,
+                        gameStart: true,
+                        playersReady: pReady
+                    }
+                }
+
                 return {
                     CODE: 200,
-                    gameStart: true,
+                    gameStart: false,
                     playersReady: pReady
                 }
             }
@@ -61,13 +70,18 @@ export class transactionClient {
                 gameStart: false,
                 playersReady: pReady
             }
+        } catch(e) {
+            await logError(`Error during redis player ready transaction`)
+            return {
+                CODE: 500,
+                gameStart: false,
+                playersReady: -1
+            }
+        } finally {
+            await this.disconnect()
         }
+        
 
-        return {
-            CODE: 200,
-            gameStart: false,
-            playersReady: pReady
-        }
 
     }
 
@@ -78,37 +92,57 @@ export class transactionClient {
      * @param  {string} username
      */
     playerUnReady = async(username: string) => {
-        await this.client.watch(this.room)
-        await this.client.watch(`${username}_${this.room}`)
-        let pReady = -1
-        const [ hDelRes ] = await this.client
-            .multi()
-            .hDel(`${username}_${this.room}`, 'ready')
-            .exec()
-        
-        if (hDelRes == null) {
-            return {
-                CODE: 500,
-                playersReady: pReady
-            }
-        }
-
-        if (hDelRes) {
+        try {
+            await this.client.watch(this.room)
             await this.client.watch(`${username}_${this.room}`)
-            const [ pReady ] = await this.client
+            let pReady = -1
+            const [ hDelRes ] = await this.client
                 .multi()
-                .hIncrBy(this.room, 'playersReady', -1)
+                .hDel(`${username}_${this.room}`, 'ready')
                 .exec()
+            
+            if (hDelRes == null) {
+                return {
+                    CODE: 500,
+                    playersReady: pReady
+                }
+            }
+
+            if (hDelRes) {
+                await this.client.watch(`${username}_${this.room}`)
+                const [ pReady ] = await this.client
+                    .multi()
+                    .hIncrBy(this.room, 'playersReady', -1)
+                    .exec()
+                return {
+                    CODE: 200,
+                    playersReady: pReady
+                }
+            }
+
             return {
                 CODE: 200,
                 playersReady: pReady
             }
+        } catch(e) {
+            await logError(`Error during redis player un-ready transaction`)
+            return {
+                CODE: 500,
+                gameStart: false,
+                playersReady: -1
+            }
+        } finally {
+            await this.disconnect()
         }
+    }
 
-        return {
-            CODE: 200,
-            playersReady: pReady
+    disconnect = async() => {
+        try {
+            await this.client.disconnect()
+        } catch(e) {
+            await logError(`Error during disconnecting transaction client.`, e)
         }
+        
     }
 
 }

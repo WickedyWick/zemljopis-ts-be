@@ -7,6 +7,7 @@ import { PlayerIdsInterface } from 'database/models/round'
 import { IO } from 'index'
 import { logError } from 'utils/logger'
 import { serveTransactionClient } from 'redisDb'
+import { transactionClient } from 'redisDb/transactionClient'
 
 export const joinRoom = async(io: Server, socket: Socket, username: string, roomCode: string) => {
     // maybe insta search for player and then return somehting like wrong player and room combo
