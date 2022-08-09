@@ -6,6 +6,7 @@ import { chooseLetter } from 'utils/strings'
 import { PlayerIdsInterface } from 'database/models/round'
 import { IO } from 'index'
 import { logError } from 'utils/logger'
+import { serveTransactionClient } from 'redisDb'
 
 export const joinRoom = async(io: Server, socket: Socket, username: string, roomCode: string) => {
     // maybe insta search for player and then return somehting like wrong player and room combo
@@ -42,8 +43,8 @@ export const playerReady = async(io: Server, socket: Socket, username: string, r
             })
             return
         }
-
-        const res = await GameData.playerReady(io, roomCode, username)
+        const transactionClient = await serveTransactionClient(roomCode)
+        const res = await transactionClient.playerReady(username)
         io.to(roomCode).emit(EVENTS.PLAYER_READY, {
             username,
             ...res
@@ -55,14 +56,15 @@ export const playerReady = async(io: Server, socket: Socket, username: string, r
         io.to(roomCode).emit(EVENTS.PLAYER_READY, {
             CODE: 500
         })
-        console.error(`${ new Date().toLocaleString() }: Doslo je do problema prilikom slanja ready upa. SocketID: ${socket.id}\nERR: ${e}`)
+        await logError(`Error during ready upa. SocketID: ${ socket.id }`, e)
     }
 }
 
 export const playerUnReady = async(io: Server, socket: Socket, username: string, roomCode: string) => {
     try {
         const gameInProgress = await GameData.checkGameState(roomCode)
-        const res = await GameData.playerUnReady(roomCode, username)
+        const transactionClient = await serveTransactionClient(roomCode)
+        const res = await transactionClient.playerUnReady(username)
         if (gameInProgress == 1) {
             socket.emit(EVENTS.PLAYER_UNREADY, {
                 CODE: 500
@@ -75,7 +77,10 @@ export const playerUnReady = async(io: Server, socket: Socket, username: string,
             ...res
         })
     } catch(e) {
-        console.error(`${new Date()}: Doslo je do problema prilikom slanja unready upa. SocketID: ${socket.id}\nERR : ${e}`)
+        io.to(roomCode).emit(EVENTS.PLAYER_UNREADY, {
+            CODE: 500
+        })
+        await logError(`Error during un-ready up. SocketID: ${ socket.id }`, e)
     }
 }
 

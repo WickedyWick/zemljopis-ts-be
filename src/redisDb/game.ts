@@ -6,6 +6,7 @@ import { gameStart } from 'controllers/socketHandlers/game.handler'
 import { Result } from 'database/models'
 import player from 'database/models/player'
 import { PlayerIdsInterface } from 'database/models/round'
+import { logError } from 'utils/logger'
 
 export const FieldIndex = {
     0: 'drzava',
@@ -141,106 +142,6 @@ export class GameData {
     static checkSessionToken = async(room: string, username: string, sessionToken: string) => {
         const sT = await redisDb.hGet(`${username}_${room}`, 'sessionToken')
         return sT === sessionToken
-    }
-
-    /**
-     * This functions readys up a player and increments players ready on room key
-     * @param  {Server} io - global io instance,  prob not nessary
-     * @param  {string} room
-     * @param  {string} username
-     */
-    static playerReady = async(io: Server, room: string, username: string) => {
-        // Lua scripts might be better here
-        // multiple clients needed for something like this?
-        await redisDb.watch(room)
-        await redisDb.watch(`${username}_${room}`)
-        let pReady = -1
-        const [setNXReply, getReply] = await redisDb
-            .multi()
-            .hSetNX(`${username}_${room}`, 'ready', '1')
-            .hmGet(room, ['playersReady', 'playerCount'])
-            .exec()
-        
-        // race condition error
-        // @ts-ignore
-        if (setNXReply == null || getReply.length != 2) {
-            return {
-                CODE: 500,
-                gameStart: false,
-                playersReady: pReady
-            }
-        }
-        
-        //@ts-ignore
-        const playerCount = getReply[1]
-        if (setNXReply) {
-            await redisDb.watch(`${username}_${room}`)
-            const [ pReady ] = await redisDb
-                .multi()
-                .hIncrBy(room, 'playersReady', 1)
-                .exec()
-
-            if (pReady == playerCount){
-                await redisDb.hSet(room, 'gameInProgress', 1)
-                return {
-                    CODE: 200,
-                    gameStart: true,
-                    playersReady: pReady
-                }
-            }
-
-            return {
-                CODE: 200,
-                gameStart: false,
-                playersReady: pReady
-            }
-        }
-
-        return {
-            CODE: 200,
-            gameStart: false,
-            playersReady: pReady
-        }
-
-    }
-    /**
-     * This functions readys up a player and increments players ready on room key
-     * @param  {Server} io - global io instance,  prob not nessary
-     * @param  {string} room
-     * @param  {string} username
-     */
-    static playerUnReady = async(room: string, username: string) => {
-        await redisDb.watch(room)
-        await redisDb.watch(`${username}_${room}`)
-        let pReady = -1
-        const [ hDelRes ] = await redisDb
-            .multi()
-            .hDel(`${username}_${room}`, 'ready')
-            .exec()
-        
-        if (hDelRes == null) {
-            return {
-                CODE: 500,
-                playersReady: pReady
-            }
-        }
-
-        if (hDelRes) {
-            await redisDb.watch(`${username}_${room}`)
-            const [ pReady ] = await redisDb
-                .multi()
-                .hIncrBy(room, 'playersReady', -1)
-                .exec()
-            return {
-                CODE: 200,
-                playersReady: pReady
-            }
-        }
-
-        return {
-            CODE: 200,
-            playersReady: pReady
-        }
     }
 
     getPlayerIds = async() => {
@@ -389,11 +290,46 @@ export class GameData {
     checkIfDataIsReceived = async(username: string) => {
         return Number(await redisDb.hGet(`${ username }_${ this._room }`, 'receivedData'))
     }
+
+    /**
+     * This functions readys up a player and increments players ready on room key
+     * @param  {Server} io - global io instance,  prob not nessary
+     * @param  {string} room
+     * @param  {string} username
+     */
+    static playerUnReadyDisconnect = async(room: string, username: string) => {
+        try {
+            let pReady  = -1
+            const res = await redisDb.hDel(`${username}_${room}`, 'ready')
+            
+            if (res == 0) {
+                return {
+                    CODE: 200,
+                    playersReady: pReady
+                }
+            }
+            
+            pReady = await redisDb.hIncrBy(room, 'playersReady', -1)
+            return {
+                CODE: 200,
+                playersReady: pReady
+            }
+        } catch(e) {
+            await logError(`Error during playerUnReadyDisconnect.`,e)
+            return {
+                CODE: 500,
+                playersReady: -1
+            }
+        }
+       
+
+
+    }
     static unTrackSocket = async(io: Server, socket: Socket) => {
         try {
             const { username, room } = await redisDb.hGetAll(socket.id)
             if (!username || !room) return
-            const res = await this.playerUnReady(room, username)
+            const res = await this.playerUnReadyDisconnect(room, username)
             io.to(room).emit(EVENTS.PLAYER_UNREADY, {
                 username,
                 ...res
@@ -402,6 +338,7 @@ export class GameData {
             await socket.leave(room)
         } catch(e) {
             console.error(`Error untracking socket. SocketID: ${ socket.id }\nErr : ${ e }`)
+            // handle this
         }
     }
 
