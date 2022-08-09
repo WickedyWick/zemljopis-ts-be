@@ -1,4 +1,4 @@
-import { gameStart, joinRoomResponse , resultHandler, playerReadyResponse, playerUnReadyReadyHandler } from './game.functions.js'
+import { gameStart, joinRoomResponse , resultHandler, playerReadyResponse, playerUnReadyReadyHandler, anotherPlayerJoin } from './game.functions.js'
 
 let serverAddress = 'http://localhost:8000'
 const socket = await io(serverAddress);
@@ -42,3 +42,11 @@ socket.on(SOCKET_EVENTS.GAME_START, (data) => {
     gameStart(data)
 })
 
+/**
+ * This event is triggered when another player joins the room
+ * @param  {string} username
+ * @param  {number} points
+ */
+socket.on(SOCKET_EVENTS.PLAYER_JOINED, (data) => {
+    anotherPlayerJoin(data)
+})

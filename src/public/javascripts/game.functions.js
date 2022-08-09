@@ -19,6 +19,7 @@ let roundTimeLimitConst = 0
 let roundTimeLimit =0
 let ready = false
 let gameStarted = false
+let points = 0
 let intervalId = null
 let lblPlayerCount = null
 let lblPlayerReady = null
@@ -38,6 +39,7 @@ let txbPlanina = null
 let txbReka = null
 let txbPredmet = null
 let fieldData = new Map()
+let players = new Map()
 export const load = (_username, _roomCode, _sessionToken) => {
     const usernameReg = new RegExp(UsernameRegEx, 'g').test(_username)
     const roomCodeReg = new RegExp(RoomCodeRegEx, 'g').test(_roomCode)
@@ -124,9 +126,13 @@ export const joinRoomResponse = (data) => {
             gameStarted = true;
             notify(N_TYPE.SUCCESS, 'Sačekajte sledecu rundu da bi ste nastavili da igrate!')
         }
+        points = Number(data['points'])
+        players.set(username, points)
         for( let i = 0; i < data['players'].length; i++) {
-            if(data['players'][i] != username)
+            if(data['players'][i] != username) {
                 $('#players').append(`<li>${data['players'][i]}</li>`)
+                players.set(data['players'][i], 0)
+            }
         }
     } else {
         $('#maxDiv').hide()
@@ -284,6 +290,20 @@ export const gameStart = async(data) => {
         } 
     }, 1000)
 }
+
+/**
+ * This event is triggered when another player joins the room
+ * @param  {string} username
+ * @param  {number} points
+ */
+export const anotherPlayerJoin = async(data) => {
+    if (!players.has(data['username'])) {
+        $('#players').append(`<li>${data['username']}</li>`)
+        players.set(data['username'], Number(data['points']))
+    }
+    notify('success', `${username} se pridružio sobi.`)
+}
+
 /**
  * Updates field by category with its value
  * @param  {number} index - Category
@@ -633,7 +653,4 @@ const setButtonGameStarted = () => {
 
 const updateRound = () => {
     lblRoundNumber.textContent = String(Number(lblRoundNumber.textContent) + 1)
-}
-const stopTimer = () => {
-
 }

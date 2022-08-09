@@ -5,6 +5,7 @@ import { Player, Round, Result } from 'database/models'
 import { chooseLetter } from 'utils/strings'
 import { PlayerIdsInterface } from 'database/models/round'
 import { IO } from 'index'
+import { logError } from 'utils/logger'
 
 export const joinRoom = async(io: Server, socket: Socket, username: string, roomCode: string) => {
     // maybe insta search for player and then return somehting like wrong player and room combo
@@ -51,6 +52,9 @@ export const playerReady = async(io: Server, socket: Socket, username: string, r
             await gameStart(io, roomCode)
         }
     } catch(e) {
+        io.to(roomCode).emit(EVENTS.PLAYER_READY, {
+            CODE: 500
+        })
         console.error(`${ new Date().toLocaleString() }: Doslo je do problema prilikom slanja ready upa. SocketID: ${socket.id}\nERR: ${e}`)
     }
 }
@@ -76,9 +80,9 @@ export const playerUnReady = async(io: Server, socket: Socket, username: string,
 }
 
 export const gameStart = async(io: Server, room: string) => {
+    const gameData = new GameData(room)
     try {
         // Create a round and send a signal update game in progress
-        const gameData = new GameData(room)
         let letter = await chooseLetter(room)
         const roundNumber = await gameData.nextRound()
 
@@ -102,8 +106,8 @@ export const gameStart = async(io: Server, room: string) => {
         const playerIds = await gameData.getPlayerIds()
         await round.createEmptyResults(playerIds)
     } catch(e) {
-         // log and eit error 
-
+        await logError(`Error during game start.`, e)
+        await gameData.rollBackGameStart()
     }
 }
 

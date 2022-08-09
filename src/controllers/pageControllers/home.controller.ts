@@ -2,7 +2,7 @@ import { Action } from 'utils/typings'
 import { Room, Player } from 'database/models'
 import { RoomModel } from 'database/models/room'
 import { makeRoomCode } from 'utils/strings'
-import { ERROR_ROOM_CREATE, ERROR_REG_PLAYER } from 'utils/errors/home'
+import { ERROR_ROOM_CREATE, ERROR_REG_PLAYER, ERROR_UNDEFINED_PARAMS } from 'utils/errors/home'
 import { randomBytes } from 'crypto'
 import { GameData } from 'redisDb/game'
 interface RoomBody {
@@ -53,6 +53,9 @@ export const createRoom: Action<any, RoomBody, any , any> = async (req, res, nex
 
 export const regUser: Action<any, any, any, any> = async(req, res, next) => {
     const { username, roomCode } = req.body
+    if (!username || !roomCode)  {
+        return next(ERROR_UNDEFINED_PARAMS)
+    }
     const exists: number = await GameData.roomExists(roomCode)
     if (exists == 1) {
        // const room = await Room.findBy({ room_code: roomCode })
