@@ -275,8 +275,8 @@ export const gameStart = async(data) => {
         roundTimeLimit--
         lblTimer.textContent = String(roundTimeLimit)
         if(roundTimeLimit == 0) {
-            data = await collectData()
-            const res = Object.fromEntries(data)
+            fieldData = await collectData()
+            const res = Object.fromEntries(fieldData)
             await convertDataToLatinic(res)
             await sendFieldData(res)
             btnReady.disabled = true
@@ -404,7 +404,7 @@ const checkAndCollectData = async() => {
             data.set('pr', pr)
         else 
             return false
-        fieldDataRegEx.lastIndex = pr
+        fieldDataRegEx.lastIndex = -1
     
         return data
     } catch (e) {
