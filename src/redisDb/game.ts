@@ -530,11 +530,7 @@ export class GameData {
     rollBackGameStart = async() => {
         // Reroll letter with sets when letters are changed into sets
         await this.unReadyAll()
-        await redisDb.hSet(this._room, {
-            'playersReady' : 0,
-            'gameInProgress': 0,
-            'numOfDataReceived': 0
-        })
+        await this.resetRoomFieldsData(0)
         await redisDb.hIncrBy(this._room, 'roundNumber', -1)
     }
 }
