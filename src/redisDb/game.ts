@@ -257,8 +257,9 @@ export class GameData {
                     console.log(i)
                     sum += points
                 }
-                // maybe in separate function
-                await redisDb.hSet(`${key}_${this._room}`, { 'ready' : 0, 'dataReceived': 0 })
+
+                // reset player after game
+                await this.resetPlayerAfterGame(key)
                 if (sum == 0) continue
                 promiseArr.push(this.updatePoints(key, sum))
                 const pId = Number(playerData[key])
@@ -271,6 +272,26 @@ export class GameData {
         } catch(e) {
             console.log(`Error during setting points to field. Err: ${ e }`)
         }
+    }
+
+    /**
+     * Resets player to default values after game is ready,
+     * this needs to happen so player can receive data and ready up after each round
+     * @param  {string} username - Username of player
+     */
+    resetPlayerAfterGame = async(username: string) => {
+        await redisDb.hSet(`${username}_${this._room}`, {
+            dr: '',
+            gr: '',
+            im: '',
+            bl: '',
+            zv: '',
+            pl: '',
+            rk: '',
+            pr: '',
+            'dataReceived': 0
+        })
+        await redisDb.hDel(`${username}_${this._room}`, 'ready')
     }
 
     updatePoints = async(username: string, value: number) => {
@@ -399,8 +420,16 @@ export class GameData {
         })
     }
 
-    setGameInProgress = async(state: number) => {
-        await redisDb.hSet(this._room, 'gameInProgress', state)
+    /**
+     * This functions resets certains fields so next rounds can be played
+     * @param  {number} state
+     */
+    resetRoomFieldsData = async(state: number) => {
+        await redisDb.hSet(this._room, { 
+            'gameInProgress': state,
+            'playersReady': 0,
+            'numOfDataReceived': 0
+        })
     }
     
     // same as craete Player
@@ -503,7 +532,8 @@ export class GameData {
         await this.unReadyAll()
         await redisDb.hSet(this._room, {
             'playersReady' : 0,
-            'gameInProgress': 0
+            'gameInProgress': 0,
+            'numOfDataReceived': 0
         })
         await redisDb.hIncrBy(this._room, 'roundNumber', -1)
     }

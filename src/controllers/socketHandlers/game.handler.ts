@@ -171,7 +171,7 @@ export const evaluate = async(room: string) => {
         results['CODE'] = 200
         IO.to(room).emit(EVENTS.RESULT, results)
         await gameData.setPointsToField(playerFieldData, pointedData, playerNameId)
-        await gameData.setGameInProgress(0)
+        await gameData.resetRoomFieldsData(0)
         console.timeEnd('timeEvaluation')
     } catch(e) {
         console.error(`${ new Date().toLocaleDateString() }`)
