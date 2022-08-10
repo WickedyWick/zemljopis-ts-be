@@ -74,6 +74,19 @@ export const load = (_username, _roomCode, _sessionToken) => {
 }
 
 // maybe this should be wrapped in class
+/**
+ * @param  {number} CODE
+ * @param  {string} MSG
+ * @param  {points} string
+ * @param  {string} ready
+ * @param  {string} playersReady(0)
+ * @param  {string} playerCount(1)
+ * @param  {string} roundNumber(2)
+ * @param  {string} roundTimeLimit(3)
+ * @param  {string} gameInProgress(4)
+ * @param  {string[]} players
+ * 
+ */
 export const joinRoomResponse = (data) => {
     /*
     CODE: 200/404
@@ -234,6 +247,7 @@ export const resultHandler = async(data) => {
     disableAllInputFields()
     enableAllPButtons()
     setButtonUnReady()
+    btnReady.disabled = false
     roundTimeLimit = -1
     if (data.CODE != 200) {
         // error
