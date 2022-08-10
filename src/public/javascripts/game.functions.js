@@ -218,11 +218,20 @@ export const playerUnReadyReadyHandler = (data) => {
 export const btnClickHandler = async() => {
     if(gameStarted) {
         fieldData = await checkAndCollectData()
+        if (fieldData == false) {
+            notify('warning', 'Format podatak nije validan!')
+            fieldData = new Map()
+            return
+        }
         const res = Object.fromEntries(fieldData)
         if (!res) {
             notify('warning', 'Format podatak nije validan!')
+            fieldData = new Map()
             return
         }
+        
+        
+       
         await convertDataToLatinic(res)
         await sendFieldData(res)
         return
@@ -260,11 +269,16 @@ export const resultHandler = async(data) => {
         const resultValue = splitted[0]
         const category = splitted[1]
         const localValue = await fieldData.get(IndexField[category])
-        if (localValue == resultValue)
+        if (localValue == resultValue) {
             updateFieldWithPoints(category, val)
+            console.log(val)
+            points += val
+        }
         else
             updateFieldWithPoints(category, 0)
     }
+    console.log(points)
+    lblPoints.textContent = String(points)
     console.log(data)
 }
 
@@ -277,6 +291,7 @@ export const resultHandler = async(data) => {
 export const gameStart = async(data) => {
     gameStarted = true
     const { letter, roundNumber } = data
+    clearAllInputFields()
     setButtonGameStarted()
     enableAllInputFields()
     disableAllPButtons()

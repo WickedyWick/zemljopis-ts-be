@@ -49,7 +49,10 @@ export class transactionClient {
                     .hIncrBy(this.room, 'playersReady', 1)
                     .exec()
 
-                if (pReady == playerCount){
+                // >= makes it work when there is
+                // rare edge case, game will start and everything will be set to default after as usual
+                // lowers numbers of checks and complications
+                if (pReady >= playerCount){
                     await this.client.hSet(this.room, 'gameInProgress', 1)
                     return {
                         CODE: 200,
