@@ -2,8 +2,9 @@ import { validator } from 'validators/index'
 import { check } from 'express-validator'
 const roundTimeLimit:any = {
     '60': 1,
-    '120': 2,
-    '180': 3
+    '90': 2,
+    '120': 3,
+    '180': 4
 }
 
 const playerCount: any = {
