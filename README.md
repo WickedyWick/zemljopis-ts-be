@@ -94,10 +94,10 @@ Add error messages on FE and serve it and just send codes from server?
 
 // export script
 sudo -u postgres psql -d zemljopis -c "copy player to '/tmp/test2.csv' with delimiter ',' csv header;"
-
+room:letters -> key that holds letters for the room
 cachovati u 8x30 keyeva ili 8 keyeva sa svim slovima? vrv 8x30
     letter and category are normalized to match postgres db , this is only exception for this format in redis
-    -> drzava_A : alzir: "1" ("1" je dummy data)
+    -> drzava:A : alzir: "1" ("1" je dummy data)
 
 enable coalation u /etc/locale.gen
 pa sudo locale-gen sr_RS.UTF-8 <- kreiranje locala
