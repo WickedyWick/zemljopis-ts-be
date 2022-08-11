@@ -90,7 +90,6 @@ export const gameStart = async(io: Server, room: string) => {
     try {
         // Create a round and send a signal update game in progress
         let letter = await chooseLetter(room)
-        letter = 'KRAJ IGRE'
         if (letter == 'KRAJ IGRE') {
             io.to(room).emit(EVENTS.GAME_START, ({
                 letter,

@@ -291,6 +291,15 @@ export const resultHandler = async(data) => {
 export const gameStart = async(data) => {
     gameStarted = true
     const { letter, roundNumber } = data
+    
+    if (letter == 'KRAJ IGRE') {
+        btnReady.disabled = true
+        disableAllInputFields()
+        enableAllPButtons()
+        setButtonGameEnd()
+        notify('sucess', `Kraj igre, soba će se uskoro zatvoriti`)
+        return
+    }
     clearAllInputFields()
     setButtonGameStarted()
     enableAllInputFields()
@@ -680,6 +689,10 @@ const setButtonGameStarted = () => {
     btnReady.textContent = BTN_STATES.BTN_GAME_STARTED
 }
 
+const setButtonGameEnd = () => {
+    btnReady.style.backgroundColor = BTN_COLORS.GREEN
+    btnReady.textContent = BTN_STATES.BTN_GAME_END
+}
 const updateRound = () => {
     lblRoundNumber.textContent = String(Number(lblRoundNumber.textContent) + 1)
 }

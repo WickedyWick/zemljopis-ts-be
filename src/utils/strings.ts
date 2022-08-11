@@ -19,7 +19,7 @@ export const chooseLetter = async(room: string) => {
     const gameData = new GameData(room)
 
     let newLetter = await gameData.chooseNextLetter()
-
+    if (!newLetter) return 'KRAJ IGRE'
     await gameData.setCurrentLetter(String(newLetter))
     return String(newLetter)
 }

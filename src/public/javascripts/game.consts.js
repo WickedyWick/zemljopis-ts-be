@@ -17,6 +17,7 @@ export const BTN_STATES = {
     BTN_NOT_READY: 'Nisi spreman!',
     BTN_READY: 'Spreman!',
     BTN_GAME_STARTED: 'Gotovo',
+    BTN_GAME_END: 'KRAJ IGRE!'
 }
 
 /**
