@@ -18,13 +18,10 @@ export const makeRoomCode = async () => {
 export const chooseLetter = async(room: string) => {
     const gameData = new GameData(room)
 
-    let letters = await gameData.getLetters()
-    if (letters == '') return letters
-
-    const charAt = Math.floor(Math.random() * letters.length)
-    const newLetter = await cirilicaLatinica.get(letters[charAt])
-    await gameData.setLetters(letters.replace(newLetter, ''), newLetter)
-    return newLetter
+    let newLetter = await gameData.chooseNextLetter()
+    if (!newLetter) return 'KRAJ IGRE'
+    await gameData.setCurrentLetter(String(newLetter))
+    return String(newLetter)
 }
 
 export const cirilicaLatinica = new Map<string, string>([
@@ -63,7 +60,38 @@ export const cirilicaLatinica = new Map<string, string>([
 
 // I want application in latinic but letters are in cirilic cause some latinic
 // letters are 2 chars and it won't work with curren't implementation of selecting letters
-export const defaultLetters = 'АБВГДЂЕЖЗИЈКЛЉМНЊОПРСТЋУФХЦЧЏШ'
+export const defaultLetters: string[] = [
+    'A',
+    'B',
+    'V',
+    'G',
+    'D',
+    'Đ',
+    'E',
+    'Ž',
+    'Z',
+    'I',
+    'J',
+    'K',
+    'L',
+    'LJ',
+    'M',
+    'N',
+    'NJ',
+    'O',
+    'P',
+    'R',
+    'S',
+    'T',
+    'Ć',
+    'U',
+    'F',
+    'H',
+    'C',
+    'Č',
+    'DŽ',
+    'Š',
+]
 export const RoomCodeRegEx = '^[A-Za-z0-9]{8}$'
 export const UsernameRegEx = '^[A-Za-z0-9а-шА-ШčČćĆžŽšŠđĐђјљњћџЂЈЉЊЋЏ ]{4,16}$'
 export const SessionTokenRegEx = '^[A-Za-z0-9]{96}$'

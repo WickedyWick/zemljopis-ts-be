@@ -6,7 +6,7 @@ import { chooseLetter } from 'utils/strings'
 import { PlayerIdsInterface } from 'database/models/round'
 import { IO } from 'index'
 import { logError } from 'utils/logger'
-import { serveTransactionClient } from 'redisDb'
+import { redisDb, serveTransactionClient } from 'redisDb'
 import { transactionClient } from 'redisDb/transactionClient'
 
 export const joinRoom = async(io: Server, socket: Socket, username: string, roomCode: string) => {
@@ -90,6 +90,14 @@ export const gameStart = async(io: Server, room: string) => {
     try {
         // Create a round and send a signal update game in progress
         let letter = await chooseLetter(room)
+        if (letter == 'KRAJ IGRE') {
+            io.to(room).emit(EVENTS.GAME_START, ({
+                letter,
+                roundNumber: -1
+            }))
+            return await gameData.closeRoom()
+            
+        }
         const roundNumber = await gameData.nextRound()
 
         const round = await Round.create({

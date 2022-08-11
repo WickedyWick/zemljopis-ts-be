@@ -47,7 +47,6 @@ export interface GameFields {
     roundTimeLimit: number,
     roundActive: number,
     roundId: number | null,
-    availableLetters: string,
     currentLetter: string,
     evalFuncExecuting: number,
     created_at: Date | string // not nessesarry in redis?
@@ -97,7 +96,6 @@ export class GameData {
             roundTimeLimit,
             roundActive: 0,
             roundId: -1,
-            availableLetters: defaultLetters,
             currentLetter: '',
             evalFuncExecuting: 0,
             created_at: new Date().toLocaleDateString(),
@@ -105,10 +103,9 @@ export class GameData {
             playersRegistered: 1,
             gameInProgress: 0,
         }
-        console.log(value)
         //@ts-ignore
         await redisDb.hSet(room, value)
-        console.log('log2')
+        await this.setDefaultLetters(room)
         // 12h
         //await redisDb.expireAt(room, 43200)
 
@@ -145,7 +142,12 @@ export class GameData {
     }
 
     getPlayerIds = async() => {
+        // TODO HSCAN
         return await redisDb.hGetAll(`players_${this._room}`)
+    }
+    getPlayerNames = async() => {
+        // TODO HSCAN
+        return await redisDb.hKeys(`players_${this._room}`)
     }
     trackSocket = async(socketId: string, username: string, room: string) => {
         try {
@@ -457,16 +459,6 @@ export class GameData {
     playerExists = async(username: string) => {
         return Number(await redisDb.exists(`${username}_${this._room}`))
     }
-
-    getLetters = async() => {
-        return redisDb.hGet(this._room, 'availableLetters')
-    }
-    setLetters = async(letters: string, currentLetter: string) => {
-        await redisDb.hSet(this._room, {
-            'currentLetter': currentLetter,
-            'availableLetters': letters
-        })
-    }
     // combine getplayer ciount and players joined in one query with hmGet?
     getPlayerCount = async() => {
         return Number(await redisDb.hGet(this._room, 'playerCount'))
@@ -529,9 +521,60 @@ export class GameData {
      */
     rollBackGameStart = async() => {
         // Reroll letter with sets when letters are changed into sets
+        await this.rollBackLetter()
         await this.unReadyAll()
         await this.resetRoomFieldsData(0)
         await redisDb.hIncrBy(this._room, 'roundNumber', -1)
     }
+    
+    /**
+     * Make letters set for room
+     * @param  {string} room
+     */
+    static setDefaultLetters = async(room: string) => {
+        await redisDb.sAdd(`${room}:letters`, defaultLetters)
+    }
+
+    /**
+     * Chooses next letter and removes it from the set
+     */
+    chooseNextLetter = async() => {
+        return await redisDb.sPop(`${this._room}:letters`)
+    }
+
+    /**
+     * Sets current letter in room hash
+     * @param  {string} letter Current letter
+     */
+    setCurrentLetter = async(letter: string) => {
+        await redisDb.hSet(`${this._room}`, 'currentLetter', letter)
+    }
+    
+    /**
+     * Gets current letter from a room
+     */
+    getCurrentLetter = async() => {
+        return await redisDb.hGet(`${this._room}`, 'currentLetter') 
+    }
+    /**
+     * This function is called to clean all the keys when game is finished and no letters are left
+     */
+    closeRoom = async() => {
+        const unlinkArr = [this._room, `players_${this._room}`, `rounds_${this._room}`]
+        const players = await this.getPlayerNames()
+        await players.forEach(async(username: string) => await unlinkArr.push(`${username}_${this._room}`))
+        await redisDb.unlink(unlinkArr)
+    }
+
+    
+    /**
+     * This function rollbacks letter in case of error during game start
+     */
+    rollBackLetter = async() => {
+        const currentLetter = await this.getCurrentLetter()
+        await redisDb.sAdd(`${this._room}:letters`, currentLetter)
+    }
+
+    
 }
 
