@@ -113,7 +113,7 @@ export class GameData {
     }
 
     static createPlayer = async(room: string, username: string, id: number, sessionToken: string) => {
-        await redisDb.hSet(`players_${room}`, { [username]: id})
+        await redisDb.hSet(`players:${room}`, { [username]: id})
         const value: PlayerValues = {
             id: id,
             points: 0,
@@ -130,24 +130,24 @@ export class GameData {
         }
 
         // @ts-ignore
-        await redisDb.hSet(`${username}_${room}`, value)
+        await redisDb.hSet(`${username}:${room}`, value)
     }
 
     static createRounds = async(room: string, roundNumber: number, id: number) => {
-        await redisDb.hSet(`rounds_${room}`, { [roundNumber]: id })
+        await redisDb.hSet(`rounds:${room}`, { [roundNumber]: id })
     }
     static checkSessionToken = async(room: string, username: string, sessionToken: string) => {
-        const sT = await redisDb.hGet(`${username}_${room}`, 'sessionToken')
+        const sT = await redisDb.hGet(`${username}:${room}`, 'sessionToken')
         return sT === sessionToken
     }
 
     getPlayerIds = async() => {
         // TODO HSCAN
-        return await redisDb.hGetAll(`players_${this._room}`)
+        return await redisDb.hGetAll(`players:${this._room}`)
     }
     getPlayerNames = async() => {
         // TODO HSCAN
-        return await redisDb.hKeys(`players_${this._room}`)
+        return await redisDb.hKeys(`players:${this._room}`)
     }
     trackSocket = async(socketId: string, username: string, room: string) => {
         try {
@@ -165,7 +165,7 @@ export class GameData {
             if (receivedData == 1) return { success: true, eval: false }
 
             // @ts-ignore
-            await redisDb.hSet(`${ username }_${this._room}`, data)
+            await redisDb.hSet(`${ username }:${this._room}`, data)
             const numOfReceivedData = await redisDb.hIncrBy(this._room, 'numOfDataReceived', 1)
             if (playerCount == numOfReceivedData) {
                 await this.deleteRoundTimer(roundId)
@@ -193,7 +193,7 @@ export class GameData {
         */
         const map: Map<string, string[]> = new Map<string, string[]>()
         for ( let i =0; i < playerNames.length; i++) {
-            const data = await redisDb.hmGet(`${playerNames[i]}_${this._room}`, ['dr','gr','im', 'bl', 'zv', 'pl', 'rk', 'pr'])
+            const data = await redisDb.hmGet(`${playerNames[i]}:${this._room}`, ['dr','gr','im', 'bl', 'zv', 'pl', 'rk', 'pr'])
             await map.set(playerNames[i], data)
         }
         /*
@@ -216,12 +216,10 @@ export class GameData {
                 console.log(val)
                 console.log(val[i])
                 // @ts-ignore
-                const exists = await redisDb.hExists(`${FieldIndex[i]}_${letter}`, val[i])
+                const exists = await redisDb.hExists(`${FieldIndex[i]}:${letter}`, val[i])
                 // @ts-ignore
-                console.log(`${val[i]} is ${exists} in ${FieldIndex[i]}_${letter}`)
-                // @ts-ignore
-                const get = await redisDb.hGet(`grad_E`, 'estonija')
-                console.log(`GET: ${get}`)
+                console.log(`${val[i]} is ${exists} in ${FieldIndex[i]}:${letter}`)
+
                 if (!exists) {
                     pointedData.set(`${val[i]}_${i}`, 0)
                     nonExistData.set(`${val[i]}_${i}`, 1)
@@ -282,7 +280,7 @@ export class GameData {
      * @param  {string} username - Username of player
      */
     resetPlayerAfterGame = async(username: string) => {
-        await redisDb.hSet(`${username}_${this._room}`, {
+        await redisDb.hSet(`${username}:${this._room}`, {
             dr: '',
             gr: '',
             im: '',
@@ -293,25 +291,25 @@ export class GameData {
             pr: '',
             'dataReceived': 0
         })
-        await redisDb.hDel(`${username}_${this._room}`, 'ready')
+        await redisDb.hDel(`${username}:${this._room}`, 'ready')
     }
 
     updatePoints = async(username: string, value: number) => {
         try {
-            await redisDb.hIncrBy(`${username}_${this._room}`, 'points', value)
+            await redisDb.hIncrBy(`${username}:${this._room}`, 'points', value)
         } catch(e) {
             console.log(`ERROR FOR UDPATE :${e}`)
         }
     }
     prepReceiveData = async(username: string) => {
         const data: string[] =  await redisDb.hmGet(this._room, ['playerCount', 'roundId'])
-        const id = await redisDb.hGet(`${username}_${this._room}`, 'id')
+        const id = await redisDb.hGet(`${username}:${this._room}`, 'id')
         data.push(id)
         return data
 
     }
     checkIfDataIsReceived = async(username: string) => {
-        return Number(await redisDb.hGet(`${ username }_${ this._room }`, 'receivedData'))
+        return Number(await redisDb.hGet(`${ username }:${ this._room }`, 'receivedData'))
     }
 
     /**
@@ -323,7 +321,7 @@ export class GameData {
     static playerUnReadyDisconnect = async(room: string, username: string) => {
         try {
             let pReady  = -1
-            const res = await redisDb.hDel(`${username}_${room}`, 'ready')
+            const res = await redisDb.hDel(`${username}:${room}`, 'ready')
             
             if (res == 0) {
                 return {
@@ -366,22 +364,22 @@ export class GameData {
     }
 
     static unReadyAllS = async(room: string) => {
-        const keys = await redisDb.hKeys(`players_${room}`)
+        const keys = await redisDb.hKeys(`players:${room}`)
         for (let i = 0 ; i < keys.length ; i++) {
-            await redisDb.hSet(`${keys[i]}_${room}`, 'ready', 0)
+            await redisDb.hSet(`${keys[i]}:${room}`, 'ready', 0)
         }
     }
 
     unReadyAll = async() => {
-        const keys = await redisDb.hKeys(`players_${this._room}`)
+        const keys = await redisDb.hKeys(`players:${this._room}`)
         for (let i = 0 ; i < keys.length ; i++) {
-            await redisDb.hSet(`${keys[i]}_${this._room}`, 'ready', 0)
+            await redisDb.hSet(`${keys[i]}:${this._room}`, 'ready', 0)
         }
     }
     retrieveJoinRoomData = async(username: string, code?: 200) => {
         const res = await redisDb.hmGet(this._room, ['playersReady', 'playerCount', 'roundNumber', 'roundTimeLimit', 'gameInProgress'])
-        const players = await redisDb.hKeys(`players_${this._room}`)
-        const pointsAndReady = await redisDb.hmGet(`${username}_${this._room}`,['points', 'ready'])
+        const players = await redisDb.hKeys(`players:${this._room}`)
+        const pointsAndReady = await redisDb.hmGet(`${username}:${this._room}`,['points', 'ready'])
 
         // code consistency ?
         return {
@@ -437,7 +435,7 @@ export class GameData {
     // same as craete Player
     addPlayer = async(username: string, id: number, sessionToken: string ) => {
         // unique key
-        await redisDb.hSet(`players_${this._room}`, { [username]: id})
+        await redisDb.hSet(`players:${this._room}`, { [username]: id})
         const value: PlayerValues = {
             id: id,
             points: 0,
@@ -454,10 +452,10 @@ export class GameData {
         }
 
         // @ts-ignore
-        await redisDb.hSet(`${username}_${this._room}`, value)
+        await redisDb.hSet(`${username}:${this._room}`, value)
     }
     playerExists = async(username: string) => {
-        return Number(await redisDb.exists(`${username}_${this._room}`))
+        return Number(await redisDb.exists(`${username}:${this._room}`))
     }
     // combine getplayer ciount and players joined in one query with hmGet?
     getPlayerCount = async() => {
@@ -560,9 +558,9 @@ export class GameData {
      * This function is called to clean all the keys when game is finished and no letters are left
      */
     closeRoom = async() => {
-        const unlinkArr = [this._room, `players_${this._room}`, `rounds_${this._room}`]
+        const unlinkArr = [this._room, `players:${this._room}`, `rounds:${this._room}`]
         const players = await this.getPlayerNames()
-        await players.forEach(async(username: string) => await unlinkArr.push(`${username}_${this._room}`))
+        await players.forEach(async(username: string) => await unlinkArr.push(`${username}:${this._room}`))
         await redisDb.unlink(unlinkArr)
     }
 

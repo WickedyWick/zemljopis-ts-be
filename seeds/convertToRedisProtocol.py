@@ -20,4 +20,6 @@ with open('./seeds/fieldData.csv', 'r', encoding='UTF-8') as f:
         lenOfFieldCategory = len(category.encode('utf-8')) + len(letter.encode('utf-8')) + 1
         lenOfData = len(row[0].encode('utf-8'))
         data = row[0]
-        redisProtocolFile.write(f'*4\\r\\n$4\\r\\nHSET\\r\\n${lenOfFieldCategory}\\r\\n{category}_{letter}\\r\\n${lenOfData}\\r\\n{data}\\r\\n$1\\r\\n1\\r\\n\n')
+        redisProtocolFile.write(f'*4\\r\\n$4\\r\\nHSET\\r\\n${lenOfFieldCategory}\\r\\n{category}:{letter}\\r\\n${lenOfData}\\r\\n{data}\\r\\n$1\\r\\n1\\r\\n\n')
+        count += 1
+    print(f'{count} data inputed')

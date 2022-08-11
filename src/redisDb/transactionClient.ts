@@ -22,11 +22,11 @@ export class transactionClient {
         // multiple clients needed for something like this?
         try {
             await this.client.watch(this.room)
-            await this.client.watch(`${username}_${this.room}`)
+            await this.client.watch(`${username}:${this.room}`)
             let pReady = -1
             const [setNXReply, getReply] = await this.client
                 .multi()
-                .hSetNX(`${username}_${this.room}`, 'ready', '1')
+                .hSetNX(`${username}:${this.room}`, 'ready', '1')
                 .hmGet(this.room, ['playersReady', 'playerCount'])
                 .exec()
             
@@ -43,7 +43,7 @@ export class transactionClient {
             //@ts-ignore
             const playerCount = getReply[1]
             if (setNXReply) {
-                await this.client.watch(`${username}_${this.room}`)
+                await this.client.watch(`${username}:${this.room}`)
                 const [ pReady ] = await this.client
                     .multi()
                     .hIncrBy(this.room, 'playersReady', 1)
@@ -83,9 +83,6 @@ export class transactionClient {
         } finally {
             await this.disconnect()
         }
-        
-
-
     }
 
     /**
@@ -97,11 +94,11 @@ export class transactionClient {
     playerUnReady = async(username: string) => {
         try {
             await this.client.watch(this.room)
-            await this.client.watch(`${username}_${this.room}`)
+            await this.client.watch(`${username}:${this.room}`)
             let pReady = -1
             const [ hDelRes ] = await this.client
                 .multi()
-                .hDel(`${username}_${this.room}`, 'ready')
+                .hDel(`${username}:${this.room}`, 'ready')
                 .exec()
             
             if (hDelRes == null) {
@@ -112,7 +109,7 @@ export class transactionClient {
             }
 
             if (hDelRes) {
-                await this.client.watch(`${username}_${this.room}`)
+                await this.client.watch(`${username}:${this.room}`)
                 const [ pReady ] = await this.client
                     .multi()
                     .hIncrBy(this.room, 'playersReady', -1)
