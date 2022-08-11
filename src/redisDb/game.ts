@@ -574,7 +574,6 @@ export class GameData {
         const currentLetter = await this.getCurrentLetter()
         await redisDb.sAdd(`${this._room}:letters`, currentLetter)
     }
-
-    
+  
 }
 
