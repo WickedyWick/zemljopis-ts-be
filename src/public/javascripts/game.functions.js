@@ -12,7 +12,7 @@ import socket , { SOCKET_EVENTS } from './game.sockets.js'
 let username = ''
 let roomCode = ''
 let sessionToken = ''
-
+let dataSent = false
 let playerCount = 0
 let playersReady = 0
 let roundTimeLimitConst = 0
@@ -230,10 +230,9 @@ export const btnClickHandler = async() => {
             return
         }
         
-        
-       
         await convertDataToLatinic(res)
-        await sendFieldData(res)
+        await sendFieldData(res, true)
+        dataSent = true
         return
     } 
     if(!ready) {
@@ -251,6 +250,7 @@ export const btnClickHandler = async() => {
  * @param  {[key: string]: string} data - Pointed data
  */
 export const resultHandler = async(data) => {
+    dataSent = false
     gameStarted = false
     ready = false
     disableAllInputFields()
@@ -313,14 +313,9 @@ export const gameStart = async(data) => {
         roundTimeLimit--
         lblTimer.textContent = String(roundTimeLimit)
         if(roundTimeLimit == 0) {
-            fieldData = await collectData()
-            const res = Object.fromEntries(fieldData)
-            await convertDataToLatinic(res)
-            await sendFieldData(res)
-            btnReady.disabled = true
-            disableAllInputFields()
-            disableAllPButtons()
-            clearInterval(intervalId)
+            if (!dataSent)  {
+                await sendDataTimerOrForce(false)
+            }
         }
         if (roundTimeLimit < 0) {
             lblTimer.textContent = '0'
@@ -329,6 +324,18 @@ export const gameStart = async(data) => {
     }, 1000)
 }
 
+export const sendDataTimerOrForce = async(force) => {
+    fieldData = await collectData()
+    const res = Object.fromEntries(fieldData)
+    await convertDataToLatinic(res)
+    await sendFieldData(res, force)
+    dataSent = true
+    btnReady.disabled = true
+    roundTimeLimit = -1
+    disableAllInputFields()
+    disableAllPButtons()
+    
+}
 /**
  * This event is triggered when another player joins the room
  * @param  {string} username
@@ -552,7 +559,7 @@ const convertDataToLatinic = async(data) => {
  * This function sends field data to the backend
  * @param  {[key: string]: string} data - Field data that is send to the backend
  */
-const sendFieldData = async(data) => {
+const sendFieldData = async(data, forced) => {
     console.log(await data.dr)
     socket.emit(
         SOCKET_EVENTS.RECEIVE_DATA,
@@ -567,7 +574,8 @@ const sendFieldData = async(data) => {
             zv: await data.zv,
             pl: await data.pl,
             rk: await data.rk,
-            pr: await data.pr
+            pr: await data.pr,
+            forced
         }
     )
 

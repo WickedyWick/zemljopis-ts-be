@@ -48,7 +48,6 @@ export interface GameFields {
     roundActive: number,
     roundId: number | null,
     currentLetter: string,
-    evalFuncExecuting: number,
     created_at: Date | string // not nessesarry in redis?
     active: number
     playersRegistered: number
@@ -68,7 +67,7 @@ export interface PlayerValues {
     pl: string,
     rk: string,
     pr: string,
-    dataReceived: number
+    dataReceived?: number
 }
 interface SearchValueFields {
     roundId: number,
@@ -97,7 +96,6 @@ export class GameData {
             roundActive: 0,
             roundId: -1,
             currentLetter: '',
-            evalFuncExecuting: 0,
             created_at: new Date().toLocaleDateString(),
             active: 1,
             playersRegistered: 1,
@@ -126,7 +124,6 @@ export class GameData {
             pl: '',
             rk: '',
             pr: '',
-            dataReceived: 0
         }
 
         // @ts-ignore
@@ -156,19 +153,26 @@ export class GameData {
             console.error(`Error tracking socket. Username: ${ username }\nSocketID: ${ socketId }\nErr : ${e}`)
         }
     }
+
+    setEvalStart = async() => {
+        return await redisDb.hSetNX(this._room, 'evalInProgress', '1')
+    }
+
     receiveData = async(username: string, roundId: number, playerCount: number, data: ReceivedData) => {
         try {
 
             // TODO 
             // have recieveddata set at one and use HSETEX and del when you want to 0 it
-            const receivedData = await this.checkIfDataIsReceived(username)
-            if (receivedData == 1) return { success: true, eval: false }
+            const receivedData = await this.setDataIsReceived(username)
+            console.log(`RECEIVED DATA : ${receivedData} , ${username}`)
+            // ignores it data is already recived
+            if (!receivedData) return { success: true, eval: false }
 
             // @ts-ignore
             await redisDb.hSet(`${ username }:${this._room}`, data)
             const numOfReceivedData = await redisDb.hIncrBy(this._room, 'numOfDataReceived', 1)
             if (playerCount == numOfReceivedData) {
-                await this.deleteRoundTimer(roundId)
+                await this.deleteRoundTimer()
                 return {
                     success: true,
                     eval: true,
@@ -213,12 +217,11 @@ export class GameData {
             for (let i = 0; i < val.length; i++) {
                 if(nonExistData.has(`${val[i]}_${i}`))
                     continue
-                console.log(val)
-                console.log(val[i])
+
                 // @ts-ignore
                 const exists = await redisDb.hExists(`${FieldIndex[i]}:${letter}`, val[i])
                 // @ts-ignore
-                console.log(`${val[i]} is ${exists} in ${FieldIndex[i]}:${letter}`)
+                //console.log(`${val[i]} is ${exists} in ${FieldIndex[i]}:${letter}`)
 
                 if (!exists) {
                     pointedData.set(`${val[i]}_${i}`, 0)
@@ -232,10 +235,7 @@ export class GameData {
                     pointedData.set(`${val[i]}_${i}`, 10)
             }
         }
-        // console.log('RESULTS1') 
-        // pointedData.forEach((key, val) => {
-        //     console.log(key, val)
-        // })
+
         return pointedData
     }
     setPointsToField = async(playerFieldData: Map<string, string[]>, pointedData: Map<string, number>, playerData: PlayerIdsInterface) => {
@@ -254,7 +254,6 @@ export class GameData {
                     if(val[i] != '') points = pointedData.get(`${val[i]}_${i}`)
                     // @ts-ignore
                     pointsData[PointFieldIndex[i]] = points
-                    console.log(i)
                     sum += points
                 }
 
@@ -289,9 +288,8 @@ export class GameData {
             pl: '',
             rk: '',
             pr: '',
-            'dataReceived': 0
         })
-        await redisDb.hDel(`${username}:${this._room}`, 'ready')
+        await redisDb.hDel(`${username}:${this._room}`, ['ready' , 'dataReceived'])
     }
 
     updatePoints = async(username: string, value: number) => {
@@ -308,8 +306,8 @@ export class GameData {
         return data
 
     }
-    checkIfDataIsReceived = async(username: string) => {
-        return Number(await redisDb.hGet(`${ username }:${ this._room }`, 'receivedData'))
+    setDataIsReceived = async(username: string) => {
+        return await redisDb.hSetNX(`${username}:${this._room}`, 'dataReceived', '1')
     }
 
     /**
@@ -430,6 +428,7 @@ export class GameData {
             'playersReady': 0,
             'numOfDataReceived': 0
         })
+        await redisDb.hDel(this._room, 'evalInProgress')
     }
     
     // same as craete Player
@@ -448,7 +447,6 @@ export class GameData {
             pl: '',
             rk: '',
             pr: '',
-            dataReceived: 0
         }
 
         // @ts-ignore
@@ -471,12 +469,14 @@ export class GameData {
     nextRound = async() => {
         return await redisDb.hIncrBy(this._room, 'roundNumber', 1)
     }
+
     addRoundTimer = async(roundId: number, mode: 'endRound' | 'force', delay: number) => {
         // adds unix timestamp to the index
-       // const expiresAt = new Date().getTime() + delay + 3000; // 60000 is one minute in ms
-       const expiresAt = new Date().getTime() + delay + 3000
+       // const expiresAt = new Date().getTime() + delay + 3000; // 60000 is one minute in ms 
+       // 3000 is grace period if client sents game force req
+       const expiresAt = new Date().getTime() + delay + 4000
         console.log(expiresAt)
-        return await redisDb.hSet(`round:timer:${ roundId }`, {
+        return await redisDb.hSet(`round:timer:${this._room}`, {
             'roundId': roundId,
             'room': this._room,
             'expiresAt': expiresAt,
@@ -486,11 +486,20 @@ export class GameData {
     getRoundTimeLimit = async(room: string) => {
         return Number(await redisDb.hGet(room, 'roundTimeLimit'))
     }
-    static delRoundTimer = async(roundId: number) => {
-        return await redisDb.unlink(`round:timer:${roundId}`)
+    static delRoundTimer = async(room: string) => {
+        return await redisDb.unlink(`round:timer:${room}`)
     }
-    deleteRoundTimer = async(roundId: number) => {
-        return await redisDb.unlink(`round:timer:${roundId}`)
+
+    /**
+     * This function is used to update round timer when force game end is requested
+     * @param  {number} delay - Time that client has to send data for evaluation in ms
+     */
+    updateRoundTimer = async(delay: number) => {
+        const expiresAt = new Date().getTime() + delay
+        await redisDb.hSet(`round:timer:${this._room}`, 'expiresAt', delay)
+    }
+    deleteRoundTimer = async() => {
+        return await redisDb.unlink(`round:timer:${this._room}`)
     }
     getHashByKey = async(setKey: string, valKey: string) => {
         return await redisDb.hGet(setKey, valKey)

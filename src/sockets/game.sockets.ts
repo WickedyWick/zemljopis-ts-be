@@ -9,7 +9,8 @@ export const EVENTS = {
     PLAYER_UNREADY: 'playerUnReady',
     RECEIVE_DATA: 'receiveData',
     GAME_START: 'gameStart',
-    RESULT: 'result'
+    RESULT: 'result',
+    FORCE_GAME_END: 'forceGameEnd'
 } as const
 
 export const registerGameHandlers = async(io: Server, socket: Socket) => {
@@ -29,11 +30,11 @@ export const registerGameHandlers = async(io: Server, socket: Socket) => {
         if (v) playerUnReady(io, socket, username, roomCode)
     })
 
-    socket.on(EVENTS.RECEIVE_DATA, async({ username, roomCode, sessionToken, dr, gr, im, bl, zv, pl, rk, pr }) => {
-        console.log('DR', dr)
-        const v: boolean = await receiveDataValidator(io, socket, username, roomCode, sessionToken)
-        if (v) receiveData(io, socket, username, roomCode, { dr: dr, gr: gr, im: im, bl:bl, zv: zv, pl: pl, rk: rk, pr: pr })
+    socket.on(EVENTS.RECEIVE_DATA, async({username, roomCode, sessionToken, dr, gr, im, bl, zv, pl, rk, pr, forced }) => {
+        const v: boolean = await receiveDataValidator(io, socket, username, roomCode, sessionToken, forced)
+        if (v) receiveData(io, socket, username, roomCode, { dr: dr, gr: gr, im: im, bl:bl, zv: zv, pl: pl, rk: rk, pr: pr }, forced)
     })
+
     socket.on('test', () => {
         socket.emit('test')
     })

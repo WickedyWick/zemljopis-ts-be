@@ -3,12 +3,21 @@ import { EVENTS } from 'sockets/game.sockets'
 import { UsernameRegEx, RoomCodeRegEx, SessionTokenRegEx} from 'utils/strings'
 import { GameData } from 'redisDb/game'
 
+/**
+ * Validator called when joinRoom request is sent
+ * @param  {Server} io
+ * @param  {Socket} socket
+ * @param  {string} username
+ * @param  {string} roomCode
+ * @param  {string} sessionToken
+ */
 export const joinRoomValidator = async(
         io: Server,
         socket: Socket,
         username: string,
         roomCode: string,
-        sessionToken: string) => {
+        sessionToken: string
+) => {
     try {
         const exists = await GameData.roomExists(roomCode)
         if (exists == 0) {
@@ -48,13 +57,21 @@ export const joinRoomValidator = async(
         return false
     }
 }
-
+/**
+ * Validator called when playerReady request is sent
+ * @param  {Server} io
+ * @param  {Socket} socket
+ * @param  {string} username
+ * @param  {string} roomCode
+ * @param  {string} sessionToken
+ */
 export const playerReadyValidator = async(
         io: Server,
         socket: Socket,
         username: string,
         roomCode: string,
-        sessionToken: string) => {
+        sessionToken: string
+) => {
     try {
         const exists = await GameData.roomExists(roomCode)
         if (exists == 0) {
@@ -94,12 +111,21 @@ export const playerReadyValidator = async(
     }
 }
 
+/**
+ * Validator called when playerUnReady request is sent
+ * @param  {Server} io
+ * @param  {Socket} socket
+ * @param  {string} username
+ * @param  {string} roomCode
+ * @param  {string} sessionToken
+ */
 export const playerUnReadyValidator = async(
     io: Server,
     socket: Socket,
     username: string,
     roomCode: string,
-    sessionToken: string) => {
+    sessionToken: string
+) => {
     try {
         const exists = await GameData.roomExists(roomCode)
         if (exists == 0) {
@@ -136,13 +162,21 @@ export const playerUnReadyValidator = async(
         return false
     }
 }
-
+/**
+ * Validator called when recieveData request is sent
+ * @param  {Server} io
+ * @param  {Socket} socket
+ * @param  {string} username
+ * @param  {string} roomCode
+ * @param  {string} sessionToken
+ */
 export const receiveDataValidator = async(
     io: Server,
     socket: Socket,
     username: string,
     roomCode: string,
     sessionToken: string,
+    forced: boolean
 ) => {
     try {
         const roomExists = await GameData.roomExists(roomCode)

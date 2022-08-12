@@ -1,4 +1,4 @@
-import { gameStart, joinRoomResponse , resultHandler, playerReadyResponse, playerUnReadyReadyHandler, anotherPlayerJoin } from './game.functions.js'
+import { gameStart, joinRoomResponse , resultHandler, playerReadyResponse, playerUnReadyReadyHandler, anotherPlayerJoin, sendDataTimerOrForce } from './game.functions.js'
 
 let serverAddress = 'http://localhost:8000'
 const socket = await io(serverAddress);
@@ -11,7 +11,8 @@ export const SOCKET_EVENTS = {
     PLAYER_UNREADY: 'playerUnReady',
     GAME_START: 'gameStart',
     RECEIVE_DATA: 'receiveData',
-    RESULT: 'result'
+    RESULT: 'result',
+    FORCE_GAME_END: 'forceGameEnd'
 }
 
 socket.on('test',()=> {
@@ -49,4 +50,13 @@ socket.on(SOCKET_EVENTS.GAME_START, (data) => {
  */
 socket.on(SOCKET_EVENTS.PLAYER_JOINED, (data) => {
     anotherPlayerJoin(data)
+})
+
+/**
+ * This event is triggered when someone force ends the game
+ * @param  {string} username
+ */
+socket.on(SOCKET_EVENTS.FORCE_GAME_END, (username) => {
+    sendDataTimerOrForce(false)
+    console.log("SENDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDD")
 })

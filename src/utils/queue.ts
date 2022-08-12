@@ -14,7 +14,7 @@ const taskQueue = queue<EnqueueData, string>(async(task, callback) => {
     try {
         console.log(`${ new Date().toLocaleString() }: ${task.room} evaluation started`)
         await evaluate(task.room)
-        await GameData.delRoundTimer(task.roundId as number)
+        await GameData.delRoundTimer(task.room as string)
         callback(`${ new Date().toLocaleString() }: ${task.room} evaluation finished successufully`)
     } catch(e) {
         console.error(`${ new Date().toLocaleString() }: Error during perfoming queue task. RoundId: ${ task.roundId }.\n ERR : ${ e }`)
