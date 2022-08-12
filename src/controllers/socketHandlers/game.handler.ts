@@ -146,7 +146,6 @@ export const receiveData = async(io: Server, socket: Socket, username: string, r
             socket.emit(EVENTS.RECEIVE_DATA, {
                 CODE: 200
             })
-
             if (forced) {
                 socket.to(room).emit(EVENTS.FORCE_GAME_END, ({ username }))
             }

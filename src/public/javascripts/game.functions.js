@@ -316,7 +316,6 @@ export const gameStart = async(data) => {
             if (!dataSent)  {
                 await sendDataTimerOrForce(false)
             }
-            clearInterval(intervalId)
         }
         if (roundTimeLimit < 0) {
             lblTimer.textContent = '0'
@@ -332,6 +331,7 @@ export const sendDataTimerOrForce = async(force) => {
     await sendFieldData(res, force)
     dataSent = true
     btnReady.disabled = true
+    roundTimeLimit = -1
     disableAllInputFields()
     disableAllPButtons()
     
@@ -559,7 +559,7 @@ const convertDataToLatinic = async(data) => {
  * This function sends field data to the backend
  * @param  {[key: string]: string} data - Field data that is send to the backend
  */
-const sendFieldData = async(data, force) => {
+const sendFieldData = async(data, forced) => {
     console.log(await data.dr)
     socket.emit(
         SOCKET_EVENTS.RECEIVE_DATA,

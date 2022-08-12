@@ -164,6 +164,7 @@ export class GameData {
             // TODO 
             // have recieveddata set at one and use HSETEX and del when you want to 0 it
             const receivedData = await this.setDataIsReceived(username)
+            console.log(`RECEIVED DATA : ${receivedData} , ${username}`)
             // ignores it data is already recived
             if (!receivedData) return { success: true, eval: false }
 
@@ -171,7 +172,7 @@ export class GameData {
             await redisDb.hSet(`${ username }:${this._room}`, data)
             const numOfReceivedData = await redisDb.hIncrBy(this._room, 'numOfDataReceived', 1)
             if (playerCount == numOfReceivedData) {
-                await this.deleteRoundTimer(roundId)
+                await this.deleteRoundTimer()
                 return {
                     success: true,
                     eval: true,
@@ -216,12 +217,11 @@ export class GameData {
             for (let i = 0; i < val.length; i++) {
                 if(nonExistData.has(`${val[i]}_${i}`))
                     continue
-                console.log(val)
-                console.log(val[i])
+
                 // @ts-ignore
                 const exists = await redisDb.hExists(`${FieldIndex[i]}:${letter}`, val[i])
                 // @ts-ignore
-                console.log(`${val[i]} is ${exists} in ${FieldIndex[i]}:${letter}`)
+                //console.log(`${val[i]} is ${exists} in ${FieldIndex[i]}:${letter}`)
 
                 if (!exists) {
                     pointedData.set(`${val[i]}_${i}`, 0)
@@ -235,10 +235,7 @@ export class GameData {
                     pointedData.set(`${val[i]}_${i}`, 10)
             }
         }
-        // console.log('RESULTS1') 
-        // pointedData.forEach((key, val) => {
-        //     console.log(key, val)
-        // })
+
         return pointedData
     }
     setPointsToField = async(playerFieldData: Map<string, string[]>, pointedData: Map<string, number>, playerData: PlayerIdsInterface) => {
@@ -257,7 +254,6 @@ export class GameData {
                     if(val[i] != '') points = pointedData.get(`${val[i]}_${i}`)
                     // @ts-ignore
                     pointsData[PointFieldIndex[i]] = points
-                    console.log(i)
                     sum += points
                 }
 
@@ -451,7 +447,6 @@ export class GameData {
             pl: '',
             rk: '',
             pr: '',
-            dataReceived: 0
         }
 
         // @ts-ignore
@@ -503,8 +498,8 @@ export class GameData {
         const expiresAt = new Date().getTime() + delay
         await redisDb.hSet(`round:timer:${this._room}`, 'expiresAt', delay)
     }
-    deleteRoundTimer = async(roundId: number) => {
-        return await redisDb.unlink(`round:timer:${roundId}`)
+    deleteRoundTimer = async() => {
+        return await redisDb.unlink(`round:timer:${this._room}`)
     }
     getHashByKey = async(setKey: string, valKey: string) => {
         return await redisDb.hGet(setKey, valKey)

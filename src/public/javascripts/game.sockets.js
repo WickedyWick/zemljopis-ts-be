@@ -1,4 +1,4 @@
-import { gameStart, joinRoomResponse , resultHandler, playerReadyResponse, playerUnReadyReadyHandler, anotherPlayerJoin } from './game.functions.js'
+import { gameStart, joinRoomResponse , resultHandler, playerReadyResponse, playerUnReadyReadyHandler, anotherPlayerJoin, sendDataTimerOrForce } from './game.functions.js'
 
 let serverAddress = 'http://localhost:8000'
 const socket = await io(serverAddress);
@@ -58,4 +58,5 @@ socket.on(SOCKET_EVENTS.PLAYER_JOINED, (data) => {
  */
 socket.on(SOCKET_EVENTS.FORCE_GAME_END, (username) => {
     sendDataTimerOrForce(false)
+    console.log("SENDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDD")
 })
