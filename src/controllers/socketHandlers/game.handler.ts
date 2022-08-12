@@ -125,7 +125,7 @@ export const gameStart = async(io: Server, room: string) => {
     }
 }
 
-export const receiveData = async(io: Server, socket: Socket, username: string, room: string, data: ReceivedData) => {
+export const receiveData = async(io: Server, socket: Socket, username: string, room: string, data: ReceivedData, forced: boolean = false) => {
     try {
         const gameData = await new GameData(room)
         const prepData = await gameData.prepReceiveData(username)
@@ -141,14 +141,19 @@ export const receiveData = async(io: Server, socket: Socket, username: string, r
             reka: data.rk,
             predmet: data.pr
         })
-
         const res = await gameData.receiveData(username, Number(prepData[1]), Number(prepData[0]), data)
         if (res.success) {
             socket.emit(EVENTS.RECEIVE_DATA, {
                 CODE: 200
             })
+
+            if (forced) {
+                socket.to(room).emit(EVENTS.FORCE_GAME_END, ({ username }))
+            }
+
             if (!res.eval) return
         }
+
 
         // evaluate
         await evaluate(room)
@@ -164,6 +169,9 @@ export const evaluate = async(room: string) => {
     try {
         console.time('timeEvaluation')
         const gameData = new GameData(room)
+        const evalInProgress = await gameData.setEvalStart()
+        // this is for edge case of eval triggering at the same time with forced eval and timer running out
+        if (!evalInProgress) return
         const letter = await gameData.getLetter()
         const playerNameId: PlayerIdsInterface = await gameData.getPlayerIds()
         const playerNames: string[] = []
