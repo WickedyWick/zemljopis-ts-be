@@ -58,5 +58,4 @@ socket.on(SOCKET_EVENTS.PLAYER_JOINED, (data) => {
  */
 socket.on(SOCKET_EVENTS.FORCE_GAME_END, (username) => {
     sendDataTimerOrForce(false)
-    console.log("SENDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDD")
 })
