@@ -264,22 +264,21 @@ export const resultHandler = async(data) => {
         return
     }
     await delete data.CODE
-    for (const [key, val] of Object.entries(data)) {
-        const splitted = key.split('_')
-        const resultValue = splitted[0]
-        const category = splitted[1]
-        const localValue = await fieldData.get(IndexField[category])
-        if (localValue == resultValue) {
-            updateFieldWithPoints(category, val)
-            console.log(val)
-            points += val
+    //iteratuj kroz nasa polja i gledaj has iz dictionarija
+    const results = new Map(Object.entries(data))
+    for (const [key, val] of fieldData.entries()) {
+        const keyF = IndexField[key]
+        if (results.has(`${val}_${keyF}`)) {
+            let p = results.get(`${val}_${keyF}`)
+            updateFieldWithPoints(keyF, p)
+            points += p
+        } else {
+            updateFieldWithPoints(keyF, 0)
         }
-        else
-            updateFieldWithPoints(category, 0)
     }
-    console.log(points)
+
     lblPoints.textContent = String(points)
-    console.log(data)
+    lblPlayerReady.textContent = '0'
 }
 
 /**
@@ -357,28 +356,28 @@ export const anotherPlayerJoin = async(data) => {
 const updateFieldWithPoints = async(category, value) => {
     console.log(category)
     switch (category) {
-        case '0':
+        case 0:
             txbDrzava.value += `  + ${ value }`
             break;
-        case '1':
+        case 1:
             txbGrad.value += `  + ${ value }`
             break;
-        case '2':
+        case 2:
             txbIme.value += `  + ${ value }`
             break;
-        case '3':
+        case 3:
             txbBiljka.value += `  + ${ value }`
             break;
-        case '4':
+        case 4:
             txbZivotinja.value += `  + ${ value }`
             break;
-        case '5':
+        case 5:
             txbPlanina.value += `  + ${ value }`
             break;
-        case '6':
+        case 6:
             txbReka.value += `  + ${ value }`
             break;
-        case '7':
+        case 7:
             txbPredmet.value += `  + ${ value }`
             break;
         default: 
