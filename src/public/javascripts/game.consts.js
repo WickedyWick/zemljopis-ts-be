@@ -58,12 +58,12 @@ export const letterDictionary = new Map([
 ])
 
 export const IndexField = {
-    0: 'dr',
-    1: 'gr',
-    2: 'im',
-    3: 'bl',
-    4: 'zv',
-    5: 'pl',
-    6: 'rk',
-    7: 'pr'
+    'dr': 0,
+    'gr': 1,
+    'im': 2,
+    'bl': 3,
+    'zv': 4,
+    'pl': 5,
+    'rk': 6,
+    'pr': 7
 }
