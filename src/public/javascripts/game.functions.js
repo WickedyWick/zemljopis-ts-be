@@ -27,6 +27,7 @@ let lblRoundNumber = null
 let lblPoints = null
 let lblRoomCode = null
 let lblTimer = null
+let lblCurrentLetter = null
 let btnReady = null
 let ddlRoundSelect = null
 
@@ -67,6 +68,7 @@ export const load = (_username, _roomCode, _sessionToken) => {
         txbPlanina = document.getElementById('inputPlanina')
         txbReka = document.getElementById('inputReka')
         txbPredmet = document.getElementById('inputPredmet')
+        lblCurrentLetter = document.getElementById('lblCurrentLetter')
     } else {
         //not and send back
     }
@@ -88,22 +90,7 @@ export const load = (_username, _roomCode, _sessionToken) => {
  * 
  */
 export const joinRoomResponse = (data) => {
-    /*
-    CODE: 200/404
-    MSG?: string (error)
-    points: string
-    ready: string
-    0(playersReady): string
-    1(playerCount): string
-    2(roundNumber): string
-    3(roundTimeLimit): string
-    4(roundActive): string
-    players: Array<string>
-    */
-    console.log(data)
     if(data.code == 200) {
-        console.log(data)
-        console.log(username, roomCode)
         $('#maxDiv').show()
         ready = data['ready'] === "1"
         console.log(ready)
@@ -128,9 +115,7 @@ export const joinRoomResponse = (data) => {
         localStorage.setItem("roomCode",roomCode)
         localStorage.setItem("username",username)
         for( let i = 0; i < data['2']; i++) {
-            $('#roundSelect').append(`<option value="${i}">
-                ${i}
-            </option>`)
+            ddlRoundSelect.options.add(new Option(`${i+1}`, `${i+1}`))
         }
         notify(N_TYPE.SUCCESS, 'Uspesno ste se pridruzili sobi')
         if(data['4'] == '1') {
@@ -303,7 +288,9 @@ export const gameStart = async(data) => {
     setButtonGameStarted()
     enableAllInputFields()
     disableAllPButtons()
-    lblRoomCode.textContent = letter
+    lblCurrentLetter.textContent = `Slovo: ${letter}`
+    ddlRoundSelect.options.add(new Option(`${roundNumber}`, `${roundNumber}`))
+    ddlRoundSelect.selectedIndex = roundNumber - 1
     lblRoundNumber.textContent = String(roundNumber)
     lblTimer.textContent = roundTimeLimitConst
     roundTimeLimit = roundTimeLimitConst
