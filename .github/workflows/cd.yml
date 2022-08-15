@@ -13,6 +13,20 @@ jobs:
   # The type of runner taht the job will run on
     runs-on: ubuntu-latest
 
+    - name: 'Create env file'
+      run: |
+        touch .env
+        echo PORT=${{ secrets.PORT }} >> .env
+        echo LOG_LEVEL=${{ secrets.LOG_LEVEL }} >> .env
+        echo DB_CLIENT=${{ secrets.DB_CLIENT }} >> .env
+        echo DB_HOST=${{ secrets.DB_HOST }} >> .env
+        echo DB_USERNAME=${{ sercrets.DB_USERNAME }} >> .env
+        echo DB_PORT=${{ secrets.DB_PORT }} >> .env
+        echo DB_PASSWORD=${{ secrets.DB_PASSWORD }} >> .env
+        echo DB_DATABASE=${{ secrets.DB_DATABASE }} >> .env
+        echo REDIS_URL=${{ secrets.REDIS_URL }} >> .env
+        echo CONCURENT_WORKERS=${{ secrets.CONCURENT_WORKERS }} >> .env
+        cat .env
     # Steps repressent a sequence of tasks that will be executed as part of the job
     - name: Deploy using ssh
       uses: appleyboy/ssh-action@master
@@ -22,4 +36,7 @@ jobs:
         key: ${{ sercrets.PRIVATE_KEY }}
         port: 22
         script: |
+          cd ~/home/wick/zemljopis/zemljopis-ts-be
+          yarn install
+          yarn dev
           
