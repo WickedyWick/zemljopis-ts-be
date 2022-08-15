@@ -231,8 +231,13 @@ export class GameData {
                 // val_cat(index) so its easier to set field points for db
                 if (!pointedData.has(`${val[i]}_${i}`))
                     pointedData.set(`${val[i]}_${i}`, 20)
-                else
+                else {
                     pointedData.set(`${val[i]}_${i}`, 10)
+
+                    // this makes it so it doesn't check that value, anymore since it will always be 10
+                    // but the value does exists
+                    nonExistData.set(`${val[i]}_${i}`,1)
+                }
             }
         }
 
