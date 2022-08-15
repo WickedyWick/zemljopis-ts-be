@@ -1,8 +1,8 @@
 
-import { playerReady, load } from './game.functions.js'
+import { btnClickHandler, load } from './game.functions.js'
 
 document.getElementById('btnReady').addEventListener('click', () => {
-    playerReady()
+    btnClickHandler()
 })
 
 window.onload = (e) => {

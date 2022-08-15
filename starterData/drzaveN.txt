@@ -1,0 +1,215 @@
+avganistan|a
+azerbejdžan|a
+albanija|a
+alžir|a
+angola|a
+andora|a
+antigva i barbuda|a
+argentina|a
+australija|a
+austrija|a
+bangladeš|b
+barbados|b
+bahame|b
+bahrein|b
+belgija|b
+belize|b
+belorusija|b
+benin|b
+bolivija|b
+bosna i hercegovina|b
+bocvana|b
+brazil|b
+brunej|b
+bugarska|b
+burkina faso|b
+burundi|b
+butan|b
+vanuatu|v
+venecuela|v
+vijetnam|v
+gabon|g
+gambija|g
+gana|g
+gvajana|g
+gvatemala|g
+gvineja|g
+gvineja bisao|g
+grenada|g
+gruzija|g
+grčka|g
+danska|d
+dominika|d
+dominikanska republika|d
+egipat|e
+ekvador|e
+ekvatorijalna gvineja|e
+eritreja|e
+estonija|e
+etiopija|e
+zambija|z
+zelenortska ostrva|z
+zimbabve|z
+izrael|i
+indija|i
+indonezija|i
+irak|i
+iran|i
+irska|i
+island|i
+istočni timor|i
+italija|i
+jamajka|j
+japan|j
+jemen|j
+jermenija|j
+jordan|j
+južna koreja|j
+južni sudan|j
+južnoafrička republika|j
+kazahstan|k
+kambodža|k
+kamerun|k
+kanada|k
+katar|k
+kenija|k
+kina|k
+kipar|k
+kirgistan|k
+kiribati|k
+kolumbija|k
+demokratska republika kongo|d
+republika kongo|r
+komori|k
+kostarika|k
+kuba|k
+kuvajt|k
+laos|l
+lesoto|l
+letonija|l
+liban|l
+liberija|l
+libija|l
+litvanija|l
+lihtenštajn|l
+luksemburg|l
+madagaskar|m
+mađarska|m
+severna makedonija|s
+malavi|m
+maldivi|m
+malezija|m
+mali|m
+malta|m
+maroko|m
+maršalska ostrva|m
+mauritanija|m
+mauricijus|m
+meksiko|m
+mjanmar|m
+mozambik|m
+moldavija|m
+monako|m
+mongolija|m
+namibija|n
+nauru|n
+nemačka|n
+nepal|n
+niger|n
+nigerija|n
+nikaragva|n
+novi zeland|n
+norveška|n
+obala slonovače|o
+oman|o
+pakistan|p
+palau|p
+panama|p
+papua nova gvineja|p
+paragvaj|p
+peru|p
+poljska|p
+portugalija|p
+ruanda|r
+rumunija|r
+rusija|r
+salvador|s
+samoa|s
+san marino|s
+sao tome i prinsipe|s
+saudijska arabija|s
+esvatini|e
+sveta lucija|s
+sent vinsent i grenadini|s
+sent kits i nevis|s
+severna koreja|s
+sejšeli|s
+senegal|s
+sijera leone|s
+singapur|s
+sirija|s
+sjedinjene američke države|s
+slovačka|s
+slovenija|s
+solomonova ostrva|s
+somalija|s
+srbija|s
+sudan|s
+surinam|s
+tajland|t
+tanzanija|t
+tadžikistan|t
+togo|t
+tonga|t
+trinidad i tobago|t
+tuvalu|t
+tunis|t
+turkmenistan|t
+turska|t
+uganda|u
+uzbekistan|u
+ujedinjeni arapski emirati|u
+ujedinjeno kraljevstvo|u
+ukrajina|u
+urugvaj|u
+filipini|f
+finska|f
+fidži|f
+francuska|f
+haiti|h
+holandija|h
+honduras|h
+hrvatska|h
+centralnoafrička republika|c
+crna gora|c
+čad|č
+češka|č
+čile|č
+džibuti|d
+švajcarska|š
+švedska|š
+španija|š
+šri lanka|š
+vatikan|v
+palestina|p
+država palestina|d
+abhazija|a
+azavad|a
+azad kašmir|a
+zapadna sahara|z
+južna osetija|j
+kukova ostrva|k
+republika arcah|r
+nijue|n
+pridnjestrovlje|p
+republika kina|r
+turska republika severni kipar|t
+somalilend|s
+antarktik|a
+ostrva spretli|o
+paracelska ostrva|p
+mikronacija|m
+malteški viteški red|m
+kneževina seborga|k
+silend|s
+kraljevstvo tavolara|k

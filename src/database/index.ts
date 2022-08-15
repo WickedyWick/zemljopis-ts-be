@@ -10,7 +10,7 @@ export const db = knex({
         password: process.env.DB_PASSWORD,
         database: process.env.DB_DATABASE
     },
-    pool: { min:0, max: 99 },
+    //pool: { min:0, max: 99 },
     postProcessResponse: async (result, queryContext) => {
         if (!queryContext?.prep) return result
 
@@ -24,5 +24,4 @@ export const db = knex({
 })
 
 // here timer objects will be stored
-export const timerMap: Map<string, NodeJS.Timer> = new Map<string, NodeJS.Timer>()
 attachPaginate()

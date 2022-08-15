@@ -1,0 +1,302 @@
+azanjske planine|A
+avala|A
+apušenske planine|A
+alpi|A
+andi|A
+atlas|A
+atos|A
+ararat|A
+apenini|A
+apalačke planine|A
+altajske planine|A
+ahagar|A
+asir|A
+akonkagva|A
+azbukovica|A
+besnakobila|B
+bukovik|B
+beljanica|B
+bukulja|B
+boranja|B
+bobija|B
+banjsko brdo|B
+babička gora|A
+belava|B
+bić|B
+bitovik|B
+bogićevica|B
+bjelašnica|B
+bjelasica|B
+budoš|B
+biokovo|B
+bitoraj|B
+belasica|B
+bihorske planine|B
+baba|B
+bistra|B
+babin zub|B
+babuna|B
+berženj|B
+bik|B
+vardenik|V
+vidojevica|V
+visitor|V
+venčac|B
+vujan|V
+vlašić|V
+veliki greben|V
+valjevske planine|V
+vidlič|V
+vlaška planina|V
+vršačke planine|V
+volujak|V
+vranica|V
+vran|V
+velež|V
+visočica|V
+vrmac|V
+velebit|V
+viševica|V
+vitoš|V
+vitoša|V
+vogezi|V
+vinson|V
+vojnik|V
+verhojanske planine|V
+vitorog|V
+giljeva|G
+golija|G
+goč|V
+gledićke planine|G
+gučevo|G
+gvozdačke stene|G
+goljak|G
+greben|G
+grmija|G
+gramada|G
+grmeč|G
+galičica|G
+dukat|G
+dinara|D
+dinarske planine|D
+deli jovan|D
+devica|D
+dešat|D
+dinaridi|D
+durmitor|D
+divčibare|D
+divčibari|D
+đeravica|Đ
+elbrus|D
+etna|E
+elgon|E
+žljeb|E
+žilindar|Ž
+željin|Ž
+žegovac|Ž
+žar|Ž
+žabljak|Ž
+žumberačkagora|Ž
+zvijezda|Ž
+zlatibor|Z
+zlatar|Z
+zelengora|Z
+zec|Z
+igman|I
+ida|I
+iverak|I
+jastrebac|J
+juhor|J
+javor|J
+jadovnik|J
+jelica|J
+jagodnja|J
+jablanik|J
+jelovagora|J
+javorje|J
+jarut|J
+ješevac|Z
+jahorina|J
+jakupica|J
+jablanica|J
+jabuka|J
+koćura|J
+kukavica|K
+kučaj|K
+karpati|K
+karpatsko-balkanske planine|K
+komovi|K
+koritnik|K
+kopaonik|K
+kosmaj|K
+kotlenik|K
+kablar|K
+kadinjača|K
+kalafat|K
+kamenagora|K
+kozjak|K
+krstača|K
+kukutnica|K
+koritnjak|K
+kozara|K
+klekovača|K
+kamešnica|K
+korab|K
+krčin|K
+kavkaz|K
+kavkaske planine|K
+kavkaske|K
+karakorum|K
+kunlun|K
+kilimandžaro|K
+kvatlamba|K
+kordiljeri|K
+kaskadske planine|K
+košćuško|K
+k2|K
+konjuh|K
+krndija|K
+kekeš|K
+liškovac|L
+lučevik|L
+lelija|K
+lička plješivica|L
+lovcen|L
+lovćen|L
+leotar|L
+ljubišnja|L
+ljuboten|LJ
+miroč|LJ
+mokra planina|M
+mučanj|M
+medvednik|M
+maljen|M
+malinik|M
+malič|M
+maglić|M
+mosor|M
+mont everest|M
+materhorn|M
+monblan|M
+mekinli|M
+majevica|M
+midžor|M
+medvednica|M
+manjača|M
+matra|M
+ninaja|N
+nidže|M
+nimba|N
+nebo|N
+njegoš|N
+ostrozub|NJ
+ozren|O
+ovčar|O
+ošljak|O
+oštrik|O
+orjen|O
+orijen|O
+obruč|O
+osogovska planina|O
+olimp|O
+ohos del salado|O
+prokletije|P
+paštrik|O
+povlen|P
+pasjača|P
+pobijenik|P
+prenj|P
+pirin|P
+pirineji|P
+pind|P
+peninske planine|P
+pamir|P
+pontijske planine|P
+plješevica|P
+papuk|P
+radan|R
+ruj-planina|R
+resavski humovi|R
+rtanj|R
+radočelo|P
+rogozna|R
+rudnik|R
+rajac|R
+rodopske planine|R
+rodopske|R
+rujen|R
+romanija|R
+raduša|R
+rumija|R
+risnjak|R
+rila|R
+rodopi|R
+retezat|R
+ruvenzori|R
+seličevica|R
+suva planina|S
+stara planina|S
+stolovi|S
+sokolska planina|S
+suvobor|S
+svrljiške planine|S
+sokolovica|S
+stol|S
+svilaja|S
+snježnik|S
+stogovo|S
+serbal|S
+sudeti|S
+skandinavske planine|S
+sahalin|S
+simijske planine|S
+simijske|S
+sijera nevada|S
+stanovojske planine|S
+sinjajevina|S
+staretina|S
+sinaj|S
+središnji masiv|S
+severne mađarske planine|S
+tara|S
+tresibaba|T
+tupižnica|T
+treskavica|T
+tjenšan|T
+tibesti|T
+triglav|T
+trebević|T
+transdunavske planine|T
+ćićarija|T
+učka|U
+ural|Ć
+uzlomac|U
+fruška gora|U
+fik|F
+futadžalon|F
+fudži|F
+fudžijama|F
+homoljske planine|H
+hajla|H
+hum|H
+himalaji|H
+harc|H
+hindukuš|H
+crni vrh|H
+cer|C
+crkvena planina|C
+crnoljeva|C
+cincar|C
+crvanj|C
+čemernik|Č
+čemernica|Č
+čičavica|Č
+čvrsnica|Č
+čovanjoš|Č
+čerhat|Č
+džaja|DŽ
+šarplanina|Š
+šomrda|Š
+švarcvald|Š
+šumava|Š
+šator|Š

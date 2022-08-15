@@ -73,6 +73,7 @@ pridruziBtn.addEventListener('click', (e) => {
     e.preventDefault()
     const username = usernameInput.value.trim()
     const room = roomCodeInput.value.trim()
+    console.log(room)
     disableButtons()
     if (roomReg.test(room) && usernameReg.test(username)) {
         axios({

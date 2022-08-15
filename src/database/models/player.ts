@@ -1,7 +1,7 @@
 import { Model, BaseModel, ModelDate } from 'database/model'
 
 export interface PlayerFields {
-    id: number 
+    id: number
     room_code: string
     username: string
     session_token: string
@@ -10,9 +10,7 @@ export interface PlayerFields {
     updated_at: ModelDate
 }
 
-export interface PlayerMethods {
-
-}
+export interface PlayerMethods { }
 
 export type PlayerModel = Model<PlayerFields, PlayerMethods>
 
