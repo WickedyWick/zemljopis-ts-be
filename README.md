@@ -6,7 +6,7 @@ Old version hosted - [www.zemljopis.rs](www.zemljopis.rs)
 
 Old version is working but its code and design is flawed and under bit more traffic it would cause problems.
 
-I decided to rewritten it with new knowledge acquired to be up to industries standards
+I decided to rewritte it with new knowledge acquired to be up to industries standards and scalable.
 
 ## Status
     In development (dev branch)
@@ -17,8 +17,7 @@ I decided to rewritten it with new knowledge acquired to be up to industries sta
 ## Tech stack
 NodeJS, Express, SocketsIO, Redis, postgresql, knex, jest
 
-## About
-Zemljopis grew from personal challenge to project that will is hosted and will be used by many people.
+Zemljopis grew from personal challenge to project that is hosted and will be used by many people.
 
 Idea is to help people learn about geography with fun.
 
@@ -85,22 +84,34 @@ Start application:
 yarn dev
 ```
 
+
+Pipe resp:
+```
+echo -e "$(cat redisProtocol.txt)" | redis-cli --pipe
+
 ### SELFNOTES
 Add error messages on FE and serve it and just send codes from server?
 
 // export script
 sudo -u postgres psql -d zemljopis -c "copy player to '/tmp/test2.csv' with delimiter ',' csv header;"
 
+room:letters -> key that holds letters for the room
 cachovati u 8x30 keyeva ili 8 keyeva sa svim slovima? vrv 8x30
     letter and category are normalized to match postgres db , this is only exception for this format in redis
-    -> drzava_A : alzir: "1" ("1" je dummy data)
+    -> drzava:A : alzir: "1" ("1" je dummy data)
 
-enable coalation u /etc/locale.gen pa napravi coaliciju pa napravi bazu . 
+enable coalation u /etc/locale.gen
+pa sudo locale-gen sr_RS.UTF-8 <- kreiranje locala
+create database zemljopis with template = template0 lc_collate = "sr_RS.UTF-8" lc_ctype= "sr_RS.UTF-8" encoding = "UTF-8";
+
 postgres linux user nije isti password za psql postgres usera -> alter user potgres PASSWORD 'passwrod';
 
 FT.CREATE round-timer-idx ON HASH PREFIX 1 "round:timer:" SCHEMA roundId NUMERIC SORTABLE room TEXT NOSTEM SORTABLE expiresAt NUMERIC SORTABLE mode TEXT NOSTEM SORTABLE --> index command napravi u respu
 
 decision -> samo prihvati nekosenu latinicu i cirilicu. nepismeni neka ne igraju
+
+
+localdb pass postgres
 
 ### Current biggest obstacle (mini blog)
 Since this is a round based game there are timers, many timers.
