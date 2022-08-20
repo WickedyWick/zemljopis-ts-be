@@ -1,6 +1,6 @@
 import { gameStart, joinRoomResponse , resultHandler, playerReadyResponse, playerUnReadyReadyHandler, anotherPlayerJoin, sendDataTimerOrForce } from './game.functions.js'
 
-let serverAddress = 'http://localhost:8000'
+let serverAddress = '/'
 const socket = await io(serverAddress);
 export default socket
 
