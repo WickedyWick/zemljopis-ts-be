@@ -1,13 +1,14 @@
 {
   "compilerOptions": {
     "module": "commonjs",
-    "esModuleInterop": true,
     "target": "es6",
+    "esModuleInterop": true,
+    "allowSyntheticDefaultImports": true,
     "noImplicitAny": true,
     "moduleResolution": "node",
     "resolveJsonModule": true,
     "sourceMap": true,
-    "outDir": "build",
+    "outDir": "build2",
     "baseUrl": "./src",
     "rootDirs": [
       "./src"
@@ -18,5 +19,25 @@
   ],
   "exclude": [
     "migrations"
-  ]
+  ],
+  "paths": {
+    "utils": ["utils"],
+    "utils/*": ["utils/*"],
+    "validators": ["validators"],
+    "validators/*": ["validators/*"],
+    "controllers": ["controllers"],
+    "controllers/*": ["controllers/*"],
+    "database": ["database"],
+    "database/*": ["database/*"],
+    "public": ["public"],
+    "public/*": ["public/*"],
+    "redisDb": ["redisDb"],
+    "redisDb/*": ["redisDb/*"],
+    "routes": ["routes"],
+    "routes/*": ["routes/*"],
+    "sockets": ["sockets"],
+    "sockets/*": ["sockets/*"],
+    "views": ["views"],
+    "views/*": ["views/*"]
+  }
 }
