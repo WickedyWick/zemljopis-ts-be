@@ -8,7 +8,7 @@
     "moduleResolution": "node",
     "resolveJsonModule": true,
     "sourceMap": true,
-    "outDir": "build2",
+    "outDir": "build",
     "baseUrl": "./src",
     "rootDirs": [
       "./src"
