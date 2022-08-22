@@ -1,6 +1,6 @@
 import { evaluate } from "controllers/socketHandlers/game.handler"
 import { GameData } from "redisDb/game"
-import { queue} from 'async'
+import { queue } from 'async'
 import dotenv from 'dotenv'
 dotenv.config()
 
@@ -10,7 +10,7 @@ export interface EnqueueData {
     mode: "endRound" | "force"
 }
 
-const taskQueue = queue<EnqueueData, string>(async(task, callback) => {
+const taskQueue = queue<EnqueueData, any>(async(task: EnqueueData, callback: any) => {
     try {
         console.log(`${ new Date().toLocaleString() }: ${task.room} evaluation started`)
         await evaluate(task.room)
