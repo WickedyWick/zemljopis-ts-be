@@ -9,7 +9,7 @@
     "migrate:generate": "knex migrate:make",
     "dev:docker": "docker-compose build base && docker-compose -f docker-compose.yml up",
     "start": "pm2-runtime ./ecosystem.config.js",
-    "build": "./scripts/build.sh",
+    "build": "npx tsc && tsc-alias",
     "repl": "node --experimental-repl-await  -r ts-node/register -r tsconfig-paths/register ./build/utils/repl.js",
     "start:docker": "docker build -t base . && docker run base",
     "ps:api": "node --trace-warnings --inspect=0.0.0.0:9229 -r ts-node/register -r tsconfig-paths/register src/index.ts",
@@ -18,6 +18,7 @@
   },
   "dependencies": {
     "@types/socket.io-client": "^3.0.0",
+    "async": "^3.2.4",
     "body-parser": "^1.19.0",
     "commonjs": "^0.0.1",
     "cors": "^2.8.5",
@@ -31,6 +32,7 @@
     "jest": "^27.5.1",
     "knex": "^1.0.2",
     "knex-paginate": "^3.0.0",
+    "module-alias": "^2.2.2",
     "morgan": "^1.10.0",
     "mysql": "^2.18.1",
     "nodemon": "^2.0.15",
@@ -42,18 +44,23 @@
     "socket.io-client": "^4.5.0",
     "supertest": "^6.2.2",
     "ts-jest": "^27.1.4",
-    "ts-node": "^10.4.0",
+    "ts-node": "^10.9.1",
     "typescript": "^4.5.4"
   },
   "devDependencies": {
+    "@types/async": "^3.2.15",
     "@types/express": "^4.17.13",
     "@types/jest": "^27.4.1",
+    "@types/module-alias": "^2.0.1",
     "@types/morgan": "^1.9.3",
     "@types/multer": "^1.4.5",
     "@types/node": "^16.11.22",
     "@types/supertest": "^2.0.12",
+    "@zerollup/ts-transform-paths": "^1.7.18",
     "concurrently": "^6.0.2",
     "nodemon": "^2.0.7",
-    "tsconfig-paths": "^3.9.0"
+    "tsc-alias": "^1.7.0",
+    "tsconfig-paths": "^3.14.1",
+    "ttypescript": "^1.5.13"
   }
 }

@@ -1,4 +1,4 @@
-import { gameStart, joinRoomResponse , resultHandler, playerReadyResponse, playerUnReadyReadyHandler, anotherPlayerJoin, sendDataTimerOrForce } from './game.functions.js'
+import { gameStart, joinRoomResponse , resultHandler, playerReadyResponse, playerUnReadyReadyHandler, anotherPlayerJoin, sendDataTimerOrForce } from './game.functions'
 
 let serverAddress = '/'
 const socket = await io(serverAddress);
