@@ -2,9 +2,14 @@ import { Router } from 'express'
 import httpStatus from 'http-status'
 import { dir } from '../index'
 import { homeRouter } from './home.router'
+import { suggestionRouter } from './suggestion.router'
 
 const router = Router()
-// maybe reorganize this?
+
+router.use('/home', homeRouter)
+
+router.use('/suggest', suggestionRouter)
+
 router.get('/ping', (req, res) => {
     res.status(httpStatus.OK).send('success')
 })
@@ -33,8 +38,6 @@ router.get('/utisci', (req,res) => {
     res.setHeader('Content-Type', 'text/html; charset=UTF-8')
     res.sendFile('./public/views/utisci.html', { root: dir })
 })
-
-router.use('/home', homeRouter)
 
 router.get('/', (req,res) => {
     res.setHeader('Content-Type','text/html;charset=UTF-8')
