@@ -10,7 +10,7 @@ export const startTimerAndQueue = async() => {
                     room: res.documents[i].value.room as string,
                     mode: "endRound",
                     roundId: res.documents[i].value.roundId as number
-                }, (msg) => {
+                }, (msg: any) => {
                     console.log(msg)
                 })
             } catch(e) {

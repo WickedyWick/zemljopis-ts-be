@@ -84,16 +84,17 @@ Start application:
 yarn dev
 ```
 
+
 Pipe resp:
 ```
 echo -e "$(cat redisProtocol.txt)" | redis-cli --pipe
-```
 
 ### SELFNOTES
 Add error messages on FE and serve it and just send codes from server?
 
 // export script
 sudo -u postgres psql -d zemljopis -c "copy player to '/tmp/test2.csv' with delimiter ',' csv header;"
+
 room:letters -> key that holds letters for the room
 cachovati u 8x30 keyeva ili 8 keyeva sa svim slovima? vrv 8x30
     letter and category are normalized to match postgres db , this is only exception for this format in redis
@@ -108,6 +109,7 @@ postgres linux user nije isti password za psql postgres usera -> alter user potg
 FT.CREATE round-timer-idx ON HASH PREFIX 1 "round:timer:" SCHEMA roundId NUMERIC SORTABLE room TEXT NOSTEM SORTABLE expiresAt NUMERIC SORTABLE mode TEXT NOSTEM SORTABLE --> index command napravi u respu
 
 decision -> samo prihvati nekosenu latinicu i cirilicu. nepismeni neka ne igraju
+
 
 localdb pass postgres
 
