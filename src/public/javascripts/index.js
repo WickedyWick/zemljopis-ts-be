@@ -44,7 +44,8 @@ napraviBtn.addEventListener('click', (e) =>{
                 "username": username,
                 "playerCount": playerCount,
                 "roundTimeLimit": roundTimeLimit
-            }
+            },
+            timeout: 20000
         }).then((res) => {
             if(res.status == 500) {
                 myAlert(res.data["ERR_MSG"])
@@ -73,7 +74,6 @@ pridruziBtn.addEventListener('click', (e) => {
     e.preventDefault()
     const username = usernameInput.value.trim()
     const room = roomCodeInput.value.trim()
-    console.log(room)
     disableButtons()
     if (roomReg.test(room) && usernameReg.test(username)) {
         axios({
@@ -82,7 +82,8 @@ pridruziBtn.addEventListener('click', (e) => {
             data: {
                 "username": username,
                 "roomCode": room
-            }
+            },
+            timeout: 20000
         }).then((res) => {
             console.log(res.status)
             console.log(res.data)
@@ -100,7 +101,11 @@ pridruziBtn.addEventListener('click', (e) => {
             console.log(err)
             enableButtons()
         })
+    } else {
+        myAlert("Korisnicko ime mora da bude barem 4 karaktera dugacko, a najviše 20,  dozvoljena pisma su sprska latinica, cirilica i engleski alfabet!")
+        enableButtons()
     }
-
+    roomReg.lastIndex =-1;
+    usernameReg.lastIndex = -1;
 })
 
