@@ -1,4 +1,5 @@
-import { Express } from 'express'
+import express, { Express } from 'express'
+import * as Sentry from '@sentry/node'
 import cors from 'cors'
 import bodyParser from 'body-parser'
 import * as dotenv from 'dotenv'
@@ -8,7 +9,7 @@ import morgan from 'morgan'
 
 export const configure = (server: Express) => {
     server.use(cors())
-
+    server.use(express.static('src/public', { extensions: ['js'] }))
     server.use(bodyParser.urlencoded({ extended: false }))
 
     if (!!process.env.LOG_LEVEL) {
