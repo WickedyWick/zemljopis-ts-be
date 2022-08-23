@@ -108,4 +108,3 @@ pridruziBtn.addEventListener('click', (e) => {
     roomReg.lastIndex =-1;
     usernameReg.lastIndex = -1;
 })
-
