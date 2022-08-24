@@ -2,13 +2,10 @@ import { Router } from 'express'
 import httpStatus from 'http-status'
 import { dir } from '../index'
 import { homeRouter } from './home.router'
-import { suggestionRouter } from './suggestion.router'
 
 const router = Router()
 
 router.use('/home', homeRouter)
-
-router.use('/suggest', suggestionRouter)
 
 router.get('/ping', (req, res) => {
     res.status(httpStatus.OK).send('success')

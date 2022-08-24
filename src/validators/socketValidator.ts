@@ -2,7 +2,8 @@ import { Server, Socket } from 'socket.io'
 import { EVENTS } from 'sockets/game.sockets'
 import { UsernameRegEx, RoomCodeRegEx, SessionTokenRegEx} from 'utils/strings'
 import { GameData } from 'redisDb/game'
-
+import { CategoriesSet } from 'utils/consts'
+import { logError } from 'utils/logger'
 /**
  * Validator called when joinRoom request is sent
  * @param  {Server} io
@@ -49,7 +50,7 @@ export const joinRoomValidator = async(
         })
         return false
     } catch(e) {
-        console.log(e)
+        await logError(`Error during player join validator`, e)
         socket.emit(EVENTS.JOIN_ROOM, {
             MSG: 'Doslo je do problema.',
             CODE: 500
@@ -102,7 +103,7 @@ export const playerReadyValidator = async(
         })
         return false
     } catch(e) {
-        console.log(`Error : ${e}`)
+        await logError(`Error during player ready validator`, e)
         socket.emit(EVENTS.PLAYER_READY, {
             MSG: 'Doslo je do problema.',
             CODE: 500
@@ -155,6 +156,7 @@ export const playerUnReadyValidator = async(
         })
         return false
     } catch(e) {
+        await logError(`Error during player un ready validator`, e)
         socket.emit(EVENTS.PLAYER_UNREADY, {
             MSG: 'Doslo je do problema.',
             CODE: 500
@@ -208,11 +210,68 @@ export const receiveDataValidator = async(
         })
         return false
     } catch(e) {
-        console.error(`Error : ${e}`)
+        await logError(`Error during recieve data validator`, e)
         socket.emit(EVENTS.RECEIVE_DATA, {
             MSG: 'Doslo je do problema.',
             CODE: 500
         })
         return false
     }
+}
+
+export const wordSuggestionValidator = async(
+    io: Server,
+    socket: Socket,
+    username: string,
+    roomCode: string,
+    sessionToken: string,
+    word: string,
+    category: number
+) => {
+    try {
+        if (!CategoriesSet.has(category)) {
+            socket.emit(EVENTS.WORD_SUGGESTION, {
+                MSG: 'Parametri nisu validni',
+                CODE: 400
+            })
+            return 
+        }
+
+        const roomExists = await GameData.roomExists(roomCode)
+        if (roomExists == 0) {
+            socket.emit(EVENTS.WORD_SUGGESTION, {
+                MSG: "Soba ne postoji",
+                CODE: 404
+            })
+            return false
+        }
+
+        // this basically checks if player exisst as well
+        const s = await GameData.checkSessionToken(roomCode, username, sessionToken)
+        if (!s) {
+            socket.emit(EVENTS.WORD_SUGGESTION, {
+                MSG: "Parametri nisu validni",
+                CODE: 400
+            })
+            return false
+        }
+        const roomReg = await new RegExp(RoomCodeRegEx,'g').test(roomCode)
+        const usernameReg = await new RegExp(UsernameRegEx,'g').test(username)
+        const tokenReg = await new RegExp(SessionTokenRegEx,'g').test(sessionToken)
+        if(roomReg && usernameReg && tokenReg) return true
+
+        socket.emit(EVENTS.WORD_SUGGESTION, {
+            MSG: "Parametri nisu validni",
+            CODE: 400
+        })
+
+        return false
+    } catch(e) {
+        await logError(`Error during validation of word suggesiton` , e)
+        socket.emit(EVENTS.WORD_SUGGESTION, {
+            MSG: 'Doslo je do problema.',
+            CODE: 500
+        })
+    }
+    
 }

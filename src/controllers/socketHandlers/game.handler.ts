@@ -1,7 +1,7 @@
 import { Server, Socket } from 'socket.io'
 import { GameData, ReceivedData } from 'redisDb/game'
 import { EVENTS } from 'sockets/game.sockets'
-import { Player, Round, Result } from 'database/models'
+import { Player, Round, Result, WordSuggestion } from 'database/models'
 import { chooseLetter } from 'utils/strings'
 import { PlayerIdsInterface } from 'database/models/round'
 import { IO } from 'index'
@@ -189,11 +189,41 @@ export const evaluate = async(room: string) => {
         await gameData.resetRoomFieldsData(0)
         console.timeEnd('timeEvaluation')
     } catch(e) {
-        console.error(`${ new Date().toLocaleDateString() }`)
+        await logError(`Error during evaluation`, e)
         IO.to(room).emit(EVENTS.RESULT, {
             CODE: 500
         })
     }
     
 }
+/**
+ * This functions inserts word suggestions into the databse
+ * @param  {Server} io
+ * @param  {Socket} socket
+ * @param  {string} word - word to suggest
+ * @param  {number} category - category word is in
+ */
+export const wordSuggestion = async(io: Server, socket: Socket, word: string, category: number) => {
+    try {
+        const wordSuggestion = WordSuggestion.create({
+            'category_id': category,
+            word
+        }, true)
 
+        socket.emit(EVENTS.WORD_SUGGESTION, ({
+            CODE: 201
+        }))
+        return
+    } catch(e) {
+        if (e.code == '23505') {
+            socket.emit(EVENTS.WORD_SUGGESTION, ({
+                CODE: 200
+            }))
+            return
+        }
+        await logError(`Error during suggesting word`, e)
+        socket.emit(EVENTS.WORD_SUGGESTION, ({
+            
+        }))
+    }
+}
