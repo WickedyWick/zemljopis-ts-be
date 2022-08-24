@@ -1,4 +1,4 @@
-import { N_TYPE, BTN_COLORS, BTN_STATES, SessionTokenRegEx, UsernameRegEx, RoomCodeRegEx, FieldDataRegExString, letterDictionary, IndexField } from './game.consts.js'
+import { N_TYPE, BTN_COLORS, BTN_STATES, SessionTokenRegEx, UsernameRegEx, RoomCodeRegEx, FieldDataRegExString, letterDictionary, IndexField, CatToBtnName, CatToShort } from './game.consts.js'
 import socket , { SOCKET_EVENTS } from './game.sockets.js'
 // player count label lblPlayerCount
 // player ready label lblPlayersReady
@@ -588,7 +588,36 @@ const cyrilicToLatinic = async(word) => {
     }
     return newWord
 }
-
+export const wordSuggest = async(category) => {
+    const word = await fieldData.get(CatToShort(cateogry))
+    const reg = new RegExp(FieldDataRegExString)
+    if (reg.test(word)) {
+        disablePButtonByCat(category)
+        socket.emit(SOCKET_EVENTS.WORD_SUGGESTION, ({
+            username,
+            roomCode,
+            sessionToken,
+            word,
+            category
+        }))
+        return
+    } 
+    notify('warning', `Reč nije pravilna.`)
+}
+/**
+ * @param  {number} CODE - response code 
+ * @param  {category} category - category tried to be suggested
+ * @param  {string} MSG? - optional message , only for erros
+ */
+export const wordSuggestionHandler = async(data) => {
+    if (data.code >= 300) {
+        notify('error', data.MSG)
+        enablePButtonByCat(data.category)
+        return
+    }
+    notify('Reč predložena')
+    disablePButtonByCat(data.category)
+}
 
 /**
  * @param  {string} type - Type of notification
@@ -605,7 +634,14 @@ const notify = (type, message) => {
         progressBar :true
     }).show()
 }
- 
+
+const disablePButtonByCat = (category) => {
+    document.getElementById(CatToBtnName[category]).disabled = true
+}
+
+const enablePButtonByCat = (category) => {
+    document.getElementById(CatToBtnName[category]).disabled = false
+}
 const disableAllPButtons = () => {
     $("#predloziBtnDrzava").prop("disabled", true )
     $("#predloziBtnGrad").prop("disabled", true )

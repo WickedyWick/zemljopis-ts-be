@@ -232,6 +232,7 @@ export const wordSuggestionValidator = async(
         if (!CategoriesSet.has(category)) {
             socket.emit(EVENTS.WORD_SUGGESTION, {
                 MSG: 'Parametri nisu validni',
+                category,
                 CODE: 400
             })
             return 
@@ -241,6 +242,7 @@ export const wordSuggestionValidator = async(
         if (roomExists == 0) {
             socket.emit(EVENTS.WORD_SUGGESTION, {
                 MSG: "Soba ne postoji",
+                category,
                 CODE: 404
             })
             return false
@@ -251,6 +253,7 @@ export const wordSuggestionValidator = async(
         if (!s) {
             socket.emit(EVENTS.WORD_SUGGESTION, {
                 MSG: "Parametri nisu validni",
+                category,
                 CODE: 400
             })
             return false
@@ -262,6 +265,7 @@ export const wordSuggestionValidator = async(
 
         socket.emit(EVENTS.WORD_SUGGESTION, {
             MSG: "Parametri nisu validni",
+            category,
             CODE: 400
         })
 
@@ -270,6 +274,7 @@ export const wordSuggestionValidator = async(
         await logError(`Error during validation of word suggesiton` , e)
         socket.emit(EVENTS.WORD_SUGGESTION, {
             MSG: 'Doslo je do problema.',
+            category,
             CODE: 500
         })
     }
