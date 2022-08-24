@@ -40,6 +40,7 @@ export const registerGameHandlers = async(io: Server, socket: Socket) => {
         const v: boolean = await wordSuggestionValidator(io, socket, username, roomCode, sessionToken, word, category)
         if (v) wordSuggestion(io, socket, word, category)
     })
+
     socket.on('test', () => {
         socket.emit('test')
     })
