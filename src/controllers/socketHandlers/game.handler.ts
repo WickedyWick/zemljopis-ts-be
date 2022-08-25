@@ -203,27 +203,32 @@ export const evaluate = async(room: string) => {
  * @param  {string} word - word to suggest
  * @param  {number} category - category word is in
  */
-export const wordSuggestion = async(io: Server, socket: Socket, word: string, category: number) => {
+export const wordSuggestion = async(io: Server, socket: Socket, word: string, category: number, letter: string) => {
     try {
-        const wordSuggestion = WordSuggestion.create({
+        const wordSuggestion = await WordSuggestion.create({
             'category_id': category,
-            word
+            word,
+            letter
         }, true)
 
         socket.emit(EVENTS.WORD_SUGGESTION, ({
-            CODE: 201
+            CODE: 201,
+            category
         }))
         return
     } catch(e) {
         if (e.code == '23505') {
             socket.emit(EVENTS.WORD_SUGGESTION, ({
-                CODE: 200
+                CODE: 200,
+                category
             }))
             return
         }
         await logError(`Error during suggesting word`, e)
         socket.emit(EVENTS.WORD_SUGGESTION, ({
-            
+            MSG: "Doslo je do problema",
+            CODE: 500,
+            category
         }))
     }
 }

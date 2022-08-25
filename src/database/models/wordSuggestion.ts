@@ -4,6 +4,7 @@ export interface WordSuggestionFields {
     id: number
     category_id: number
     word: string
+    letter: string
     created_at: ModelDate
     updated_at: ModelDate
 }
@@ -18,6 +19,7 @@ export class WordSuggestion extends BaseModel<WordSuggestionFields, WordSuggesti
         'id',
         'category_id',
         'word',
+        'letter',
         'created_at',
         'updated_at'
     ]

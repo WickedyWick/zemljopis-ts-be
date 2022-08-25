@@ -36,9 +36,9 @@ export const registerGameHandlers = async(io: Server, socket: Socket) => {
         if (v) receiveData(io, socket, username, roomCode, { dr: dr, gr: gr, im: im, bl:bl, zv: zv, pl: pl, rk: rk, pr: pr }, forced)
     })
 
-    socket.on(EVENTS.WORD_SUGGESTION, async({ username, roomCode, sessionToken , word, category }) => {
-        const v: boolean = await wordSuggestionValidator(io, socket, username, roomCode, sessionToken, word, category)
-        if (v) wordSuggestion(io, socket, word, category)
+    socket.on(EVENTS.WORD_SUGGESTION, async({ username, roomCode, sessionToken , word, category, currentLetter }) => {
+        const v: boolean = await wordSuggestionValidator(io, socket, username, roomCode, sessionToken, word, category, currentLetter)
+        if (v) wordSuggestion(io, socket, word, category, currentLetter)
     })
 
     socket.on('test', () => {

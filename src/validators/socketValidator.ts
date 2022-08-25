@@ -2,7 +2,7 @@ import { Server, Socket } from 'socket.io'
 import { EVENTS } from 'sockets/game.sockets'
 import { UsernameRegEx, RoomCodeRegEx, SessionTokenRegEx} from 'utils/strings'
 import { GameData } from 'redisDb/game'
-import { CategoriesSet } from 'utils/consts'
+import { CategoriesSet, LettersSet } from 'utils/consts'
 import { logError } from 'utils/logger'
 /**
  * Validator called when joinRoom request is sent
@@ -226,16 +226,26 @@ export const wordSuggestionValidator = async(
     roomCode: string,
     sessionToken: string,
     word: string,
-    category: number
+    category: number,
+    letter: string
 ) => {
     try {
-        if (!CategoriesSet.has(category)) {
+        console.log(category, letter)
+        if (!CategoriesSet.has(category) || !LettersSet.has(letter)) {
             socket.emit(EVENTS.WORD_SUGGESTION, {
                 MSG: 'Parametri nisu validni',
                 category,
                 CODE: 400
             })
             return 
+        }
+
+        const suggested = await GameData.addSuggestion(word, category, letter)
+        if (suggested == 0) {
+            socket.emit(EVENTS.WORD_SUGGESTION, {
+                CODE: 200,
+                category
+            })
         }
 
         const roomExists = await GameData.roomExists(roomCode)

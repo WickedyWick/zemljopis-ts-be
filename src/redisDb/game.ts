@@ -137,7 +137,16 @@ export class GameData {
         const sT = await redisDb.hGet(`${username}:${room}`, 'sessionToken')
         return sT === sessionToken
     }
-
+    /**
+     * This function is caching 
+     * @param  {string} word - word that is being suggested
+     * @param  {number} category - category of the word
+     * @param  {string} letter - letter
+     * @return {number} 1 if word didnt exist 0 if word existed
+     */
+    static addSuggestion = async(word: string, category: number, letter: string) => {
+        return await redisDb.sAdd(`suggest:${letter}:${category}`, word)
+    }
     getPlayerIds = async() => {
         // TODO HSCAN
         return await redisDb.hGetAll(`players:${this._room}`)

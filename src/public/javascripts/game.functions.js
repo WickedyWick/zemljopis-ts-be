@@ -1,4 +1,4 @@
-import { N_TYPE, BTN_COLORS, BTN_STATES, SessionTokenRegEx, UsernameRegEx, RoomCodeRegEx, FieldDataRegExString, letterDictionary, IndexField, CatToBtnName, CatToShort } from './game.consts.js'
+import { N_TYPE, BTN_COLORS, BTN_STATES, SessionTokenRegEx, UsernameRegEx, RoomCodeRegEx, FieldDataRegExString, letterDictionary, IndexField, CatToShort } from './game.consts.js'
 import socket , { SOCKET_EVENTS } from './game.sockets.js'
 // player count label lblPlayerCount
 // player ready label lblPlayersReady
@@ -30,6 +30,7 @@ let lblTimer = null
 let lblCurrentLetter = null
 let btnReady = null
 let ddlRoundSelect = null
+let currentLetter = ''
 
 let txbDrzava = null
 let txbGrad = null
@@ -239,7 +240,6 @@ export const resultHandler = async(data) => {
     gameStarted = false
     ready = false
     disableAllInputFields()
-    enableAllPButtons()
     setButtonUnReady()
     btnReady.disabled = false
     roundTimeLimit = -1
@@ -288,6 +288,7 @@ export const gameStart = async(data) => {
     setButtonGameStarted()
     enableAllInputFields()
     disableAllPButtons()
+    currentLetter = letter
     lblCurrentLetter.textContent = `Slovo: ${letter}`
     ddlRoundSelect.options.add(new Option(`${roundNumber}`, `${roundNumber}`))
     ddlRoundSelect.selectedIndex = roundNumber - 1
@@ -341,7 +342,8 @@ export const anotherPlayerJoin = async(data) => {
  * @param  {number} value - Number of points 
  */
 const updateFieldWithPoints = async(category, value) => {
-    console.log(category)
+    if ( value == 0) enablePButtonByCat(category)
+
     switch (category) {
         case 0:
             txbDrzava.value += `  + ${ value }`
@@ -589,19 +591,21 @@ const cyrilicToLatinic = async(word) => {
     return newWord
 }
 export const wordSuggest = async(category) => {
-    const word = await fieldData.get(CatToShort(cateogry))
+    const word = await fieldData.get(CatToShort[category])
     const reg = new RegExp(FieldDataRegExString)
+    console.log(currentLetter)
     if (reg.test(word)) {
-        disablePButtonByCat(category)
         socket.emit(SOCKET_EVENTS.WORD_SUGGESTION, ({
             username,
             roomCode,
             sessionToken,
             word,
-            category
+            category,
+            currentLetter
         }))
         return
     } 
+    enablePButtonByCat(category)
     notify('warning', `Reč nije pravilna.`)
 }
 /**
@@ -610,12 +614,12 @@ export const wordSuggest = async(category) => {
  * @param  {string} MSG? - optional message , only for erros
  */
 export const wordSuggestionHandler = async(data) => {
-    if (data.code >= 300) {
+    if (data.CODE >= 300) {
         notify('error', data.MSG)
         enablePButtonByCat(data.category)
         return
     }
-    notify('Reč predložena')
+    notify('success', 'Reč predložena')
     disablePButtonByCat(data.category)
 }
 
@@ -635,32 +639,23 @@ const notify = (type, message) => {
     }).show()
 }
 
-const disablePButtonByCat = (category) => {
-    document.getElementById(CatToBtnName[category]).disabled = true
+export const disablePButtonByCat = (category) => {
+    document.getElementById(`predloziBtn_${category}`).disabled = true
 }
 
-const enablePButtonByCat = (category) => {
-    document.getElementById(CatToBtnName[category]).disabled = false
+export const enablePButtonByCat = (category) => {
+    document.getElementById(`predloziBtn_${category}`).disabled = false
 }
+
 const disableAllPButtons = () => {
-    $("#predloziBtnDrzava").prop("disabled", true )
-    $("#predloziBtnGrad").prop("disabled", true )
-    $("#predloziBtnIme").prop("disabled", true )
-    $("#predloziBtnBiljka").prop("disabled", true )
-    $("#predloziBtnZivotinja").prop("disabled", true )
-    $("#predloziBtnPlanina").prop("disabled", true )
-    $("#predloziBtnReka").prop("disabled", true )
-    $("#predloziBtnPredmet").prop("disabled", true )
+    for( let i = 0; i < 8; i++) {
+        document.getElementById(`predloziBtn_${i}`).disabled = true
+    }
 }
 const enableAllPButtons = () => {
-    $("#predloziBtnDrzava").prop("disabled", false )
-    $("#predloziBtnGrad").prop("disabled", false )
-    $("#predloziBtnIme").prop("disabled", false )
-    $("#predloziBtnBiljka").prop("disabled", false )
-    $("#predloziBtnZivotinja").prop("disabled", false )
-    $("#predloziBtnPlanina").prop("disabled", false )
-    $("#predloziBtnReka").prop("disabled", false )
-    $("#predloziBtnPredmet").prop("disabled", false )
+    for( let i = 0; i < 8; i++) {
+        document.getElementById(`predloziBtn_${i}`).disabled = false
+    }
 } 
 const hideAllHelp = () => {
     $("#helpDrzava").hide()

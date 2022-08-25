@@ -20,17 +20,6 @@ export const BTN_STATES = {
     BTN_GAME_END: 'KRAJ IGRE!'
 }
 
-export const CatToBtnName = {
-    0: 'predloziBtnDrzava',
-    1: 'predloziBtnGrad',
-    2: 'predloziBtnIme',
-    3: 'predloziBtnBiljka',
-    4: 'predloziBtnZivotinja',
-    5: 'predloziBtnPlanina',
-    6: 'predloziBtnReka',
-    7: 'predloziBtnBiljka'
-}
-
 export const CatToShort = {
     0: 'dr',
     1: 'gr',
