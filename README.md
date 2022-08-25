@@ -100,6 +100,8 @@ cachovati u 8x30 keyeva ili 8 keyeva sa svim slovima? vrv 8x30
     letter and category are normalized to match postgres db , this is only exception for this format in redis
     -> drzava:A : alzir: "1" ("1" je dummy data)
 
+suggest:{letter}:{category} -> Suggestion keys that are caching suggestions
+
 enable coalation u /etc/locale.gen
 pa sudo locale-gen sr_RS.UTF-8 <- kreiranje locala
 create database zemljopis with template = template0 lc_collate = "sr_RS.UTF-8" lc_ctype= "sr_RS.UTF-8" encoding = "UTF-8";

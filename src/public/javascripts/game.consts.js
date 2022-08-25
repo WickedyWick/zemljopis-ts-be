@@ -20,6 +20,16 @@ export const BTN_STATES = {
     BTN_GAME_END: 'KRAJ IGRE!'
 }
 
+export const CatToShort = {
+    0: 'dr',
+    1: 'gr',
+    2: 'im',
+    3: 'bl',
+    4: 'zv',
+    5: 'pl',
+    6: 'rk',
+    7: 'pr'
+}
 /**
  * Dictionary that holds records of cirilic and latinic alfabet
  */
