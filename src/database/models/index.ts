@@ -5,6 +5,7 @@ import { Category as CategoryModel } from './category'
 import { Round as RoundModel } from './round'
 import { Result as ResultModel } from './result'
 import { WordSuggestion as WordSuggestionModel } from './wordSuggestion'
+import { GeneralSuggestion as GeneralSuggestionModel } from './generalSuggestion'
 
 export const Room = new RoomModel()
 export const Player = new PlayerModel()
@@ -13,3 +14,4 @@ export const Category = new CategoryModel()
 export const Round = new RoundModel()
 export const Result = new ResultModel()
 export const WordSuggestion = new WordSuggestionModel()
+export const GeneralSuggestion = new GeneralSuggestionModel()
