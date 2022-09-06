@@ -10,3 +10,5 @@ router.get('/', (req,res) => {
 })
 
 router.post('/suggest-general', generalSuggestionValidator, generalSuggestion)
+
+export const suggestionRouter = router
