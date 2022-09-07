@@ -8,11 +8,12 @@ interface generalSuggestionBody {
 export const generalSuggestion: Action<any, generalSuggestionBody, any , any> = async (req, res, next) => {
     try {
         const { suggestion } = await req.body
+        console.log('PRE')
         const sugg = await GeneralSuggestion.create({
             'suggestion_text': suggestion
         })
-        
-        return res.status(201)
+        console.log(sugg.id)
+        return res.status(201).send()
     } catch (e) {
         await logError(`Error during adding suggstion`, e)
         return next(ERROR_GENERAL_SUGGESTION)
