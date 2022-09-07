@@ -17,6 +17,11 @@ router.get('/android', (req,res) => {
     res.sendFile('./public/views/android.html', { root: dir })
 })
 
+router.get('/about', (req, res) => {
+    res.setHeader('Content-Type', 'text/html; charset=UTF-8')
+    res.sendFile('./public/views/about.html', { root: dir })
+})
+
 router.get('/word-sheet', (req, res) => {
     res.setHeader('Content-Type', 'text/html; chartset=UTF-8')
     res.sendFile('./public/views/wordSheet.html', { root: dir })
