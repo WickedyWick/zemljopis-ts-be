@@ -101,11 +101,12 @@ export const joinRoomResponse = (data) => {
             ready = true
             notify(N_TYPE.SUCCESS, 'Spremni ste!')
         }
+        console.log(data['2'])
         playerCount = Number(data['1'])
         $('#lblPlayerCount').text(playerCount)
         playersReady= Number(data['0'])
         $('#lblPlayersReady').text(playersReady)
-        $('#roundNumber').text(data['2'])
+        lblRoundNumber.textContent = data['2']
         $('#poeni').text(data['points'])
         $('#localPlayer').text(username)
         $('#lblRoomCode').append(roomCode)
@@ -118,6 +119,7 @@ export const joinRoomResponse = (data) => {
         for( let i = 0; i < data['2']; i++) {
             ddlRoundSelect.options.add(new Option(`${i+1}`, `${i+1}`))
         }
+        ddlRoundSelect.selectedIndex = data['2'] -1
         notify(N_TYPE.SUCCESS, 'Uspesno ste se pridruzili sobi')
         if(data['4'] == '1') {
             btnReady.disabled = true
