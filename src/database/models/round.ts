@@ -1,6 +1,6 @@
 import { Model, BaseModel, ModelDate } from 'database/model'
 import { Result } from '.'
-import { db } from 'database'
+
 export interface RoundFields {
     id: number,
     room_code: string,

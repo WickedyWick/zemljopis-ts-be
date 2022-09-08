@@ -17,6 +17,8 @@
     "seed": "knex seed:run"
   },
   "dependencies": {
+    "@sentry/node": "^7.11.1",
+    "@sentry/tracing": "^7.11.1",
     "@types/socket.io-client": "^3.0.0",
     "async": "^3.2.4",
     "body-parser": "^1.19.0",

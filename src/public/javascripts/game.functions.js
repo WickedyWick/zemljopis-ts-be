@@ -1,4 +1,4 @@
-import { N_TYPE, BTN_COLORS, BTN_STATES, SessionTokenRegEx, UsernameRegEx, RoomCodeRegEx, FieldDataRegExString, letterDictionary, IndexField } from './game.consts.js'
+import { N_TYPE, BTN_COLORS, BTN_STATES, SessionTokenRegEx, UsernameRegEx, RoomCodeRegEx, FieldDataRegExString, letterDictionary, IndexField, CatToShort } from './game.consts.js'
 import socket , { SOCKET_EVENTS } from './game.sockets.js'
 // player count label lblPlayerCount
 // player ready label lblPlayersReady
@@ -30,6 +30,7 @@ let lblTimer = null
 let lblCurrentLetter = null
 let btnReady = null
 let ddlRoundSelect = null
+let currentLetter = ''
 
 let txbDrzava = null
 let txbGrad = null
@@ -49,7 +50,6 @@ export const load = (_username, _roomCode, _sessionToken) => {
         username = _username
         roomCode = _roomCode
         sessionToken = _sessionToken
-        console.log(socket)
         socket.emit(SOCKET_EVENTS.JOIN_ROOM, { username, roomCode, sessionToken })
         // initialzie fields
         lblPlayerCount = document.getElementById('lblPlayerCount')
@@ -93,7 +93,6 @@ export const joinRoomResponse = (data) => {
     if(data.code == 200) {
         $('#maxDiv').show()
         ready = data['ready'] === "1"
-        console.log(ready)
         if (ready) {
             setButtonReady()
             btnReady.disabled = false
@@ -104,7 +103,7 @@ export const joinRoomResponse = (data) => {
         $('#lblPlayerCount').text(playerCount)
         playersReady= Number(data['0'])
         $('#lblPlayersReady').text(playersReady)
-        $('#roundNumber').text(data['2'])
+        lblRoundNumber.textContent = data['2']
         $('#poeni').text(data['points'])
         $('#localPlayer').text(username)
         $('#lblRoomCode').append(roomCode)
@@ -117,6 +116,7 @@ export const joinRoomResponse = (data) => {
         for( let i = 0; i < data['2']; i++) {
             ddlRoundSelect.options.add(new Option(`${i+1}`, `${i+1}`))
         }
+        ddlRoundSelect.selectedIndex = data['2'] -1
         notify(N_TYPE.SUCCESS, 'Uspesno ste se pridruzili sobi')
         if(data['4'] == '1') {
             btnReady.disabled = true
@@ -127,7 +127,7 @@ export const joinRoomResponse = (data) => {
         points = Number(data['points'])
         players.set(username, points)
         for( let i = 0; i < data['players'].length; i++) {
-            if(data['players'][i] != username) {
+            if(data['players'][i] != username) {https://app.asana.com/0/1201761066131098//f
                 $('#players').append(`<li>${data['players'][i]}</li>`)
                 players.set(data['players'][i], 0)
             }
@@ -150,13 +150,11 @@ export const playerReadyResponse = (data) => {
     CODE: number
     playersReady: number
     */
-   console.log(data)
     if(data.CODE >= 400) {
         //alert
         setButtonUnReady()
         btnReady.disabled = false
         ready = false
-        console.log(data.MSG)
         notify(N_TYPE.WARNING, 'Doslo je do problema pokusajte ponovo')
         return
     } 
@@ -185,7 +183,6 @@ export const playerUnReadyReadyHandler = (data) => {
         setButtonUnReady()
         btnReady.disabled = false
         ready = false
-        console.log("PUERROR")
         notify(N_TYPE.WARNING, 'Doslo je do problema pokusajte ponovo')
         return
     } 
@@ -208,14 +205,10 @@ export const btnClickHandler = async() => {
             fieldData = new Map()
             return
         }
+ 
+        await convertDataToLatinic(fieldData)
         const res = Object.fromEntries(fieldData)
-        if (!res) {
-            notify('warning', 'Format podatak nije validan!')
-            fieldData = new Map()
-            return
-        }
-        
-        await convertDataToLatinic(res)
+
         await sendFieldData(res, true)
         dataSent = true
         return
@@ -239,7 +232,6 @@ export const resultHandler = async(data) => {
     gameStarted = false
     ready = false
     disableAllInputFields()
-    enableAllPButtons()
     setButtonUnReady()
     btnReady.disabled = false
     roundTimeLimit = -1
@@ -288,6 +280,7 @@ export const gameStart = async(data) => {
     setButtonGameStarted()
     enableAllInputFields()
     disableAllPButtons()
+    currentLetter = letter
     lblCurrentLetter.textContent = `Slovo: ${letter}`
     ddlRoundSelect.options.add(new Option(`${roundNumber}`, `${roundNumber}`))
     ddlRoundSelect.selectedIndex = roundNumber - 1
@@ -312,8 +305,8 @@ export const gameStart = async(data) => {
 
 export const sendDataTimerOrForce = async(force) => {
     fieldData = await collectData()
+    await convertDataToLatinic(fieldData)
     const res = Object.fromEntries(fieldData)
-    await convertDataToLatinic(res)
     await sendFieldData(res, force)
     dataSent = true
     btnReady.disabled = true
@@ -341,7 +334,8 @@ export const anotherPlayerJoin = async(data) => {
  * @param  {number} value - Number of points 
  */
 const updateFieldWithPoints = async(category, value) => {
-    console.log(category)
+    if ( value == 0) enablePButtonByCat(category)
+
     switch (category) {
         case 0:
             txbDrzava.value += `  + ${ value }`
@@ -439,7 +433,7 @@ const checkAndCollectData = async() => {
     
         return data
     } catch (e) {
-        console.log(e)
+        console.error(e)
         return false
     }  
 }
@@ -514,7 +508,7 @@ const collectData = async() => {
         return data
     } catch (e) {
 
-        console.log(e)
+        console.error(e)
         return await new Map(Object.entries({
             'dr': '',
             'gr': '',
@@ -531,12 +525,12 @@ const collectData = async() => {
 
 /**
  * This function iterates data and alters it to make sure its latinic
- * @param  {[key: string]: string} data - Original data that may be altered
+ * @param  {Map<string,string>} fieldData - Original data that may be altered
  */
-const convertDataToLatinic = async(data) => {
-    for (const [key, val] of Object.entries(data)) {
-        const word = cyrilicToLatinic(val)
-        data[key] = word
+const convertDataToLatinic = async(fieldData) => {
+    for (const [key, val] of fieldData.entries()) {
+        const word = await cyrilicToLatinic(val)
+        await fieldData.set(key, word)
     }
 }
 
@@ -546,7 +540,6 @@ const convertDataToLatinic = async(data) => {
  * @param  {[key: string]: string} data - Field data that is send to the backend
  */
 const sendFieldData = async(data, forced) => {
-    console.log(await data.dr)
     socket.emit(
         SOCKET_EVENTS.RECEIVE_DATA,
         {
@@ -588,7 +581,37 @@ const cyrilicToLatinic = async(word) => {
     }
     return newWord
 }
-
+export const wordSuggest = async(category) => {
+    const word = await fieldData.get(CatToShort[category])
+    const reg = new RegExp(FieldDataRegExString)
+    if (reg.test(word)) {
+        socket.emit(SOCKET_EVENTS.WORD_SUGGESTION, ({
+            username,
+            roomCode,
+            sessionToken,
+            word,
+            category,
+            currentLetter
+        }))
+        return
+    } 
+    enablePButtonByCat(category)
+    notify('warning', `Reč nije pravilna.`)
+}
+/**
+ * @param  {number} CODE - response code 
+ * @param  {category} category - category tried to be suggested
+ * @param  {string} MSG? - optional message , only for erros
+ */
+export const wordSuggestionHandler = async(data) => {
+    if (data.CODE >= 300) {
+        notify('error', data.MSG)
+        enablePButtonByCat(data.category)
+        return
+    }
+    notify('success', 'Reč predložena')
+    disablePButtonByCat(data.category)
+}
 
 /**
  * @param  {string} type - Type of notification
@@ -605,26 +628,24 @@ const notify = (type, message) => {
         progressBar :true
     }).show()
 }
- 
+
+export const disablePButtonByCat = (category) => {
+    document.getElementById(`predloziBtn_${category}`).disabled = true
+}
+
+export const enablePButtonByCat = (category) => {
+    document.getElementById(`predloziBtn_${category}`).disabled = false
+}
+
 const disableAllPButtons = () => {
-    $("#predloziBtnDrzava").prop("disabled", true )
-    $("#predloziBtnGrad").prop("disabled", true )
-    $("#predloziBtnIme").prop("disabled", true )
-    $("#predloziBtnBiljka").prop("disabled", true )
-    $("#predloziBtnZivotinja").prop("disabled", true )
-    $("#predloziBtnPlanina").prop("disabled", true )
-    $("#predloziBtnReka").prop("disabled", true )
-    $("#predloziBtnPredmet").prop("disabled", true )
+    for( let i = 0; i < 8; i++) {
+        document.getElementById(`predloziBtn_${i}`).disabled = true
+    }
 }
 const enableAllPButtons = () => {
-    $("#predloziBtnDrzava").prop("disabled", false )
-    $("#predloziBtnGrad").prop("disabled", false )
-    $("#predloziBtnIme").prop("disabled", false )
-    $("#predloziBtnBiljka").prop("disabled", false )
-    $("#predloziBtnZivotinja").prop("disabled", false )
-    $("#predloziBtnPlanina").prop("disabled", false )
-    $("#predloziBtnReka").prop("disabled", false )
-    $("#predloziBtnPredmet").prop("disabled", false )
+    for( let i = 0; i < 8; i++) {
+        document.getElementById(`predloziBtn_${i}`).disabled = false
+    }
 } 
 const hideAllHelp = () => {
     $("#helpDrzava").hide()
