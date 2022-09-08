@@ -2,7 +2,7 @@
 
 This project is rewritten and upgraded version of https://github.com/WickedyWick/Zemljopis-NacionalnaGeografija
 
-Old version hosted - [www.zemljopis.rs](www.zemljopis.rs)
+ALFA version - [www.zemljopis.rs](www.zemljopis.rs)
 
 Old version is working but its code and design is flawed and under bit more traffic it would cause problems.
 
@@ -11,11 +11,8 @@ I decided to rewritte it with new knowledge acquired to be up to industries stan
 ## Status
     In development (dev branch)
 
-## Current branch
-    origin/feature/game_start_1202487634315800
-
 ## Tech stack
-NodeJS, Express, SocketsIO, Redis, postgresql, knex, jest
+NodeJS, Express, SocketsIO, Redis, PostgreSQL, Knex, Jest, Sentry, Plausible, TypeScript
 
 Zemljopis grew from personal challenge to project that is hosted and will be used by many people.
 
@@ -23,9 +20,7 @@ Idea is to help people learn about geography with fun.
 
 This is digital version of IRL version of the game where you are playing on paper with group of friends that are next to you.
 
-Using this application you can play with your friends anywhere and anytime.
-
-Crossplay enabled.
+Crossplay will be possibly once mobile application is developed.
 
 Prototype mobile application already exists but is not yet published and will probably be rewritten in Flutter instead of Java to support all platforms and make it even more accessible.
 
@@ -125,74 +120,18 @@ At timer execution redis index is checked for any records wheere expiresAt < cur
 Workaround this is just to dump tiny data fetched from redis to queue and delete redis key. Then queue is working on its own pace and not ommiting timer.
 
 ### Current sprint (Run to Alpha)
-#### DONE
-Middleware
 
-Room, round, player creation
+### Future plans
 
-Join room
-
-Ready up
-
-Track sockets
-
-Handle disconnect
-
-Fill database with data
-
-Precache data into redis
-
-Handle round timers
-
-Save player guesses
-
-Use HINCRBY
-
-Expand db schema
-
-#### IN WORK / TODO
-FE handling
-
-Evaluation method
-
-Testing
-
-Look into TDD
-
-Prep for alpha
-
-Update README
-
-
-### Backlog
-UI/UX rework
-
-IO should be global 
-
-Transaction and full object loading instead of hot loading?
-
-Use promise all
-
-Reference id and not room_code
-
-Redis OM?
-
-Clearing data from redis after x amount of time
-
-Implement match history
-
-Implement kick
-
-Socket auth
-
-Implement word suggestion
-
-Rethink ready logic
-
-Accounts and leaderboards?
-
-Public matches?
-
-Basic chat
-
-Rethink redis class logic
+- Socket Auth
+- Leaderboard
+- Public games
+- Simple canned chat
+- Prevention of verbal abuse
+- UI/UX rework
+- Kick functionality
+- Backend optimization
+- Autopipelining to Redis
+- Flutter mobile application for IOS and Android that enables crossplay
+- Account system?
+- Friend system?
