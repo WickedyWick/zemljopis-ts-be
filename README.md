@@ -123,6 +123,8 @@ Workaround this is just to dump tiny data fetched from redis to queue and delete
 
 ### Future plans
 
+- Tests for socket functionalities
+- Cypress FE tests?
 - Socket Auth
 - Leaderboard
 - Public games
