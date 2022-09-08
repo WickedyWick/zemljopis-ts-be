@@ -34,7 +34,7 @@ export const CatToShort = {
  * Dictionary that holds records of cirilic and latinic alfabet
  */
 export const letterDictionary = new Map([
-    ['a', 'a'],
+    ['а', 'a'],
     ['б', 'b'],
     ['в', 'v'],
     ['г', 'g'],
