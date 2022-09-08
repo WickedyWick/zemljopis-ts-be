@@ -1,4 +1,4 @@
-import { gameStart, joinRoomResponse , resultHandler, playerReadyResponse, playerUnReadyReadyHandler, anotherPlayerJoin, sendDataTimerOrForce } from './game.functions.js'
+import { gameStart, joinRoomResponse , resultHandler, playerReadyResponse, playerUnReadyReadyHandler, anotherPlayerJoin, sendDataTimerOrForce, wordSuggestionHandler } from './game.functions.js'
 
 let serverAddress = '/'
 const socket = await io(serverAddress);
@@ -12,7 +12,8 @@ export const SOCKET_EVENTS = {
     GAME_START: 'gameStart',
     RECEIVE_DATA: 'receiveData',
     RESULT: 'result',
-    FORCE_GAME_END: 'forceGameEnd'
+    FORCE_GAME_END: 'forceGameEnd',
+    WORD_SUGGESTION: 'wordSuggestion'
 }
 
 socket.on('test',()=> {
@@ -58,4 +59,12 @@ socket.on(SOCKET_EVENTS.PLAYER_JOINED, (data) => {
  */
 socket.on(SOCKET_EVENTS.FORCE_GAME_END, (username) => {
     sendDataTimerOrForce(false)
+})
+/**
+ * @param  {number} CODE - response code 
+ * @param  {category} category - category tried to be suggested
+ * @param  {string} MSG? - optional message , only for erros
+ */
+socket.on(SOCKET_EVENTS.WORD_SUGGESTION, (data) => {
+    wordSuggestionHandler(data)
 })
