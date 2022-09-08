@@ -173,7 +173,7 @@ export class GameData {
             // TODO 
             // have recieveddata set at one and use HSETEX and del when you want to 0 it
             const receivedData = await this.setDataIsReceived(username)
-            console.log(`RECEIVED DATA : ${receivedData} , ${username}`)
+
             // ignores it data is already recived
             if (!receivedData) return { success: true, eval: false }
 

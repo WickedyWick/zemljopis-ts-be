@@ -50,7 +50,6 @@ export const load = (_username, _roomCode, _sessionToken) => {
         username = _username
         roomCode = _roomCode
         sessionToken = _sessionToken
-        console.log(socket)
         socket.emit(SOCKET_EVENTS.JOIN_ROOM, { username, roomCode, sessionToken })
         // initialzie fields
         lblPlayerCount = document.getElementById('lblPlayerCount')
@@ -94,14 +93,12 @@ export const joinRoomResponse = (data) => {
     if(data.code == 200) {
         $('#maxDiv').show()
         ready = data['ready'] === "1"
-        console.log(ready)
         if (ready) {
             setButtonReady()
             btnReady.disabled = false
             ready = true
             notify(N_TYPE.SUCCESS, 'Spremni ste!')
         }
-        console.log(data['2'])
         playerCount = Number(data['1'])
         $('#lblPlayerCount').text(playerCount)
         playersReady= Number(data['0'])
@@ -130,7 +127,7 @@ export const joinRoomResponse = (data) => {
         points = Number(data['points'])
         players.set(username, points)
         for( let i = 0; i < data['players'].length; i++) {
-            if(data['players'][i] != username) {
+            if(data['players'][i] != username) {https://app.asana.com/0/1201761066131098//f
                 $('#players').append(`<li>${data['players'][i]}</li>`)
                 players.set(data['players'][i], 0)
             }
@@ -153,13 +150,11 @@ export const playerReadyResponse = (data) => {
     CODE: number
     playersReady: number
     */
-   console.log(data)
     if(data.CODE >= 400) {
         //alert
         setButtonUnReady()
         btnReady.disabled = false
         ready = false
-        console.log(data.MSG)
         notify(N_TYPE.WARNING, 'Doslo je do problema pokusajte ponovo')
         return
     } 
@@ -188,7 +183,6 @@ export const playerUnReadyReadyHandler = (data) => {
         setButtonUnReady()
         btnReady.disabled = false
         ready = false
-        console.log("PUERROR")
         notify(N_TYPE.WARNING, 'Doslo je do problema pokusajte ponovo')
         return
     } 
@@ -211,14 +205,10 @@ export const btnClickHandler = async() => {
             fieldData = new Map()
             return
         }
+ 
+        await convertDataToLatinic(fieldData)
         const res = Object.fromEntries(fieldData)
-        if (!res) {
-            notify('warning', 'Format podatak nije validan!')
-            fieldData = new Map()
-            return
-        }
-        
-        await convertDataToLatinic(res)
+
         await sendFieldData(res, true)
         dataSent = true
         return
@@ -315,8 +305,8 @@ export const gameStart = async(data) => {
 
 export const sendDataTimerOrForce = async(force) => {
     fieldData = await collectData()
+    await convertDataToLatinic(fieldData)
     const res = Object.fromEntries(fieldData)
-    await convertDataToLatinic(res)
     await sendFieldData(res, force)
     dataSent = true
     btnReady.disabled = true
@@ -443,7 +433,7 @@ const checkAndCollectData = async() => {
     
         return data
     } catch (e) {
-        console.log(e)
+        console.error(e)
         return false
     }  
 }
@@ -518,7 +508,7 @@ const collectData = async() => {
         return data
     } catch (e) {
 
-        console.log(e)
+        console.error(e)
         return await new Map(Object.entries({
             'dr': '',
             'gr': '',
@@ -535,12 +525,12 @@ const collectData = async() => {
 
 /**
  * This function iterates data and alters it to make sure its latinic
- * @param  {[key: string]: string} data - Original data that may be altered
+ * @param  {Map<string,string>} fieldData - Original data that may be altered
  */
-const convertDataToLatinic = async(data) => {
-    for (const [key, val] of Object.entries(data)) {
-        const word = cyrilicToLatinic(val)
-        data[key] = word
+const convertDataToLatinic = async(fieldData) => {
+    for (const [key, val] of fieldData.entries()) {
+        const word = await cyrilicToLatinic(val)
+        await fieldData.set(key, word)
     }
 }
 
@@ -550,7 +540,6 @@ const convertDataToLatinic = async(data) => {
  * @param  {[key: string]: string} data - Field data that is send to the backend
  */
 const sendFieldData = async(data, forced) => {
-    console.log(await data.dr)
     socket.emit(
         SOCKET_EVENTS.RECEIVE_DATA,
         {
@@ -595,7 +584,6 @@ const cyrilicToLatinic = async(word) => {
 export const wordSuggest = async(category) => {
     const word = await fieldData.get(CatToShort[category])
     const reg = new RegExp(FieldDataRegExString)
-    console.log(currentLetter)
     if (reg.test(word)) {
         socket.emit(SOCKET_EVENTS.WORD_SUGGESTION, ({
             username,
