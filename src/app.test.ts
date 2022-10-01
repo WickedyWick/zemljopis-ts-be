@@ -1,9 +1,11 @@
 
 import request from 'supertest'
 import app from 'index'
+import socketio , { Server } from 'socket.io'
 const Client = require('socket.io-client')
-
 const express = require('express')
+const { createServer } = require('http')
+
 const nameCreator = async() => {
     let result = ''
     const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789'
@@ -12,6 +14,7 @@ const nameCreator = async() => {
     }
     return result
 }
+/*
 describe('Todos API', () => {
     it('POST /home/createGame --> return sessionToken', async() => {
         const name:string = await nameCreator()
@@ -55,14 +58,44 @@ describe('Todos API', () => {
             .expect(400)
     })
 })
+*/
 
 describe('Sockets', () => {
+    let io: socketio.Server, serverSocket: socketio.Socket, clientSocket: any
+    beforeAll((done) => {
+        const httpServer = createServer()
+        io = new Server(httpServer)
+        httpServer.listen(() => {
+            const port = httpServer.address().port;
+            clientSocket = new Client(`http://localhost:${port}`)
+            io.on('connection', (socket: socketio.Socket) => {
+                serverSocket = socket;
+            })
+            clientSocket.on('connect', done)
+        }) 
+       
+    })
+
+    afterAll(() => {
+        io.close()
+        clientSocket.close()
+    })
+
+    it('should work', (done) => {
+        clientSocket.on('test',(arg: string) => {
+            expect(arg).toBe('test')
+            done()
+        })
+        serverSocket.emit('test', 'test')
+    })
+    /*
     it('test', async()=> {
         const socketClient = await new Client('http://localhost:8000')
         socketClient.emit('test', (test:string) => {
             expect(test).toBe('test')
         })
-    })
+        
+    })*/
     /*
     it('Validate user', async() => {
         const socketClient = await new Client('http://localhost:8000')
