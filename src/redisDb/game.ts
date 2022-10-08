@@ -395,7 +395,7 @@ export class GameData {
 
         // code consistency ?
         return {
-            code: 200,
+            CODE: 200,
             ...res,
             points: pointsAndReady[0],
             ready: pointsAndReady[1],

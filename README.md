@@ -69,20 +69,28 @@ Seed database:
 yarn seed
 ```
 
-Run tests:
-```
-yarn test
-```
-
 Start application:
 ```
 yarn dev
 ```
 
-
 Pipe resp:
 ```
 echo -e "$(cat redisProtocol.txt)" | redis-cli --pipe
+
+
+### TESTING
+
+Tests are split in two files: 
+- tests/api.test.ts
+- tests/socket.test.ts
+
+To run Api tests run ``` yarn test-Api ```
+To run Socket tests you have to use 2 terminals:
+- Run ``` yarn dev ``` in first terminal
+- Run ``` yarn test-Socket ``` in second terminal after server started
+
+Note: Can't run both tests at the same time, itás recommended to first run API tests and then socket tests
 
 ### SELFNOTES
 Add error messages on FE and serve it and just send codes from server?

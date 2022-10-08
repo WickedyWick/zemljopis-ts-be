@@ -90,7 +90,7 @@ export const load = (_username, _roomCode, _sessionToken) => {
  * 
  */
 export const joinRoomResponse = (data) => {
-    if(data.code == 200) {
+    if(data.CODE == 200) {
         $('#maxDiv').show()
         ready = data['ready'] === "1"
         if (ready) {
@@ -127,7 +127,7 @@ export const joinRoomResponse = (data) => {
         points = Number(data['points'])
         players.set(username, points)
         for( let i = 0; i < data['players'].length; i++) {
-            if(data['players'][i] != username) {https://app.asana.com/0/1201761066131098//f
+            if(data['players'][i] != username) {
                 $('#players').append(`<li>${data['players'][i]}</li>`)
                 players.set(data['players'][i], 0)
             }

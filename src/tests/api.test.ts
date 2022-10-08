@@ -5,7 +5,7 @@ import socketio , { Server } from 'socket.io'
 const Client = require('socket.io-client')
 const express = require('express')
 const { createServer } = require('http')
-
+import { EVENTS } from '../sockets/game.sockets'
 const nameCreator = async() => {
     let result = ''
     const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789'
@@ -13,6 +13,18 @@ const nameCreator = async() => {
         result += characters.charAt(Math.floor(Math.random() * characters.length))
     }
     return result
+}
+
+interface JoinRoomInterface {
+    CODE: number,
+    0: string,
+    1: string,
+    2: string,
+    3: string,
+    4: string,
+    points: string,
+    ready: string,
+    players: string[]
 }
 /*
 describe('Todos API', () => {
@@ -60,58 +72,14 @@ describe('Todos API', () => {
 })
 */
 
-describe('Sockets', () => {
-    let io: socketio.Server, serverSocket: socketio.Socket, clientSocket: any
-    beforeAll((done) => {
-        const httpServer = createServer()
-        io = new Server(httpServer)
-        httpServer.listen(() => {
-            const port = httpServer.address().port;
-            clientSocket = new Client(`http://localhost:${port}`)
-            io.on('connection', (socket: socketio.Socket) => {
-                serverSocket = socket;
-            })
-            clientSocket.on('connect', done)
-        }) 
-       
-    })
-
-    afterAll(() => {
-        io.close()
-        clientSocket.close()
-    })
-
-    it('should work', (done) => {
-        clientSocket.on('test',(arg: string) => {
-            expect(arg).toBe('test')
-            done()
-        })
-        serverSocket.emit('test', 'test')
-    })
-    /*
-    it('test', async()=> {
-        const socketClient = await new Client('http://localhost:8000')
-        socketClient.emit('test', (test:string) => {
-            expect(test).toBe('test')
-        })
-        
-    })*/
-    /*
-    it('Validate user', async() => {
-        const socketClient = await new Client('http://localhost:8000')
-        const name:string = await nameCreator()
+describe('API', () => {
+    it('API', async() => {
         const response = await request(app)
-            .post('/home/createGame')
-            .send({ username: name, playerCount: 1, roundTimeLimit: 60 })
-            .expect(201)
-        await expect(response.body.sessionToken).toEqual(expect.any(String))
-        await expect(response.body.roomCode).toEqual(expect.any(String))
-        const data = { username: name, sessionToken: response.body.sessionToken, roomCode: response.body.roomCode }
-        await socketClient.emit('test', (data) , (d:any) => {
-            expect(d.sessionToken).toBe('string')
-        })
+        .post('/home/createGame')
+        .send({ username: 'test', playerCount: 1, roundTimeLimit: 60 })
+        .expect(201)
     })
-    */
+    
 })
 
 
