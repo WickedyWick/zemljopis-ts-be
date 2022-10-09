@@ -41,8 +41,9 @@ export const registerGameHandlers = async(io: Server, socket: Socket) => {
         if (v) wordSuggestion(io, socket, word, category, currentLetter)
     })
 
-    socket.on('test', () => {
-        socket.emit('test')
+    socket.on('test', ({username}) => {
+        console.log(username)
+        socket.emit('test', username)
     })
 
 }
