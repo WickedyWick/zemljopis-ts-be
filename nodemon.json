@@ -3,6 +3,6 @@
     "restart": "rs",
     "delay": 2,
     "exec": "concurrently \"yarn ps:api\"",
-    "ext": "ts,js"
+    "ext": "ts"
   }
   

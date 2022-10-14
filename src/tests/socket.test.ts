@@ -4,7 +4,7 @@ import { EVENTS } from 'sockets/game.sockets'
 import * as dotenv from 'dotenv'
 import { Socket } from 'socket.io-client'
 import fetch from 'node-fetch'
-dotenv.config()
+import axios from 'axios'
 
 interface JoinRoomInterface {
     CODE: number,
@@ -54,26 +54,30 @@ const destroySocket = (socket: Socket) => {
 
 describe('Sockets', () => {
     it.each([
-        { roundTimeLimit: 60, playerCount: 1 },
-        { roundTimeLimit: 120, playerCount: 1 },
-        { roundTimeLimit: 180, playerCount: 1 }
+        { roundTimeLimit: '60', playerCount: '1' },
+        { roundTimeLimit: '90', playerCount: '1' },
+        { roundTimeLimit: '120', playerCount: '1' },
+        { roundTimeLimit: '180', playerCount: '1' }
     ])
     ('should join room if solo player', async({ roundTimeLimit, playerCount }) => {
         //@ts-ignore
         const clientSocket: Socket = await initSocket()
-        const rand = Math.floor((Math.random() * 100000) + 1)
-        const username = `AleksaTest${rand}`
-        const response = await fetch(`http://localhost:${port}/createGame`, {
-            method: 'POST',
-            body: JSON.stringify({
+        const username = `AleksaTest`
+        const response = await axios({
+            method: 'post',
+            url: 'http://localhost:8000/home/createGame',
+            data: {
                 username,
                 roundTimeLimit,
                 playerCount
-            })
+            },
+            timeout: 20000
         })
-        const parsedResponse: CreateRoomInterface | any= await response.body
+
+        const data = await response.data
+
         const serverResponse: Promise<JoinRoomInterface> | Error = new Promise((resolve, reject) => {
-            clientSocket.on('test', (response: JoinRoomInterface) => {
+            clientSocket.on('joinRoom', (response: JoinRoomInterface) => {
                 const _response = response
                 destroySocket(clientSocket)
                 resolve(_response)
@@ -86,20 +90,20 @@ describe('Sockets', () => {
         
         clientSocket.emit(EVENTS.JOIN_ROOM, ({
             username,
-            roomCode: parsedResponse.roomCode,
-            sessionToken: parsedResponse.sessionToken 
+            roomCode: data.roomCode,
+            sessionToken: data.sessionToken 
         }))
 
         const serverRes: JoinRoomInterface = await serverResponse
 
         expect(serverRes.CODE).toBe(200)
         expect(serverRes.points).toBe('0')
-        expect(serverRes.ready).toBe('0')
-        expect(serverRes.players).toBe([username])
+        expect(serverRes.ready).toBe(null)
+        expect(serverRes.players[0]).toBe(username)
         expect(serverRes.players).toHaveLength(1)
         expect(serverRes[0]).toBe('0')
         expect(serverRes[1]).toBe(`${playerCount}`)
-        expect(serverRes[2]).toBe('1')
+        expect(serverRes[2]).toBe('0')
         expect(serverRes[3]).toBe(`${roundTimeLimit}`)
         expect(serverRes[4]).toBe('0')
     })

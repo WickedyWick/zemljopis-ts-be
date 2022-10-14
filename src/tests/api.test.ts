@@ -1,5 +1,5 @@
 
-import request from 'supertest'
+/*import request from 'supertest'
 import app from 'index'
 import socketio , { Server } from 'socket.io'
 const Client = require('socket.io-client')
@@ -71,7 +71,7 @@ describe('Todos API', () => {
     })
 })
 */
-
+/*
 describe('API', () => {
     it('API', async() => {
         const response = await request(app)
@@ -83,3 +83,4 @@ describe('API', () => {
 })
 
 
+*/
