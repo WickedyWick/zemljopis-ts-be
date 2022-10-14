@@ -85,14 +85,12 @@ pridruziBtn.addEventListener('click', (e) => {
             },
             timeout: 20000
         }).then((res) => {
-            console.log(res.status)
-            console.log(res.data)
             if (res.status >= 500){
                 myAlert(res.data["ERR_MSG"])
                 enableButtons()
             }else if(res.status >= 200 && res.status < 300) {
                 localStorage.setItem('sessionToken',res.data['sessionToken'])
-                window.location.href = `/game?roomCode=${res.data['roomCode']}&username=${res.data['username']}`
+                window.location.href = `/game?roomCode=${room}&username=${username}`
             } else {
                 myAlert('Doslo je do problema!')
                 enableButtons()

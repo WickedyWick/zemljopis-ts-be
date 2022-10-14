@@ -76,7 +76,7 @@ export const regUser: Action<any, any, any, any> = async(req, res, next) => {
                 }, true)
                 await roomR.addPlayer(username, player.id, sessionToken)
                 //send only sess
-                return res.status(201).json({ username, roomCode, sessionToken })
+                return res.status(201).json({ sessionToken })
             } catch (err) {
                 // check
                 console.log(err.code)
