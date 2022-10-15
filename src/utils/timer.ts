@@ -1,5 +1,7 @@
 import { GameData } from "redisDb/game"
 import { Queue } from "./queue"
+import { logError } from "./logger"
+
 export const startTimerAndQueue = async() => {
     setInterval(async() => {
         const res = await GameData.getExpiredRoundTimers()
@@ -13,7 +15,7 @@ export const startTimerAndQueue = async() => {
                     console.log(msg)
                 })
             } catch(e) {
-               console.log(`Queuing failed for eval data: ${ res }\n Retrying. Err: ${ e }`)
+               logError(`Queuing failed for eval data: ${ res }\n Retrying. Err: ${ e }`)
             }
         }
     }, 1000)
