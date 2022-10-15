@@ -230,7 +230,6 @@ export const wordSuggestionValidator = async(
     letter: string
 ) => {
     try {
-        console.log(category, letter)
         if (!CategoriesSet.has(category) || !LettersSet.has(letter)) {
             socket.emit(EVENTS.WORD_SUGGESTION, {
                 MSG: 'Parametri nisu validni',

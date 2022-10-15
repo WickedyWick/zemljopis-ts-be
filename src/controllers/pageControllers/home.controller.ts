@@ -5,6 +5,8 @@ import { makeRoomCode } from 'utils/strings'
 import { ERROR_ROOM_CREATE, ERROR_REG_PLAYER, ERROR_UNDEFINED_PARAMS } from 'utils/errors/home'
 import { randomBytes } from 'crypto'
 import { GameData } from 'redisDb/game'
+import { logError } from 'utils/logger'
+
 interface RoomBody {
     username: string
     playerCount: number
@@ -44,7 +46,7 @@ export const createRoom: Action<any, RoomBody, any , any> = async (req, res, nex
         }, true)
         await GameData.createPlayer(roomCode, username, player.id, sessionToken)
     } catch (err) {
-        console.log(`Error during creating player. Err : ${err}`)
+        logError(`Error during creating player. Err : ${err}`)
         return next(ERROR_ROOM_CREATE)
     }
     // change that to return only sess
@@ -79,8 +81,7 @@ export const regUser: Action<any, any, any, any> = async(req, res, next) => {
                 return res.status(201).json({ sessionToken })
             } catch (err) {
                 // check
-                console.log(err.code)
-                console.log(`Error during creating player. Err : ${err}`)
+                logError(`Error during creating player. Err : ${err}`)
                 return next(ERROR_REG_PLAYER)
             }
         }

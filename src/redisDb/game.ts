@@ -280,10 +280,10 @@ export class GameData {
                 await Result.updateWhere(roundId, pId, pointsData)
             }
             await Promise.all(promiseArr).catch((e) => {
-                console.log(e)
+                logError(e)
             })
         } catch(e) {
-            console.log(`Error during setting points to field. Err: ${ e }`)
+            logError(`Error during setting points to field. Err: ${ e }`)
         }
     }
 
@@ -486,10 +486,9 @@ export class GameData {
 
     addRoundTimer = async(roundId: number, mode: 'endRound' | 'force', delay: number) => {
         // adds unix timestamp to the index
-       // const expiresAt = new Date().getTime() + delay + 3000; // 60000 is one minute in ms 
-       // 3000 is grace period if client sents game force req
-       const expiresAt = new Date().getTime() + delay + 4000
-        console.log(expiresAt)
+        // const expiresAt = new Date().getTime() + delay + 3000; // 60000 is one minute in ms 
+        // 3000 is grace period if client sents game force req
+        const expiresAt = new Date().getTime() + delay + 4000
         return await redisDb.hSet(`round:timer:${this._room}`, {
             'roundId': roundId,
             'room': this._room,

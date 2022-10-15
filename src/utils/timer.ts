@@ -5,7 +5,6 @@ export const startTimerAndQueue = async() => {
         const res = await GameData.getExpiredRoundTimers()
         for(let i =0 ;i < res.total;i ++) {
             try {
-                console.log(res)
                 Queue.push({
                     room: res.documents[i].value.room as string,
                     mode: "endRound",

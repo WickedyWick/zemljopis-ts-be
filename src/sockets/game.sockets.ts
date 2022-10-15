@@ -42,7 +42,6 @@ export const registerGameHandlers = async(io: Server, socket: Socket) => {
     })
 
     socket.on('test', ({username}) => {
-        console.log(username)
         socket.emit('test', username)
     })
 

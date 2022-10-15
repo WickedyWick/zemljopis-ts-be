@@ -27,8 +27,16 @@ interface RegUserInterface {
     sessionToken: string
 }
 
+interface PlayerReadyInterface {
+    username: string
+    CODE: number,
+    gameStart: boolean,
+    playersReady: number | string
+}
+
 const port = process.env.PORT || 8000
 const baseUrl = process.env.BASE_URL || 'http://localhost'
+
 const initSocket = () => {
     return new Promise((resolve, reject) => {
         const socket = io(`${baseUrl}:${port}`, {
@@ -191,11 +199,11 @@ describe('Sockets', () => {
                 const _response = response
                 destroySocket(clientSocket2)
                 resolve(_response)
-
-                setTimeout(() => {
-                    reject(new Error('Failed to get response, connection timed out...'))
-                }, 5000)
             })
+
+            setTimeout(() => {
+                reject(new Error('Failed to get response, connection timed out...'))
+            }, 5000)
         })
 
         clientSocket2.emit(EVENTS.JOIN_ROOM, ({
@@ -217,6 +225,71 @@ describe('Sockets', () => {
         expect(serverResData2[2]).toBe('0')
         expect(serverResData2[3]).toBe(`${roundTimeLimit}`)
         expect(serverResData2[4]).toBe('0')
+    })
+
+    it('should ready up player', async() => {
+        
+        //@ts-ignore
+        const clientSocket: Socket = await initSocket()
+        const username = 'AleksaTest'
+        
+        const createRoomApiResponse = await axios({
+            method: 'post',
+            url: `${baseUrl}:${port}/home/createGame`,
+            data: {
+                username,
+                roundTimeLimit: '60',
+                playerCount: '1'
+            },
+            timeout: 20000
+        })
+
+        
+        const createRoomData: CreateRoomInterface = await createRoomApiResponse.data
+
+        const serverResponse1: Promise<JoinRoomInterface> | Error = new Promise((resolve, reject) => {
+            clientSocket.on(EVENTS.JOIN_ROOM, (response: JoinRoomInterface) => {
+                const _response = response
+                resolve(_response)
+            })
+
+            setTimeout(() => {
+                reject(new Error('Failed to get response, connection timed out...'))
+            },5000)
+        })
+
+        clientSocket.emit(EVENTS.JOIN_ROOM, ({
+            username,
+            roomCode: createRoomData.roomCode,
+            sessionToken: createRoomData.sessionToken
+        }))
+        
+        const joinRoomData: JoinRoomInterface = await serverResponse1
+
+        const serverResponse2: Promise<PlayerReadyInterface> | Error = new Promise((resolve, reject) => {
+            clientSocket.on(EVENTS.PLAYER_READY, (response: PlayerReadyInterface) => {
+                const _response = response
+                destroySocket(clientSocket)
+                resolve(_response)
+            })
+
+            setTimeout(() => {
+                reject(new Error('Failed to get response, connection timed out...'))
+            }, 5000)
+        })
+
+        clientSocket.emit(EVENTS.PLAYER_READY, ({
+            username,
+            roomCode: createRoomData.roomCode,
+            sessionToken: createRoomData.sessionToken
+        }))
+
+        const serverResponseData: PlayerReadyInterface = await serverResponse2
+        
+        expect(serverResponseData.CODE).toBe(200)
+        expect(serverResponseData.gameStart).toBe(true)
+        expect(serverResponseData.playersReady).toBe(1)
+        expect(serverResponseData.username).toBe(username)
     })
 
 })

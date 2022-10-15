@@ -1,4 +1,5 @@
 import { GameData } from 'redisDb/game'
+import { logError } from './logger'
 
 export const makeRoomCode = async () => {
     try {
@@ -9,7 +10,7 @@ export const makeRoomCode = async () => {
         }
         return result
     } catch(err) {
-        console.log(`Error during loading creating room coode!Err : ${ err }`)
+        logError(`Error during loading creating room coode!Err : ${ err }`)
         return ''
     }
 

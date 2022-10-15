@@ -38,8 +38,7 @@ export class Round extends BaseModel<RoundFields, RoundMethods> {
             // Precreate empty results so less load on evaluation method and
             // its covering edge case where client disconnects and doesn't return data
             for ( const [ key, value] of Object.entries(playerIds)) {
-                //await db('round').insert({ round_id: this.id , player_id: value})
-                console.log(this.id)
+
                 const r = await Result.create({
                     round_id: this.id,
                     player_id: Number(value),
