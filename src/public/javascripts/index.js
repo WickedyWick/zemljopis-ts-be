@@ -52,6 +52,7 @@ napraviBtn.addEventListener('click', (e) =>{
                 enableButtons()
             }else if(res.status >= 200 && res.status < 300){               
                 localStorage.setItem('sessionToken',res.data['sessionToken'])
+                enableButtons()
                 window.location.href = `/game?roomCode=${res.data['roomCode']}&username=${username}`
             } else {
                 myAlert("Doslo je do problema , pokusajte ponovo!")
@@ -92,6 +93,7 @@ pridruziBtn.addEventListener('click', (e) => {
                 enableButtons()
             }else if(res.status >= 200 && res.status < 300) {
                 localStorage.setItem('sessionToken',res.data['sessionToken'])
+                enableButtons()
                 window.location.href = `/game?roomCode=${res.data['roomCode']}&username=${res.data['username']}`
             } else {
                 myAlert('Doslo je do problema!')
