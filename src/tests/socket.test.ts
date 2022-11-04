@@ -34,6 +34,10 @@ interface PlayerReadyInterface {
     playersReady: number | string
 }
 
+interface GameStartInterface {
+    letter: string
+    roundNumber: number
+}
 const port = process.env.PORT || 8000
 const baseUrl = process.env.BASE_URL || 'http://localhost'
 
@@ -67,6 +71,35 @@ const destroySocket = (socket: Socket) => {
     })
 }
 
+const createGame = async(username: string, playerCount: string, roundTimeLimit: string) => {
+    const response = await axios({
+        method: 'post',
+        url: `${baseUrl}:${port}/home/createGame`,
+        data: {
+            username,
+            roundTimeLimit,
+            playerCount
+        },
+        timeout: 20000
+    })
+
+    return response
+}
+
+const regUser = async(username: string, roomCode: string) => {
+    const response = await axios({
+        method: 'post',
+        url: `${baseUrl}:${port}/home/regUser`,
+        data: {
+            username,
+            roomCode
+        },
+        timeout: 20000
+    })
+
+    return response
+}
+
 describe('Sockets', () => {
     it.each([
         { roundTimeLimit: '60', playerCount: '1' },
@@ -78,16 +111,7 @@ describe('Sockets', () => {
         //@ts-ignore
         const clientSocket: Socket = await initSocket()
         const username = `AleksaTest`
-        const response = await axios({
-            method: 'post',
-            url: `${baseUrl}:${port}/home/createGame`,
-            data: {
-                username,
-                roundTimeLimit,
-                playerCount
-            },
-            timeout: 20000
-        })
+        const response = await createGame(username, playerCount, roundTimeLimit)
 
         const data = await response.data
 
@@ -134,16 +158,7 @@ describe('Sockets', () => {
         //@ts-ignore
         const clientSocket: Socket = await initSocket()
         const username = `AleksaTest`
-        const createRoomApiResponse = await axios({
-            method: 'post',
-            url: `${baseUrl}:${port}/home/createGame`,
-            data: {
-                username,
-                roundTimeLimit,
-                playerCount
-            },
-            timeout: 20000
-        })
+        const createRoomApiResponse = await createGame(username, playerCount, roundTimeLimit)
 
         const createRoomData: CreateRoomInterface = await createRoomApiResponse.data
 
@@ -182,15 +197,7 @@ describe('Sockets', () => {
         const clientSocket2: Socket = await initSocket()
 
         const username2 = 'AleksaTest1'
-        const regUserApiResponse = await axios({
-            method: 'post',
-            url: `${baseUrl}:${port}/home/regUser`,
-            data: {
-                username: username2,
-                roomCode: createRoomData.roomCode
-            },
-            timeout: 20000
-        })
+        const regUserApiResponse = await regUser(username2, createRoomData.roomCode)
 
         const regUserData: RegUserInterface = await regUserApiResponse.data
 
@@ -228,21 +235,11 @@ describe('Sockets', () => {
     })
 
     it('should ready up player', async() => {
-        
         //@ts-ignore
         const clientSocket: Socket = await initSocket()
         const username = 'AleksaTest'
         
-        const createRoomApiResponse = await axios({
-            method: 'post',
-            url: `${baseUrl}:${port}/home/createGame`,
-            data: {
-                username,
-                roundTimeLimit: '60',
-                playerCount: '1'
-            },
-            timeout: 20000
-        })
+        const createRoomApiResponse = await createGame(username, '1', '60')
 
         
         const createRoomData: CreateRoomInterface = await createRoomApiResponse.data
@@ -290,6 +287,74 @@ describe('Sockets', () => {
         expect(serverResponseData.gameStart).toBe(true)
         expect(serverResponseData.playersReady).toBe(1)
         expect(serverResponseData.username).toBe(username)
+    })
+
+    it('should start game when player alone', async() => {
+        //@ts-ignore
+        const clientSocket: Socket = await initSocket()
+        const username = 'AleksaTest'
+        
+        const createRoomApiResponse = await createGame(username, '1', '60')
+
+        
+        const createRoomData: CreateRoomInterface = await createRoomApiResponse.data
+
+        const serverResponse1: Promise<JoinRoomInterface> | Error = new Promise((resolve, reject) => {
+            clientSocket.on(EVENTS.JOIN_ROOM, (response: JoinRoomInterface) => {
+                const _response = response
+                resolve(_response)
+            })
+
+            setTimeout(() => {
+                reject(new Error('Failed to get response, connection timed out...'))
+            },5000)
+        })
+
+        clientSocket.emit(EVENTS.JOIN_ROOM, ({
+            username,
+            roomCode: createRoomData.roomCode,
+            sessionToken: createRoomData.sessionToken
+        }))
+        
+        const joinRoomData: JoinRoomInterface = await serverResponse1
+
+        const serverResponse2: Promise<PlayerReadyInterface> | Error = new Promise((resolve, reject) => {
+            clientSocket.on(EVENTS.PLAYER_READY, (response: PlayerReadyInterface) => {
+                const _response = response
+                destroySocket(clientSocket)
+                resolve(_response)
+            })
+
+            setTimeout(() => {
+                reject(new Error('Failed to get response, connection timed out...'))
+            }, 5000)
+        })
+
+        const gameStartResponse: Promise<GameStartInterface> | Error = new Promise((resolve, reject) => {
+            clientSocket.on(EVENTS.GAME_START, (response: GameStartInterface) => {
+                const _response = response
+                destroySocket(clientSocket)
+                resolve(_response)
+            })
+
+            setTimeout(() => {
+                reject(new Error('Failed to get response, connection timed out...'))
+            }, 5000)
+        })
+
+        clientSocket.emit(EVENTS.PLAYER_READY, ({
+            username,
+            roomCode: createRoomData.roomCode,
+            sessionToken: createRoomData.sessionToken
+        }))
+
+        const serverResponseData: PlayerReadyInterface = await serverResponse2
+        const gameStartResponseData: GameStartInterface = await gameStartResponse
+
+        expect(serverResponseData.gameStart).toBe(true)
+        expect(gameStartResponseData.roundNumber).toBe(1)
+        expect(gameStartResponseData.letter).toBeInstanceOf(String)
+
     })
 
 })

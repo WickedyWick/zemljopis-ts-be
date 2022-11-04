@@ -51,6 +51,7 @@ export const playerReady = async(io: Server, socket: Socket, username: string, r
             ...res
         })
         if (res.gameStart) {
+
             await gameStart(io, roomCode)
         }
     } catch(e) {
@@ -86,6 +87,7 @@ export const playerUnReady = async(io: Server, socket: Socket, username: string,
 }
 
 export const gameStart = async(io: Server, room: string) => {
+    console.log('here')
     const gameData = new GameData(room)
     try {
         // Create a round and send a signal update game in progress
@@ -117,9 +119,11 @@ export const gameStart = async(io: Server, room: string) => {
             letter,
             roundNumber
         }))
+       
         const playerIds = await gameData.getPlayerIds()
         await round.createEmptyResults(playerIds)
     } catch(e) {
+        // TODO send room wide playerUnready event
         await logError(`Error during game start.`, e)
         await gameData.rollBackGameStart()
     }
