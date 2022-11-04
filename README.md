@@ -11,6 +11,10 @@ I decided to rewritte it with new knowledge acquired to be up to industries stan
 ## Status
     In development (dev branch)
 
+## How to play
+    If you want to start a game write your name in second input box and press first button
+    If you want to join the game write room code in first input box, name in second and press second button
+
 ## Tech stack
 NodeJS, Express, SocketsIO, Redis, PostgreSQL, Knex, Jest, Sentry, Plausible, TypeScript
 
@@ -33,16 +37,21 @@ Redis data is somewhat split under different keys
 
 Every room has its own key with room data
 
-Every player is registered under unique key {username}_{room} which contains their id, points and sessionToken
+Every player is registered under unique key {username}:{room} which contains their id, points and sessionToken
 
-Player list for a room is under players_{room} key which is just an array of strings (rethink)
+Player list for a room is under players:{room} key which is just an array of strings (rethink)
 
 Data is precached into redis as hset of field_letter: field_data: 1 ; where field_letter is name of the hash set
 
 ## SETUP
+
+setup db, fill .env file
+
+
+```
 git clone --recursive https://github.com/RediSearch/RediSearch.git
 https://redis.io/docs/stack/search/quick_start/
-setup db, fill .env file
+```
 
 Install packages
 ```
@@ -83,6 +92,37 @@ yarn dev
 Pipe resp:
 ```
 echo -e "$(cat redisProtocol.txt)" | redis-cli --pipe
+```
+
+### Current biggest obstacle (mini blog)
+Since this is a round based game there are timers, many timers.
+I do not like idea of having lots of timer objects running at the same time.
+
+Solution was to create index in redis with basic informaton about the room and expiresAt field that stores unix timestamp of when timer is supposed to expire and having one global timer running at 1 second interval.
+
+At timer execution redis index is checked for any records wheere expiresAt < current timestamp. Since nodejs timers work that way if all things needed are not executed in set interval next execution won't start and it can cause delay.
+Workaround this is just to dump tiny data fetched from redis to queue and delete redis key. Then queue is working on its own pace and not ommiting timer.
+
+### Current sprint (Run to Alpha)
+
+### Future plans
+
+- Tests for socket functionalities
+- Rejoin button (so you can rejoin last room without using browser commands)
+- Cypress FE tests?
+- Socket Auth
+- Leaderboard
+- Public games
+- Simple canned chat
+- Prevention of verbal abuse
+- UI/UX rework
+- Kick functionality
+- Backend optimization
+- Autopipelining to Redis
+- Flutter mobile application for IOS and Android that enables crossplay
+- Account system?
+- Friend system?
+
 
 ### SELFNOTES
 Add error messages on FE and serve it and just send codes from server?
@@ -109,31 +149,3 @@ decision -> samo prihvati nekosenu latinicu i cirilicu. nepismeni neka ne igraju
 
 
 localdb pass postgres
-
-### Current biggest obstacle (mini blog)
-Since this is a round based game there are timers, many timers.
-I do not like idea of having lots of timer objects running at the same time.
-
-Solution was to create index in redis with basic informaton about the room and expiresAt field that stores unix timestamp of when timer is supposed to expire and having one global timer running at 1 second interval.
-
-At timer execution redis index is checked for any records wheere expiresAt < current timestamp. Since nodejs timers work that way if all things needed are not executed in set interval next execution won't start and it can cause delay.
-Workaround this is just to dump tiny data fetched from redis to queue and delete redis key. Then queue is working on its own pace and not ommiting timer.
-
-### Current sprint (Run to Alpha)
-
-### Future plans
-
-- Tests for socket functionalities
-- Cypress FE tests?
-- Socket Auth
-- Leaderboard
-- Public games
-- Simple canned chat
-- Prevention of verbal abuse
-- UI/UX rework
-- Kick functionality
-- Backend optimization
-- Autopipelining to Redis
-- Flutter mobile application for IOS and Android that enables crossplay
-- Account system?
-- Friend system?
