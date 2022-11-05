@@ -347,7 +347,7 @@ describe('Sockets', () => {
             roomCode: createRoomData.roomCode,
             sessionToken: createRoomData.sessionToken
         }))
-
+        
         const serverResponseData: PlayerReadyInterface = await serverResponse2
         const gameStartResponseData: GameStartInterface = await gameStartResponse
 
