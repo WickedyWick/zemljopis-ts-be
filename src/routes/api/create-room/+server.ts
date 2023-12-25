@@ -1,4 +1,4 @@
-import type { CreateRoomDto } from '$lib/utils/types/types';
+import type { CreateRoomDto } from '$lib/types/types';
 import { createRoomValidator } from '$lib'
 import { createRoomService } from '$lib/server'
 import type { RequestHandler } from './$types';
@@ -17,6 +17,7 @@ export const POST: RequestHandler = async ({request}) => {
             return new Response(null, {status: 500})
         return new Response(res, {status: 201})
     } catch(err) {
+        console.log(err)
         // if body is not valid json
         if (err instanceof SyntaxError) {
             return new Response(null, {status: 400})

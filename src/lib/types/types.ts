@@ -3,10 +3,17 @@ export type CreateRoomDto = {
   playerCount: number
   password: string | undefined
 }
+
+export type RoomInfo = {
+  playerCount: number
+  password: string | undefined
+  players: string[]
+}
 export type ClassicDto = {
   [key: string]: any
 }
 
 export enum RedisKeys {
-  roomSet
+  roomSet,
+  room
 }
