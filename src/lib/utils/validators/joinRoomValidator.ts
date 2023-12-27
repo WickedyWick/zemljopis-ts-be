@@ -1,10 +1,10 @@
-import type { ClassicDto, CreateRoomDto } from "../../types/types";
+import type { ClassicDto, CreateRoomDto, JoinRoomDto } from "../../types/types";
 import { containsSpecialChar } from ".";
 let invalidStrings: Set<string> = new Set(['[object object]', 'null', 'undefined', 'nan'])
 /***** DTO Fields *****/
-let createRoomFields: Set<string> = new Set(['username', 'password', 'playerCount'])
+let createRoomFields: Set<string> = new Set(['username', 'password', 'roomCode'])
 
-export const createRoomValidator = (body: CreateRoomDto):boolean | undefined => {
+export const joinRoomValidator = (body: JoinRoomDto):boolean | undefined => {
   try {
     let rightCount: number = 0
     let totalCount: number = 0
@@ -26,8 +26,8 @@ export const createRoomValidator = (body: CreateRoomDto):boolean | undefined => 
      
           if (username.length < 3 || username.length > 24 || containsSpecialChar(username))  
             return false
-          
-          body[property] = body[property].trim()
+
+          body[property] = body[property].trim()  
           rightCount++;
           break;
         case 'password':
@@ -36,17 +36,18 @@ export const createRoomValidator = (body: CreateRoomDto):boolean | undefined => 
           if (pwd != '')
             return false
 
-          body[property] = body[property].trim()
+          body[property] = body[property].trim()  
           rightCount++;
           break;
-        case 'playerCount':
-          if (!Number.isInteger(Number(body[property])))
+        case 'roomCode':
+          let rc: string = String(body[property])
+          if (invalidStrings.has(rc.toLowerCase()))
             return false
 
-          let pc: number = Number(body[property])
-          if (pc < 1 || pc > 10)
+          if (rc.trim().length != 8)
             return false
-
+  
+          body[property] = body[property].trim() 
           rightCount++;
           break;
         default:
@@ -54,7 +55,6 @@ export const createRoomValidator = (body: CreateRoomDto):boolean | undefined => 
       }
     }
     return rightCount == createRoomFields.size;
-    
   } catch(err) {
     console.log(err)
     // log to db

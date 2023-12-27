@@ -1,6 +1,7 @@
-import type { CreateRoomDto, RoomInfo } from "$lib/types/types";
+import type { CreateRoomDto, JoinRoomDto, RoomInfo } from "$lib/types/types";
 import { createRoomCode } from '$lib'
-import { addRoomCode, createRoom } from '$lib/server'
+import { addRoomCode, createRoom, joinRoom } from '$lib/server'
+
 export const createRoomService = async(data: CreateRoomDto): Promise<string | undefined> => {
   try {
     let retryCount: number = 5;
@@ -22,18 +23,33 @@ export const createRoomService = async(data: CreateRoomDto): Promise<string | un
 
     let roomInfo: RoomInfo = {
       'playerCount': data.playerCount,
-      'players': [data.username],
+      'currentLetter': '',
+      'playersJoined': 0,
       'password': data.password
     }
-    let success: boolean = await createRoom(roomCode, roomInfo)
-    if (!success) {
+    let success: any[] = await createRoom(roomCode, roomInfo, data.username)
+    if (success.length != 2) {
+      // log err
+      return undefined
+    } else if (success[0]['0'] != 4 || success[1]['1'] != 1) {
+      // 4 is size of roomInfo
       // log err
       return undefined
     }
+    
     return roomCode;
   } catch(err) {
     console.log(err);
     
     return undefined
+  }
+}
+
+export const joinRoomService = async(data: JoinRoomDto) => {
+  try {
+    return await joinRoom(data.roomCode, data.username)
+  } catch(err){
+    //log err
+    return 500
   }
 }
