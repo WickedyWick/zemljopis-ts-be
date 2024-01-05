@@ -7,9 +7,6 @@ import { SchemaFieldTypes } from "redis"
   room:{roomCode} -> Information about the room
   players:{roomCode} -> Set of players in the room
 */
-export const SET = async(key: string, val: any):Promise<boolean>  => {
-  return await redisDb.SET(key, val)
-}
 
 export const addRoomCode = async(roomCode: string):Promise<boolean> => {
   return Boolean(await redisDb.SADD('roomSet', roomCode))

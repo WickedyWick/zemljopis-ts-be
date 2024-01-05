@@ -2,6 +2,7 @@ import type { RedisClientType, RedisFunctions, RedisModules, RedisScripts } from
 import { createClient } from 'redis';
 import { REDIS_CLIENT_POOL_SIZE } from "$env/static/private";
 import { logError } from "./commands";
+import type { NumericRange } from "@sveltejs/kit";
 /**** Commands that use transactions ****/
 let clientPool: RedisClientType<RedisModules, RedisFunctions, RedisScripts>[] = []
 let poolSize: number = Number(REDIS_CLIENT_POOL_SIZE ?? 50)
@@ -39,27 +40,27 @@ export const joinRoom = async(roomCode: string, username: string): Promise<numbe
     // we unwatch keys by closing connection
     await client.watch(`players:${roomCode}`)
     // TODO: OPTIMIZE THIS
-    const playerIsMember: string = await client.SISMEMBER(`players:${roomCode}`, username)
-    if (playerIsMember == "1") {
+    const playerIsMember: boolean = await client.SISMEMBER(`players:${roomCode}`, username)
+    if (playerIsMember) {
       await returnClientToPool(poolClient, client)
       return 200
     }
   
     // check if room exists
-    const maxPlayer: string | null = await client.HGET(`room:${roomCode}`, 'playerCount')
-    if (maxPlayer == null) {
+    const maxPlayer: string | undefined = await client.HGET(`room:${roomCode}`, 'playerCount')
+    if (maxPlayer == undefined) {
       await returnClientToPool(poolClient, client)
       return 404
     }
 
-    const currentPlayerCount: string = await client.SCARD(`players:${roomCode}`)
+    const currentPlayerCount: number = await client.SCARD(`players:${roomCode}`)
     // roomfull
-    if (maxPlayer >= currentPlayerCount) {
+    if (Number(maxPlayer) >= currentPlayerCount) {
       await returnClientToPool(poolClient, client)
       return 409
     }
 
-    const addedPlayer: string | null = await client.SADD(`players:${roomCode}`, 'string')
+    const addedPlayer: number | null = await client.SADD(`players:${roomCode}`, 'string')
     // race condition
     if (addedPlayer == null) {
       returnClientToPool(poolClient, client)
