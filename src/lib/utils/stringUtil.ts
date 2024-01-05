@@ -1,3 +1,4 @@
+import { logError } from "$lib/server/db/commands"
 const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789'
 export const createRoomCode = ():string => {
   try {
@@ -7,7 +8,7 @@ export const createRoomCode = ():string => {
     }
     return result
   } catch(err) {
-      console.log(`Error during loading creating room coode!Err : ${ err }`)
+      logError(String(err), 'createRoomCode')
       return ''
   }
 }

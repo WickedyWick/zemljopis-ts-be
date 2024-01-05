@@ -2,10 +2,11 @@ import type { CreateRoomDto } from '$lib/types/types';
 import { createRoomValidator } from '$lib'
 import { createRoomService } from '$lib/server'
 import type { RequestHandler } from './$types';
+import { logError } from '$lib/server/db/commands';
 export const POST: RequestHandler = async ({request}) => {
     try {
         const body: CreateRoomDto = await request.json() as CreateRoomDto
-        const isValid: boolean | undefined = createRoomValidator(body)
+        const isValid: boolean | undefined = await createRoomValidator(body)
         if (isValid == undefined)
             return new Response(null, {status: 500})
         if (isValid == false)
@@ -16,11 +17,11 @@ export const POST: RequestHandler = async ({request}) => {
             return new Response(null, {status: 500})
         return new Response(res, {status: 201})
     } catch(err) {
-        console.log(err)
         // if body is not valid json
         if (err instanceof SyntaxError) {
             return new Response(null, {status: 400})
         }
+        await logError(String(err), 'api\\create-room POST')
         return new Response(null, {status: 500})
     }
 };

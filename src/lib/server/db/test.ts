@@ -3,11 +3,10 @@ import { redisDb } from "."
 // testing only, delete before adding
 export const test = async(): Promise<boolean> => {
   try {
-    const res = await redisDb.ft.INFO('kurac')
-    console.log(res)
-  } catch(err){
-    console.log('kurac');
-    
+    let s: number = 0;
+    //@ts-ignore
+    s.push()
+  } catch(err) {
   }
   
   return true

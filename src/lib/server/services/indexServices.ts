@@ -1,6 +1,7 @@
 import type { CreateRoomDto, JoinRoomDto, RoomInfo } from "$lib/types/types";
 import { createRoomCode } from '$lib'
 import { addRoomCode, createRoom, joinRoom } from '$lib/server'
+import { logError } from "../db/commands";
 
 export const createRoomService = async(data: CreateRoomDto): Promise<string | undefined> => {
   try {
@@ -39,8 +40,7 @@ export const createRoomService = async(data: CreateRoomDto): Promise<string | un
     
     return roomCode;
   } catch(err) {
-    console.log(err);
-    
+    await logError(String(err), 'createRoomService')
     return undefined
   }
 }
@@ -49,7 +49,7 @@ export const joinRoomService = async(data: JoinRoomDto) => {
   try {
     return await joinRoom(data.roomCode, data.username)
   } catch(err){
-    //log err
+    await logError(String(err), 'joinRoomService')
     return 500
   }
 }

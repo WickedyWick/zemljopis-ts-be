@@ -1,6 +1,7 @@
 import type { RedisClientType, RedisFunctions, RedisModules, RedisScripts } from "redis";
 import { createClient } from 'redis';
 import { REDIS_CLIENT_POOL_SIZE } from "$env/static/private";
+import { logError } from "./commands";
 /**** Commands that use transactions ****/
 let clientPool: RedisClientType<RedisModules, RedisFunctions, RedisScripts>[] = []
 let poolSize: number = Number(REDIS_CLIENT_POOL_SIZE ?? 50)
@@ -68,7 +69,7 @@ export const joinRoom = async(roomCode: string, username: string): Promise<numbe
     returnClientToPool(poolClient, client)
     return 200
   } catch(err) {
-    //log
+    await logError(String(err), 'joinRoom')
     // return client to thet pool
     await returnClientToPool(poolClient, client)
     return 500

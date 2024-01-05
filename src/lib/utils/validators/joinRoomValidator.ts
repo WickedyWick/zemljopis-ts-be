@@ -1,10 +1,11 @@
 import type { ClassicDto, CreateRoomDto, JoinRoomDto } from "../../types/types";
 import { containsSpecialChar } from ".";
+import { logError } from "$lib/server/db/commands";
 let invalidStrings: Set<string> = new Set(['[object object]', 'null', 'undefined', 'nan'])
 /***** DTO Fields *****/
 let createRoomFields: Set<string> = new Set(['username', 'password', 'roomCode'])
 
-export const joinRoomValidator = (body: JoinRoomDto):boolean | undefined => {
+export const joinRoomValidator = async(body: JoinRoomDto):Promise<boolean | undefined> => {
   try {
     let rightCount: number = 0
     let totalCount: number = 0
@@ -56,8 +57,7 @@ export const joinRoomValidator = (body: JoinRoomDto):boolean | undefined => {
     }
     return rightCount == createRoomFields.size;
   } catch(err) {
-    console.log(err)
-    // log to db
+    await logError(String(err), 'joinRoomValidator')
     return undefined
   }
 }
