@@ -36,3 +36,29 @@ npm run build
 You can preview the production build with `npm run preview`.
 
 > To deploy your app, you may need to install an [adapter](https://kit.svelte.dev/docs/adapters) for your target environment.
+
+
+
+# REDIS
+
+Create error log index
+```
+  FT.CREATE idx
+    ON HASH
+    PREFIX 1 err:log:
+  SCHEMA
+    errLog TEXT
+    method TEXT
+    time NUMERIC SORTABLE
+```
+
+CReate inf log index
+```
+  FT.CREATE idx
+    ON HASH
+    PREFIX 1 msg:log:
+  SCHEMA
+    msgLog TEXT
+    method TEXT
+    time NUMERIC SORTABLE
+```

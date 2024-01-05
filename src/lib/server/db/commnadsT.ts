@@ -6,7 +6,7 @@ let clientPool: RedisClientType<RedisModules, RedisFunctions, RedisScripts>[] = 
 let poolSize: number = Number(REDIS_CLIENT_POOL_SIZE ?? 50)
 
 for (let i = 0; i < poolSize; i++) {
-  const client = await createClient()
+  const client = createClient()
   // Not sure if preopning conenction is better or not
   clientPool.push(client)
 }
