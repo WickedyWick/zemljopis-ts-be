@@ -1,8 +1,6 @@
 import type { CreateRoomDto } from '$lib/types/types';
-import { createRoomValidator } from '$lib'
-import { createRoomService } from '$lib/server'
+import { createRoomService, logError, createRoomValidator } from '$lib/server'
 import type { RequestHandler } from './$types';
-import { logError } from '$lib/server/db/commands';
 export const POST: RequestHandler = async ({request}) => {
     try {
         const body: CreateRoomDto = await request.json() as CreateRoomDto

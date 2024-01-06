@@ -1,8 +1,6 @@
-import { joinRoomService } from '$lib/server/services/indexServices';
+import { joinRoomService, logError, joinRoomValidator } from '$lib/server';
 import type { JoinRoomDto } from '$lib/types/types';
-import { joinRoomValidator } from '$lib/utils/validators/joinRoomValidator';
 import type { RequestHandler } from './$types';
-import { logError } from '$lib/server/db/commands';
 export const POST: RequestHandler = async ({request}) => {
    try {
         const body: JoinRoomDto = await request.json() as JoinRoomDto

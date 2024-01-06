@@ -1,6 +1,6 @@
-import type { ClassicDto, CreateRoomDto, JoinRoomDto } from "../../types/types";
+import type { ClassicDto, CreateRoomDto, JoinRoomDto } from "../../../types/types";
 import { containsSpecialChar } from ".";
-import { logError } from "$lib/server/db/commands";
+import { logError } from "$lib/server";
 let invalidStrings: Set<string> = new Set(['[object object]', 'null', 'undefined', 'nan'])
 /***** DTO Fields *****/
 let createRoomFields: Set<string> = new Set(['username', 'password', 'roomCode'])

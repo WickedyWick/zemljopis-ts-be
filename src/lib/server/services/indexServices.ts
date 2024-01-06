@@ -1,7 +1,5 @@
 import type { CreateRoomDto, JoinRoomDto, RoomInfo } from "$lib/types/types";
-import { createRoomCode } from '$lib'
-import { addRoomCode, createRoom, joinRoom } from '$lib/server'
-import { logError } from "../db/commands";
+import { addRoomCode, createRoom, joinRoom, logError, createRoomCode } from '$lib/server'
 
 export const createRoomService = async(data: CreateRoomDto): Promise<string | undefined> => {
   try {

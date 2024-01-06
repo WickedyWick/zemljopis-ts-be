@@ -1,7 +1,7 @@
 import { sveltekit } from '@sveltejs/kit/vite';
 import { defineConfig } from 'vite';
 import { Server } from 'socket.io'
-import { setupSocketListeners } from '$lib/server/socket';
+import { setupSocketListeners } from './src/lib/server/socket';
 export default defineConfig({
 	plugins: [sveltekit(),
 	{
